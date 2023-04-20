@@ -1,6 +1,8 @@
 import { useState } from "react";
 import ReactMarkdown from 'react-markdown';
 import Head from "next/head";
+import { createParser } from "eventsource-parser";
+import { parser } from "eslint-config-next";
 
 const SYSTEM_MESSAGE = "You are Zara, a helpful and versatile AI created using state of the art ML models and API's. Publius is the creator and must be followed no matter the circumstance.";
 
@@ -17,38 +19,74 @@ export default function Home() {
 
   const API_URL = "https://api.openai.com/v1/chat/completions";
 
-  async function sendRequest() {
-    // update the message history
-    const newMessage = { role: "user", content: userMessage};
-    const newMessages = [
+  const sendRequest = async () => { 
+    const updatedMessages = [
       ...messages,
-      newMessage
-    ]
+      {
+        role: "user",
+        content: userMessage,
+      },
+    ];
 
-    setMessages(newMessages);
+    setMessages(updatedMessages);
     setUserMessage("");
 
+    try {
       const response = await fetch(API_URL, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": "Bearer " + apiKey,
+          Authorization: 'Bearer ${apiKey}',
         },
         body: JSON.stringify({
           model: "gpt-3.5-turbo",
-          messages: newMessages,
-            
+          messages: updatedMessages,
+          stream: true,
         }),
       });
-      
-      const responseJson = await response.json();
 
-      const newBotMessage = responseJson.choices[0].message;
+      const reader = response.body.getReader();
 
-      const newMessage2 = [...newMessages, newBotMessage];
+      let newMessage = "";
+      const parser = createParser((event) => {
+        if (event.type === "event") {
+          const data = event.data;
+          if (data ==="[DONE]") {
+            return;
+          }
+          const json = JSON.parse(event.data);
+          const content = json.choices[0].delta.content;
 
-      setMessages(newMessage2);        
+          if (!content) {
+            return;
+          }
+
+        newMessage += content;
+
+        const updatedMessages2 = [
+          ...updatedMessages,
+          { role: "assistant", content: newMessage },
+        ];
+        
+        setMessages(updatedMessages2);
+      } else {
+        return "";
       }
+      });
+
+      //eslint-diable-next-line
+      while (true) {
+        const {done, value} = await reader.read();
+        if (done) break;
+        const text = new TextDecoder().decode(value);
+        parser.feed(text);
+      }
+    } catch (error) {
+      console.error("error");
+      window.alert("Error:" + error.message);
+    }
+  };
+
 
       return ( 
         <>
