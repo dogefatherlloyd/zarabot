@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import ReactMarkdown from 'react-markdown';
 import Head from "next/head";
 import { createParser } from "eventsource-parser";
@@ -15,8 +15,17 @@ export default function Home() {
 
   const [userMessage, setUserMessage] = useState("");
 
-
   const API_URL = "https://api.openai.com/v1/chat/completions";
+
+  const messagesEndRef = useRef(null);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
 
   const sendRequest = async () => { 
     const updatedMessages = [
@@ -86,13 +95,20 @@ export default function Home() {
     }
   };
 
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      sendRequest();
+    }
+  };
 
-      return ( 
-        <>
-        <Head>
-          <title>Zara - AI</title>
-        </Head>
-        <div className="flex flex-col h-screen" style={{ fontFamily: 'Lato, sans-serif'}}>
+
+  return ( 
+    <>
+      <Head>
+        <title>Zara - AI</title>
+      </Head>
+      <div className="flex flex-col h-screen" style={{ fontFamily: 'Lato, sans-serif'}}>
 
         {/* Navigation Bar */}
         <nav className="shadow px-4 py-2 flex flex-row justify-between items-center">
@@ -107,9 +123,9 @@ export default function Home() {
           </div>
         </nav>
       
-        {/* Message History */}
-        <div className="flex-1 overflow-y-scroll mb-4">
-          <div className="w-full max-w-screen-md mx-auto px-4">
+       {/* Message History */}
+      <div className="flex-1 overflow-y-scroll mb-4">
+        <div className="w-full max-w-screen-md mx-auto px-4">
           {messages.filter(message => message.role !== "system")
   .map((message, idx) => (
     <div key={idx} className="my-3 p-3 border rounded" style={{ borderColor: message.role === "user" ? "blue" : "green", backgroundColor: "lightgrey" }}>
@@ -122,17 +138,22 @@ export default function Home() {
         </ReactMarkdown>
       </div>
     </div>
-))}
-            </div>
+  ))}
+          <div ref={messagesEndRef} />
         </div>
+      </div>
       
         {/* Message Input Box */}
+        
         <div>
           <div className="w-full max-w-screen-md mx-auto flex px-4 pb-4">
-          <textarea 
-          value={userMessage}
-          onChange={(e) => setUserMessage(e.target.value)}
-          className="border text-lg rounded-md p-1 flex-1" rows={1}/>
+          <textarea
+  value={userMessage}
+  onChange={(e) => setUserMessage(e.target.value)}
+  onKeyDown={handleKeyPress}
+  className="border text-lg rounded-md p-1 flex-1"
+  rows={1}
+/>
           <button 
           onClick={sendRequest}
           className="bg-blue-500 hover:bg-blue-600 border rounded-md text-white text-lg w-20 p-1 ml-2">Send</button>
