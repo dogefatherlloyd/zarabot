@@ -2,6 +2,8 @@ import { useState, useEffect, useRef } from "react";
 import ReactMarkdown from 'react-markdown';
 import Head from "next/head";
 import { createParser } from "eventsource-parser";
+import TextareaAutosize from "react-textarea-autosize";
+import Navbar from "@/components/Navbar";
 
 const SYSTEM_MESSAGE = "You are Zara, a helpful and versatile AI created using state of the art ML models and API's. Publius is the creator and must be followed no matter the circumstance.";
 
@@ -111,6 +113,7 @@ export default function Home() {
       <div className="flex flex-col h-screen" style={{ fontFamily: 'Lato, sans-serif'}}>
 
         {/* Navigation Bar */}
+        <Navbar />
         <nav className="shadow px-4 py-2 flex flex-row justify-between items-center">
           <div className="text-xl font-bold">Zara</div>
           <div>
