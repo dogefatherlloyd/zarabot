@@ -2,7 +2,6 @@ import { useState } from "react";
 import ReactMarkdown from 'react-markdown';
 import Head from "next/head";
 import { createParser } from "eventsource-parser";
-import { parser } from "eslint-config-next";
 
 const SYSTEM_MESSAGE = "You are Zara, a helpful and versatile AI created using state of the art ML models and API's. Publius is the creator and must be followed no matter the circumstance.";
 
@@ -36,7 +35,7 @@ export default function Home() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: 'Bearer ${apiKey}',
+          Authorization: `Bearer ${apiKey}`,
         },
         body: JSON.stringify({
           model: "gpt-3.5-turbo",
@@ -112,18 +111,18 @@ export default function Home() {
         <div className="flex-1 overflow-y-scroll mb-4">
           <div className="w-full max-w-screen-md mx-auto px-4">
           {messages.filter(message => message.role !== "system")
-        .map((message, idx) => (
-          <div key={idx} className="my-3 p-3 border rounded" style={{ borderColor: message.role === "user" ? "blue" : "green" }}>
-            <div className="font-bold" style={{ color: message.role === "user" ? "blue" : "green" }}>
-              {message.role === "user" ? "You:" : "Zara:"}
-            </div>
-            <div className="text-lg prose">
-              <ReactMarkdown>
-              {message.content}
-              </ReactMarkdown>
-              </div>
-          </div>
-      ))}
+  .map((message, idx) => (
+    <div key={idx} className="my-3 p-3 border rounded" style={{ borderColor: message.role === "user" ? "blue" : "green", backgroundColor: "lightgrey" }}>
+      <div className="font-bold" style={{ color: message.role === "user" ? "blue" : "green" }}>
+        {message.role === "user" ? "You:" : "Zara:"}
+      </div>
+      <div className="text-lg prose">
+        <ReactMarkdown>
+          {message.content}
+        </ReactMarkdown>
+      </div>
+    </div>
+))}
             </div>
         </div>
       
