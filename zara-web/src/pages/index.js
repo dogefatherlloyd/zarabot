@@ -70,7 +70,7 @@ export default function Home() {
     <div className="w-full max-w-screen-md mx-auto px-4">
     {messages.filter(message => message.role !== "system")
   .map((message, idx) => (
-    <div key={idx} className="mt-3 p-3 border rounded" style={{ borderColor: message.role === "user" ? "blue" : "green" }}>
+    <div key={idx} className="my-3 p-3 border rounded" style={{ borderColor: message.role === "user" ? "blue" : "green" }}>
       <div className="font-bold" style={{ color: message.role === "user" ? "blue" : "green" }}>
         {message.role === "user" ? "You:" : "Zara:"}
       </div>
