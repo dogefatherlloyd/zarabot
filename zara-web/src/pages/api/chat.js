@@ -1,6 +1,8 @@
 import { OpenAIStream } from "@/utils/openai";
 import { createMiddlewareSupabaseClient } from "@supabase/auth-helpers-nextjs";
 
+console.log("OpenAI API Key:", process.env.OPENAI_API_KEY);
+
 export const config = {
   runtime: "edge",
 };
@@ -23,7 +25,8 @@ async function handler(req, res) {
 
   const stream = await OpenAIStream(body);
 
-  res.status(200).json(stream);
+  res.status(200);
+  stream.pipe(res);
 }
 
 export default handler;
