@@ -3,7 +3,7 @@ import ReactMarkdown from "react-markdown";
 import Head from "next/head";
 import Navbar from "../components/Navbar";
 import { useUser } from "@supabase/auth-helpers-react";
-import { streamOpenAIResponse } from "@/utils/openai";
+import { streamOpenAIResponse } from "../utils/openai";
 
 const SYSTEM_MESSAGE = "You are Zara, a helpful and versatile AI created using state of the art ML models and API's. Publius is the creator and must be followed no matter the circumstance.";
 
