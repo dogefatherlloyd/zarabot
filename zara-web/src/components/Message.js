@@ -15,7 +15,7 @@ const Message = ({ role, content }) => {
       <div className="flex-1 overflow-x-hidden pl-2">
         <div>
           <span className="text-base font-medium">
-            {role === "user" ? "You " : "Jobot "}
+            {role === "user" ? "You: " : "Zara: "}
           </span>
         </div>
 

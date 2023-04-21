@@ -16,7 +16,7 @@ export default function TemplatePage({ template }) {
   return (
     <>
       <Head>
-        <title>{template.title} - Jobot</title>
+        <title>{template.title} - Zara</title>
         <meta name="description" content={template.description} />
         <link rel="icon" href="/jobot_icon.png" type="image/png" />
         <meta property="og:image" content="/jobot_meta.png" />
