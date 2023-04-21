@@ -1,8 +1,6 @@
 import { OpenAIStream } from "@/utils/openai";
 import { createMiddlewareSupabaseClient } from "@supabase/auth-helpers-nextjs";
 
-console.log("OpenAI API Key:", process.env.OPENAI_API_KEY);
-
 export const config = {
   runtime: "edge",
 };
@@ -19,14 +17,12 @@ async function handler(req, res) {
   } = await supabase.auth.getUser();
 
   if (!user || error) {
-    res.status(401).json({ message: "Unauthorized" });
-    return;
+    return new Response("Unauthorized", { status: 401 });
   }
 
   const stream = await OpenAIStream(body);
 
-  res.status(200);
-  stream.pipe(res);
+  return new Response(stream, { status: 200 });
 }
 
 export default handler;
