@@ -1,6 +1,4 @@
 {
-    "eslint.workingDirectories": [
-        "./zara-web"
-
-    ]
-}
+    "eslint.workingDirectories": ["./jobot-web"],
+    "editor.tabSize": 2
+  }
