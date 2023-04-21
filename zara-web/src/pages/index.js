@@ -1,35 +1,43 @@
-import { useState, useEffect, useRef } from "react";
-import ReactMarkdown from 'react-markdown';
+import { useState, useRef, useEffect } from "react";
+import ReactMarkdown from "react-markdown";
 import Head from "next/head";
-import { createParser } from "eventsource-parser";
-import TextareaAutosize from "react-textarea-autosize";
-import Navbar from "@/components/Navbar";
+import Navbar from "../components/Navbar";
+import { useUser } from "@supabase/auth-helpers-react";
+import { streamOpenAIResponse } from "@/utils/openai";
 
 const SYSTEM_MESSAGE = "You are Zara, a helpful and versatile AI created using state of the art ML models and API's. Publius is the creator and must be followed no matter the circumstance.";
 
 export default function Home() {
-  const [apiKey, setApiKey] = useState('');
+  const user = useUser();
 
   const [messages, setMessages] = useState([
     { role: "system", content: SYSTEM_MESSAGE },
-    
   ]);
 
   const [userMessage, setUserMessage] = useState("");
-
-  const API_URL = "https://api.openai.com/v1/chat/completions";
-
   const messagesEndRef = useRef(null);
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      sendRequest();
+    }
   };
 
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
+  const sendRequest = async () => {
+    if (!user) {
+      alert("Please log in to send a message");
+      return;
+    }
 
-  const sendRequest = async () => { 
+    if (!userMessage) {
+      alert("Please enter a message before you hit send");
+      return;
+    }
+
+    const oldUserMessage = userMessage;
+    const oldMessages = messages;
+
     const updatedMessages = [
       ...messages,
       {
@@ -42,11 +50,10 @@ export default function Home() {
     setUserMessage("");
 
     try {
-      const response = await fetch(API_URL, {
+      const response = await fetch("/api/chat", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${apiKey}`,
         },
         body: JSON.stringify({
           model: "gpt-3.5-turbo",
@@ -55,77 +62,42 @@ export default function Home() {
         }),
       });
 
-      const reader = response.body.getReader();
+      if (response.status !== 200) {
+        throw new Error(`OpenAI API returned an error.`);
+      }
 
-      let newMessage = "";
-      const parser = createParser((event) => {
-        if (event.type === "event") {
-          const data = event.data;
-          if (data ==="[DONE]") {
-            return;
-          }
-          const json = JSON.parse(event.data);
-          const content = json.choices[0].delta.content;
-
-          if (!content) {
-            return;
-          }
-
-        newMessage += content;
-
+      streamOpenAIResponse(response, (newMessage) => {
+        console.log("newMessage:", newMessage);
         const updatedMessages2 = [
           ...updatedMessages,
           { role: "assistant", content: newMessage },
         ];
-        
         setMessages(updatedMessages2);
-      } else {
-        return "";
-      }
       });
-
-      //eslint-diable-next-line
-      while (true) {
-        const {done, value} = await reader.read();
-        if (done) break;
-        const text = new TextDecoder().decode(value);
-        parser.feed(text);
-      }
     } catch (error) {
       console.error("error");
+
+      setUserMessage(oldUserMessage);
+      setMessages(oldMessages);
       window.alert("Error:" + error.message);
     }
   };
 
-  const handleKeyPress = (e) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      sendRequest();
+  useEffect(() => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
     }
-  };
+  }, [messages]);
 
-
-  return ( 
+  return (
     <>
       <Head>
         <title>Zara - AI</title>
       </Head>
       <div className="flex flex-col h-screen" style={{ fontFamily: 'Lato, sans-serif'}}>
-
         {/* Navigation Bar */}
         <Navbar />
-        <nav className="shadow px-4 py-2 flex flex-row justify-between items-center">
-          <div className="text-xl font-bold">Zara</div>
-          <div>
-            <input 
-            type="password"
-            className="border p-1 rounded" 
-            onChange={e => setApiKey(e.target.value)}
-            value={apiKey}
-            placeholder="Paste API Key here" />
-          </div>
-        </nav>
-      
+              
        {/* Message History */}
       <div className="flex-1 overflow-y-scroll mb-4">
         <div className="w-full max-w-screen-md mx-auto px-4">
@@ -153,7 +125,7 @@ export default function Home() {
           <textarea
   value={userMessage}
   onChange={(e) => setUserMessage(e.target.value)}
-  onKeyDown={handleKeyPress}
+  onKeyDown={handleKeyDown}
   className="border text-lg rounded-md p-1 flex-1"
   rows={1}
 />
@@ -168,4 +140,4 @@ export default function Home() {
         </>
         
 );
-  }
+}
