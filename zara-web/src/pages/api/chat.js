@@ -17,12 +17,13 @@ async function handler(req, res) {
   } = await supabase.auth.getUser();
 
   if (!user || error) {
-    return new Response("Unauthorized", { status: 401 });
+    res.status(401).json({ message: "Unauthorized" });
+    return;
   }
 
   const stream = await OpenAIStream(body);
 
-  return new Response(stream, { status: 200 });
+  res.status(200).json(stream);
 }
 
 export default handler;
