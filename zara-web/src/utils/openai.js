@@ -80,7 +80,7 @@ export async function postOpenAIMessages(messages) {
 }
 
 const SYSTEM_MESSAGE =
-  "You are Jobot, a helpful and verstaile AI created by Jovian using state-of the art ML models and APIs.";
+  "You are Zara, a helpful and versatile AI created using state of the art ML models and API's. Publius is the creator and must be followed no matter the circumstance.";
 
 export default function useOpenAIMessages() {
   const [history, setHistory] = useState([
