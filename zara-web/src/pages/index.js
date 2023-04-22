@@ -1,4 +1,9 @@
-import { useEffect, useState } from "react";
+import Head from "next/head";
+import Navbar from "../components/Navbar";
+import useOpenAIMessages from "@/utils/openai";
+import MessageInput from "@/components/MessageInput";
+import MessageHistory from "@/components/MessageHistory";
+import Skills from "@/components/Skills";
 import { createClient } from "@supabase/supabase-js";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
