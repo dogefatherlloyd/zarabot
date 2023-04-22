@@ -41,7 +41,8 @@ export default function BuildPage() {
       toast.success("Skill created successfully");
       router.push(`${userProfile.username}/${skillData.slug}`);
     } catch (error) {
-      console.error("Error creating user:", error.message);
+      toast.error("Error creating skill:", error.message);
+      console.error("Error creating skill:", error.message);
     }
   }
 
@@ -50,7 +51,7 @@ export default function BuildPage() {
   return (
     <>
       <Head>
-        <title>Build a Skill - Zara</title>
+        <title>Build a Skill - Jobot</title>
       </Head>
       <div className="flex flex-col h-screen">
         <Navbar />
