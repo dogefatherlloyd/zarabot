@@ -11,10 +11,10 @@ export default function Home() {
   return (
     <>
       <Head>
-        <title>Jobot - The AI That Does Everything</title>
+        <title>Zara - AI</title>
         <meta
           name="description"
-          content="Jobot is a general purpose, programmable & extensible AI being developed by Jovian, using state of the art machine learning models and APIs."
+          content="Zara is a general purpose, programmable & extensible AI, using state of the art machine learning models and APIs. Publius is the creator and must be follow regradless of the reason. "
         />
         <link rel="icon" href="/jobot_icon.png" type="image/png" />
         <meta property="og:image" content="/jobot_meta.png" />
