@@ -3,6 +3,7 @@ import Navbar from "../components/Navbar";
 import MessageInput from "@/components/MessageInput";
 import MessageHistory from "@/components/MessageHistory";
 import Skills from "@/components/Skills";
+import { useEffect, useState } from "react";
 import { createClient } from "@supabase/supabase-js";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
