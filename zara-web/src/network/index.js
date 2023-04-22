@@ -1,5 +1,4 @@
-export const TEMPLATES_BASE_URL =
-  "https://raw.githubusercontent.com/JovianHQ/jobot/main/templates";
+export const TEMPLATES_BASE_URL ="https://raw.githubusercontent.com/dogefatherlloyd/zarabot/main/templates";
 
 export async function getTemplates() {
   const res = await fetch(
