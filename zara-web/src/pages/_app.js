@@ -19,7 +19,7 @@ export default function App({ Component, pageProps }) {
           <Toaster />
         </>
       </SessionContextProvider>
-      <Analytics />
+      <Analytics /> id="prj_iEN3cqwHipb90ikWR8rc7ilJIoy1"
     </>
   );
 }
