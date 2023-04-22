@@ -8,24 +8,55 @@ export default function Navbar() {
     <nav className="shadow px-2 z-40">
       <div className="flex w-full max-w-4xl py-3 items-center justify-between mx-auto">
         <div className="text-2xl font-medium text-gray-800 flex items-center">
-          <Link href="/" onClick={() => (window.location = "/")}>
+          <Link href="/">
             <Image
               src="/jobot_text_logo.png"
               height={32}
               width={117}
-              className="object-contain"
+              className="hidden md:block object-contain"
+              alt="logo"
+              unoptimized
+            />
+            <Image
+              src="/jobot_icon.png"
+              height={32}
+              width={32}
+              className="md:hidden object-contain"
               alt="logo"
               unoptimized
             />
           </Link>
         </div>
         <div>
+          <Link href="/" className="text-gray-500 hover:text-blue-600 ml-4">
+            Home
+          </Link>
+          <Link
+            href="/build"
+            className="text-gray-500 hover:text-blue-600 ml-4"
+          >
+            Build
+          </Link>
+          <Link
+            href="https://github.com/dogefatherlloyd/zarabot"
+            className="text-gray-500 hover:text-blue-600 ml-4"
+            target="_blank"
+            rel="noreferrer"
+          >
+            Docs
+          </Link>
           {user ? (
-            <Link href="/logout" className="text-gray-500 hover:text-blue-600">
-              Log Out
+            <Link
+              href="/account"
+              className="text-gray-500 hover:text-blue-600 ml-4"
+            >
+              Account
             </Link>
           ) : (
-            <Link href="/login" className="text-gray-500 hover:text-blue-600">
+            <Link
+              href="/login"
+              className="text-gray-500 hover:text-blue-600 ml-4"
+            >
               Log In
             </Link>
           )}
