@@ -1,5 +1,5 @@
 import { useState } from "react";
-import SkillInput from "./SkillInput";
+import SkillInput from "../SkillInput";
 import { makeDisplayName } from "@/utils";
 import { useUser } from "@supabase/auth-helpers-react";
 import Link from "next/link";
