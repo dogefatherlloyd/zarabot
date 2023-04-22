@@ -51,7 +51,7 @@ export default function BuildPage() {
   return (
     <>
       <Head>
-        <title>Build a Skill - Jobot</title>
+        <title>Build a Skill - Zara</title>
       </Head>
       <div className="flex flex-col h-screen">
         <Navbar />
