@@ -1,5 +1,4 @@
 import { useEffect, useRef } from "react";
-import Message from "./Message";
 import Image from "next/image";
 import { AiOutlineUser, AiOutlineRobot } from "react-icons/ai";
 
@@ -74,7 +73,6 @@ const MessageHistory = ({ history }) => {
                 )}
               </div>
             </div>
-            <Message {...message} /> {/* Added from original code */}
           </div>
         ))}
     </div>
