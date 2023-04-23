@@ -79,4 +79,4 @@ const MessageHistory = ({ history }) => {
   );
 };
 
-export default MessageHistory; do
+export default MessageHistory;
