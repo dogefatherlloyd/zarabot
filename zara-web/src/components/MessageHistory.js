@@ -18,7 +18,7 @@ const MessageHistory = ({ history }) => {
           <AiOutlineUser className="text-white" />
         </div>
       );
-    } else if (role === "ai") {
+    } else {
       return (
         <div className="rounded-full bg-red-400 w-6 h-6 flex items-center justify-center">
           <AiOutlineRobot className="text-white" />
@@ -36,11 +36,10 @@ const MessageHistory = ({ history }) => {
         .filter((message) => message.role !== "system")
         .map((message, index) => (
           <div key={index} className={message.role === "user" ? "flex justify-end" : "flex"}>
-            <div className="flex items-end">
-              {message.role === "ai" && (
-                <div className="mr-2">{getAvatar(message.role)}</div>
-              )}
-
+            {message.role === "ai" && (
+              <div className="mr-2">{getAvatar(message.role)}</div>
+            )}
+            <div className="flex flex-col">
               <div className={message.role === "user" ? "text-right" : "text-left"}>
                 {message.content.split(/(\[Image: .+?\])/).map((part, i) => {
                   if (/\[Image: .+?\]/.test(part)) {
@@ -59,15 +58,27 @@ const MessageHistory = ({ history }) => {
                   return <span key={i}>{part}</span>;
                 })}
               </div>
-
-              {message.role === "user" && (
-                <div className="ml-2">{getAvatar(message.role)}</div>
-              )}
+              <div className="text-sm text-gray-500 flex items-center">
+                {message.role === "user" ? (
+                  <>
+                    {getAvatar(message.role)}
+                    <span className="ml-2">{message.timestamp}</span>
+                  </>
+                ) : (
+                  <>
+                    <span className="mr-2">{message.timestamp}</span>
+                    {getAvatar(message.role)}
+                  </>
+                )}
+              </div>
             </div>
+            {message.role === "user" && (
+              <div className="ml-2">{getAvatar(message.role)}</div>
+            )}
           </div>
         ))}
     </div>
   );
 };
 
-export default MessageHistory
+export default MessageHistory;
