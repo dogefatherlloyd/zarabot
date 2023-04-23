@@ -51,7 +51,7 @@ export default function Home() {
             <MessageInput
               sendMessages={sendMessages}
               sending={sending}
-              handleFileUpload={handleFileUpload} {/* Updated comment */}
+              handleFileUpload={handleFileUpload} // Updated comment
             />
           </>
         )}
