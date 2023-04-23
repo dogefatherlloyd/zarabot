@@ -9,7 +9,7 @@ import { toast } from "react-hot-toast";
 const MessageInput = ({
   sending,
   sendMessages,
-  handleFileUpload, // New prop
+  handleFileUpload,
   placeholder = "Start typing here...",
 }) => {
   const inputRef = useRef(null);
@@ -20,17 +20,12 @@ const MessageInput = ({
       return;
     }
 
-    sendMessages([{ role: "user", content: prompt }]).then(
-      (success) => !success && setPrompt(prompt)
-    );
+    sendMessages([{ role: "user", content: prompt }]);
     setPrompt("");
   };
 
-  const handleImageUpload = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      handleFileUpload(file); // Pass the file to the parent component
-    }
+  const handleFileChange = (e) => {
+    handleFileUpload(e.target.files[0]);
   };
 
   const Icon = sending ? HiOutlineDotsHorizontal : AiOutlineSend;
@@ -43,12 +38,6 @@ const MessageInput = ({
     <div className="px-2 pb-2">
       <div className="mx-auto w-full max-w-4xl">
         <div className="flex items-end rounded-md border p-4 pr-2 dark:border-gray-400">
-          <input
-            type="file"
-            accept="image/*"
-            onChange={handleImageUpload}
-            style={{ marginRight: "1rem" }}
-          />
           <TextArea
             ref={inputRef}
             minRows={1}
@@ -68,6 +57,12 @@ const MessageInput = ({
                 handleSendClick();
               }
             }}
+          />
+          <input
+            type="file"
+            accept="image/*"
+            onChange={handleFileChange}
+            className="mr-2"
           />
           <button
             className="rounded-full flex items-center justify-center p-2 bg-blue-500 hover:bg-blue-600 text-white text-lg"
