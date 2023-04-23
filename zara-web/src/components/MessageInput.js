@@ -14,7 +14,7 @@ const MessageInput = ({
 }) => {
   const inputRef = useRef(null);
   const [prompt, setPrompt] = useState("");
-  
+
   const handleSendClick = () => {
     if (!prompt) {
       toast.error("Enter a message before you hit send.");
