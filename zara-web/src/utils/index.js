@@ -1,8 +1,12 @@
 export function makeDisplayName(profile) {
   if (profile.first_name && profile.last_name) {
     return `${profile.first_name} ${profile.last_name}`;
-  } else {
+  } else if (profile.first_name) {
     return profile.first_name;
+  } else if (profile.last_name) {
+    return profile.last_name;
+  } else {
+    return "Unknown Name";
   }
 }
 
