@@ -51,7 +51,8 @@ export default function Home() {
             <MessageInput
               sendMessages={sendMessages}
               sending={sending}
-              handleFileUpload={handleFileUpload} // Updated comment
+              handleFileUpload={handleFileUpload}
+              placeholder="Ask me anything.." // Added placeholder prop back
             />
           </>
         )}
