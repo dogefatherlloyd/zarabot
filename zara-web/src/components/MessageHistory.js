@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import Message from "./Message";
+import Image from "next/image"; // Add this import
 
 const MessageHistory = ({ history }) => {
   let messagesWindow = useRef();
@@ -22,7 +22,11 @@ const MessageHistory = ({ history }) => {
             {message.content.split(/(\[Image: .+?\])/).map((part, i) => {
               if (/\[Image: .+?\]/.test(part)) {
                 const base64Image = part.replace(/^\[Image: (.+?)\]$/, "$1");
-                return <img key={i} src={base64Image} alt="User uploaded" />;
+                return (
+                  <div key={i} className="uploaded-image">
+                    <Image src={base64Image} alt="User uploaded" layout="fill" objectFit="contain" />
+                  </div>
+                );
               }
               return <span key={i}>{part}</span>;
             })}
