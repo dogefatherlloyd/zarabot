@@ -14,6 +14,7 @@ const MessageInput = ({
 }) => {
   const inputRef = useRef(null);
   const [prompt, setPrompt] = useState("");
+  
   const handleSendClick = () => {
     if (!prompt) {
       toast.error("Enter a message before you hit send.");
@@ -25,7 +26,9 @@ const MessageInput = ({
   };
 
   const handleFileChange = (e) => {
-    handleFileUpload(e.target.files[0]);
+    if (e.target.files && e.target.files[0]) {
+      handleFileUpload(e.target.files[0]);
+    }
   };
 
   const Icon = sending ? HiOutlineDotsHorizontal : AiOutlineSend;
@@ -61,9 +64,15 @@ const MessageInput = ({
           <input
             type="file"
             accept="image/*"
+            className="hidden"
+            id="file-upload"
             onChange={handleFileChange}
-            className="mr-2"
           />
+          <label htmlFor="file-upload" className="mr-2">
+            <button className="rounded-full flex items-center justify-center p-2 bg-blue-500 hover:bg-blue-600 text-white text-lg">
+              <AiOutlinePaperClip style={{ fontSize: 20 }} />
+            </button>
+          </label>
           <button
             className="rounded-full flex items-center justify-center p-2 bg-blue-500 hover:bg-blue-600 text-white text-lg"
             title="Send"
