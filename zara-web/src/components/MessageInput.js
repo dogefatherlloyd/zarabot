@@ -1,6 +1,6 @@
 import React, { useRef, useEffect } from "react";
 import cn from "classnames";
-import { AiOutlineSend } from "react-icons/ai";
+import { AiOutlineSend, AiOutlinePaperClip } from "react-icons/ai";
 import { HiOutlineDotsHorizontal } from "react-icons/hi";
 import TextArea from "react-textarea-autosize";
 import { useState } from "react";
@@ -9,20 +9,26 @@ import { toast } from "react-hot-toast";
 const MessageInput = ({
   sending,
   sendMessages,
+  handleFileUpload,
   placeholder = "Start typing here...",
 }) => {
   const inputRef = useRef(null);
   const [prompt, setPrompt] = useState("");
+
   const handleSendClick = () => {
     if (!prompt) {
       toast.error("Enter a message before you hit send.");
       return;
     }
 
-    sendMessages([{ role: "user", content: prompt }]).then(
-      (success) => !success && setPrompt(prompt)
-    );
+    sendMessages([{ role: "user", content: prompt }]);
     setPrompt("");
+  };
+
+  const handleFileChange = (e) => {
+    if (e.target.files && e.target.files[0]) {
+      handleFileUpload(e.target.files[0]);
+    }
   };
 
   const Icon = sending ? HiOutlineDotsHorizontal : AiOutlineSend;
@@ -55,6 +61,18 @@ const MessageInput = ({
               }
             }}
           />
+          <label htmlFor="file-upload" className="ml-2">
+            <input
+              type="file"
+              accept="image/*"
+              className="hidden"
+              id="file-upload"
+              onChange={handleFileChange}
+            />
+            <button className="rounded-full flex items-center justify-center p-2 bg-blue-500 hover:bg-blue-600 text-white text-lg">
+              <AiOutlinePaperClip style={{ fontSize: 20 }} />
+            </button>
+          </label>
           <button
             className="rounded-full flex items-center justify-center p-2 bg-blue-500 hover:bg-blue-600 text-white text-lg"
             title="Send"
