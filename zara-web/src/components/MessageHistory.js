@@ -18,7 +18,7 @@ const MessageHistory = ({ history }) => {
           <AiOutlineUser className="text-white" />
         </div>
       );
-    } else {
+    } else if (role === "ai") {
       return (
         <div className="rounded-full bg-red-400 w-6 h-6 flex items-center justify-center">
           <AiOutlineRobot className="text-white" />
@@ -70,4 +70,4 @@ const MessageHistory = ({ history }) => {
   );
 };
 
-export default MessageHistory;
+export default MessageHistory
