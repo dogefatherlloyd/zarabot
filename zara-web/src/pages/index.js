@@ -57,6 +57,62 @@ export default function Home() {
           </>
         )}
       </div>
+      <style jsx>{`
+        h1 {
+          font-size: 3rem;
+          margin-bottom: 1rem;
+          font-weight: 700;
+          text-align: center;
+          color: #2e2e2e;
+        }
+
+        .flex-col {
+          display: flex;
+          flex-direction: column;
+        }
+
+        .flex-1 {
+          flex: 1;
+        }
+
+        .overflow-y-auto {
+          overflow-y: auto;
+        }
+
+        .mx-auto {
+          margin-left: auto;
+          margin-right: auto;
+        }
+
+        .max-w-4xl {
+          max-width: 60rem;
+        }
+
+        .my-6 {
+          margin-top: 1.5rem;
+          margin-bottom: 1.5rem;
+        }
+
+        .mt-4 {
+          margin-top: 1rem;
+        }
+
+        .text-center {
+          text-align: center;
+        }
+
+        .text-3xl {
+          font-size: 1.875rem;
+        }
+
+        .text-4xl {
+          font-size: 2.25rem;
+        }
+
+        .font-medium {
+          font-weight: 500;
+        }
+      `}</style>
     </>
   );
 }
