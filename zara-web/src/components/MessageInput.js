@@ -1,12 +1,10 @@
 import React, { useRef, useEffect } from "react";
 import cn from "classnames";
-import { AiOutlineSend } from "react-icons/ai";
 import { HiOutlineDotsHorizontal } from "react-icons/hi";
 import TextArea from "react-textarea-autosize";
 import { useState } from "react";
 import { toast } from "react-hot-toast";
 import { AiOutlineSend, AiOutlinePaperClip } from "react-icons/ai";
-
 
 const MessageInput = ({
   sending,
