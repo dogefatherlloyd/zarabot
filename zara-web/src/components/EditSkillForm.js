@@ -41,7 +41,7 @@ export function EditSkillForm({ skillData, setSkillData, onSubmit, editMode }) {
           <span>
             System Prompt (
             <Link
-              href="https://github.com/JovianHQ/jobot/tree/main/templates"
+              href="https://github.com/dogefatherlloyd/zarabot/tree/main/templates"
               target="_blank"
               rel="noreferrer"
               className="text-blue-500 hover:text-blue-600"
@@ -72,7 +72,7 @@ export function EditSkillForm({ skillData, setSkillData, onSubmit, editMode }) {
           <span>
             Input Fields (
             <Link
-              href="https://gist.github.com/aakashns/60a32f4f05ff052fcd80b190492a1911"
+              href="https://gist.github.com/dogefatherlloyd/8c71d293284dafb2f138875bf755d6a1"
               target="_blank"
               rel="noreferrer"
               className="text-blue-500 hover:text-blue-600"
