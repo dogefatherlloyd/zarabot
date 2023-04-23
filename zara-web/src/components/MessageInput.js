@@ -38,7 +38,7 @@ const MessageInput = ({
   }, [sending]);
 
   return (
-    <div className="px-2 pb-2 border border-solid border-gray-400 rounded-md">
+    <div className="px-2 pb-2 border border-solid border-gray-400 rounded-md" style={{ padding: '0 10px' }}>
       <div className="mx-auto w-full max-w-4xl">
         <div className="flex items-end rounded-md border p-4 pr-2 dark:border-gray-400">
           <TextArea
