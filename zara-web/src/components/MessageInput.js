@@ -9,6 +9,7 @@ import { toast } from "react-hot-toast";
 const MessageInput = ({
   sending,
   sendMessages,
+  handleFileUpload, // New prop
   placeholder = "Start typing here...",
 }) => {
   const inputRef = useRef(null);
@@ -25,6 +26,13 @@ const MessageInput = ({
     setPrompt("");
   };
 
+  const handleImageUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      handleFileUpload(file); // Pass the file to the parent component
+    }
+  };
+
   const Icon = sending ? HiOutlineDotsHorizontal : AiOutlineSend;
 
   useEffect(() => {
@@ -35,6 +43,12 @@ const MessageInput = ({
     <div className="px-2 pb-2">
       <div className="mx-auto w-full max-w-4xl">
         <div className="flex items-end rounded-md border p-4 pr-2 dark:border-gray-400">
+          <input
+            type="file"
+            accept="image/*"
+            onChange={handleImageUpload}
+            style={{ marginRight: "1rem" }}
+          />
           <TextArea
             ref={inputRef}
             minRows={1}
