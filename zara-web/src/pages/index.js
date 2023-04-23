@@ -52,7 +52,7 @@ export default function Home() {
               sendMessages={sendMessages}
               sending={sending}
               handleFileUpload={handleFileUpload}
-              placeholder="Ask me anything.." // Added placeholder prop back
+              placeholder={sending ? "Wait for my response.." : "Ask me anything.."} // Updated placeholder prop
             />
           </>
         )}
