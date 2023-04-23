@@ -8,7 +8,7 @@ import Skills from "@/components/Skills";
 export default function Home() {
   const { history, sending, sendMessages } = useOpenAIMessages();
 
-  const handleFileUpload = (file) => {
+  const handleFileUpload = (e) => {
     // Process the image file here, and pass it to sendMessages if needed
   };
 
