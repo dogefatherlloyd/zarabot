@@ -14,7 +14,6 @@ const MessageInput = ({
 }) => {
   const inputRef = useRef(null);
   const [prompt, setPrompt] = useState("");
-  const [filePreview, setFilePreview] = useState("");
 
   const handleSendClick = () => {
     if (!prompt) {
@@ -24,13 +23,11 @@ const MessageInput = ({
 
     sendMessages([{ role: "user", content: prompt }]);
     setPrompt("");
-    setFilePreview("");
   };
 
   const handleFileChange = (e) => {
     if (e.target.files && e.target.files[0]) {
       handleFileUpload(e.target.files[0]);
-      setFilePreview(URL.createObjectURL(e.target.files[0]));
     }
   };
 
@@ -88,11 +85,6 @@ const MessageInput = ({
             />
           </button>
         </div>
-        {filePreview && (
-          <div className="mt-2 flex justify-center">
-            <img src={filePreview} alt="File preview" style={{ maxHeight: 150 }} />
-          </div>
-        )}
       </div>
     </div>
   );
