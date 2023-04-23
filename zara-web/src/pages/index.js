@@ -37,7 +37,7 @@ export default function Home() {
             <MessageInput
               sending={sending}
               sendMessages={sendMessages}
-              handleFileUpload={handleFileUpload} // Pass the new prop here
+              handleFileUpload={handleFileUpload}
               placeholder="Ask me anything.."
             />
 
@@ -48,7 +48,11 @@ export default function Home() {
         {history.length > 1 && (
           <>
             <MessageHistory history={history} />
-            <MessageInput sendMessages={sendMessages} sending={sending} handleFileUpload={handleFileUpload} /> // Pass the new prop here
+            <MessageInput
+              sendMessages={sendMessages}
+              sending={sending}
+              handleFileUpload={handleFileUpload} {/* Updated comment */}
+            />
           </>
         )}
       </div>
