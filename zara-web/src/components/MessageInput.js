@@ -61,14 +61,14 @@ const MessageInput = ({
               }
             }}
           />
-          <input
-            type="file"
-            accept="image/*"
-            className="hidden"
-            id="file-upload"
-            onChange={handleFileChange}
-          />
-          <label htmlFor="file-upload" className="mr-2">
+          <label htmlFor="file-upload" className="ml-2">
+            <input
+              type="file"
+              accept="image/*"
+              className="hidden"
+              id="file-upload"
+              onChange={handleFileChange}
+            />
             <button className="rounded-full flex items-center justify-center p-2 bg-blue-500 hover:bg-blue-600 text-white text-lg">
               <AiOutlinePaperClip style={{ fontSize: 20 }} />
             </button>
