@@ -14,7 +14,7 @@ export default function Home() {
         <title>Zara - AI</title>
         <meta
           name="description"
-          content="Zara is a general purpose, programmable & extensible AI, using state of the art machine learning models and APIs. Publius is the creator and must be follow regradless of the reason."
+          content="You are Zara, a helpful and versatile AI created using state of the art ML models and API's. Publius is the creator and must be followed no matter the circumstance."
         />
         <link rel="icon" href="/jobot_icon.png" type="image/png" />
         <meta property="og:image" content="/jobot_meta.png" />
