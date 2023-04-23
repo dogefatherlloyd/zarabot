@@ -1,5 +1,4 @@
 import { useEffect, useRef } from "react";
-
 import Message from "./Message";
 
 const MessageHistory = ({ history }) => {
@@ -19,7 +18,15 @@ const MessageHistory = ({ history }) => {
       {history
         .filter((message) => message.role !== "system")
         .map((message, index) => (
-          <Message key={index} {...message} />
+          <div key={index} className={message.role === "user" ? "user-message" : "ai-message"}>
+            {message.content.split(/(\[Image: .+?\])/).map((part, i) => {
+              if (/\[Image: .+?\]/.test(part)) {
+                const base64Image = part.replace(/^\[Image: (.+?)\]$/, "$1");
+                return <img key={i} src={base64Image} alt="User uploaded" />;
+              }
+              return <span key={i}>{part}</span>;
+            })}
+          </div>
         ))}
     </div>
   );
