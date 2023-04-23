@@ -59,12 +59,13 @@ const MessageHistory = ({ history }) => {
                 })}
               </div>
               <div className="text-sm text-gray-500 flex items-center">
-                {message.role === "user" ? (
+                {message.role === "user" && (
                   <>
                     {getAvatar(message.role)}
                     <span className="ml-2">{message.timestamp}</span>
                   </>
-                ) : (
+                )}
+                {message.role === "ai" && (
                   <>
                     <span className="mr-2">{message.timestamp}</span>
                     {getAvatar(message.role)}
@@ -72,13 +73,10 @@ const MessageHistory = ({ history }) => {
                 )}
               </div>
             </div>
-            {message.role === "user" && (
-              <div className="ml-2">{getAvatar(message.role)}</div>
-            )}
           </div>
         ))}
     </div>
   );
 };
 
-export default MessageHistory;
+export default MessageHistory; do
