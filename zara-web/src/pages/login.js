@@ -25,13 +25,13 @@ async function ensureUserProfile(supabase, user, router) {
         throw error;
       }
 
-      router.push("/account");
+      router.push("/chat"); // push to chat.js screen
     } catch (e) {
       console.error("Error while creating profile", e);
       router.push("/");
     }
   } else {
-    router.push("/");
+    router.push("/chat"); // push to chat.js screen
   }
 }
 
@@ -63,24 +63,29 @@ export default function Login() {
       token: code,
       type: "magiclink",
     });
-
+  
     if (data?.user) {
       toast.success("Signed in successfully");
       ensureUserProfile(supabase, data.user, router);
+  
+      // Redirect the user to the chat page
+      router.push("/chat");
     }
-
+  
     if (error) {
       console.error("Failed to sign in", error);
-
+  
       const { data: d2, error: e2 } = await supabase.auth.verifyOtp({
         email: email,
         token: code,
         type: "signup",
       });
-
+  
       if (d2.user) {
         toast.success("Signed up successfully");
         ensureUserProfile(supabase, d2.user, router);
+        // Redirect the user to the chat page after signing up
+        router.push("/chat");
       }
       if (e2) {
         toast.error("Failed to sign in / sign up");
