@@ -50,7 +50,7 @@ export default function LoginModal() {
                   as="h3"
                   className="text-center text-xl font-bold leading-6 text-gray-900"
                 >
-                  Log In - Jobot
+                  Log In - Artemis
                 </Dialog.Title>
 
                 <div className=" flex flex-col my-4">
