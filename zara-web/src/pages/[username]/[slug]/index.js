@@ -62,4 +62,4 @@ export async function getServerSideProps(context) {
   return {
     props: { skill: skills[0] },
   };
-};
+}
