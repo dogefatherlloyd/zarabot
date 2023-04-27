@@ -1,4 +1,3 @@
-import ManageAPIKeys from "@/components/ManageAPIKeys";
 import Navbar from "@/components/Navbar";
 import SlugInput from "@/components/inputs/SlugInput";
 import TextArea from "@/components/inputs/TextArea";
@@ -36,7 +35,7 @@ export default function AccountPage() {
   return (
     <>
       <Head>
-        <title>Manage Account - Jobot</title>
+        <title>Manage Account - Artemis</title>
       </Head>
       <div className="flex flex-col h-screen">
         <Navbar />
