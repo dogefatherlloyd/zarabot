@@ -41,44 +41,41 @@ const Skills = () => {
           role="list"
           className="mt-4 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3"
         >
-          {skills.map((skill) =>
-            skill.slug && skill.profiles?.username ? (
-              <li
-                className="group col-span-1 cursor-pointer divide-y divide-gray-200 rounded-lg border bg-white hover:shadow dark:border-gray-400 dark:bg-transparent"
-                key={skill.slug}
-              >
-                <Link href={`/${skill.profiles.username}/${skill.slug}`}>
-                  <div className="flex h-full w-full flex-col p-5">
-                    <div>
-                      {skill.iconUrl && (
-                        <span className="inline-flex rounded-lg">
-                          <Image
-                            key={`image-${skill.slug}`}
-                            src={skill.iconUrl}
-                            width={32}
-                            height={32}
-                            className="h-8 w-8"
-                            alt={skill.title}
-                            unoptimized
-                          />
-                        </span>
-                      )}
-                    </div>
-                    <div className="mt-2 text-gray-500 font-medium text-sm">
-                      {makeDisplayName(skill.profiles)}
-                    </div>
-                    <h3 className="mt-2 truncate text-lg font-medium text-gray-900 group-hover:text-blue-600 dark:text-white">
-                      {skill.title}
-                    </h3>
-
-                    <p className="mt-1 text-gray-500 flex-1">
-                      {skill.description}
-                    </p>
+          {skills.map((skill) => (
+            <li
+              className="group col-span-1 cursor-pointer divide-y divide-gray-200 rounded-lg border bg-white hover:shadow"
+              key={skill.slug}
+            >
+              <Link href={`/${skill.profiles.username}/${skill.slug}`}>
+                <div className="flex h-full w-full flex-col p-5">
+                  <div>
+                    {skill.iconUrl && (
+                      <span className="inline-flex rounded-lg">
+                        <Image
+                          src={skill.iconUrl}
+                          width={32}
+                          height={32}
+                          className="h-8 w-8"
+                          alt={skill.title}
+                          unoptimized
+                        />
+                      </span>
+                    )}
                   </div>
-                </Link>
-              </li>
-            ) : null
-          )}
+                  <div className="mt-2 text-gray-500 font-medium text-sm">
+                    {makeDisplayName(skill.profiles)}
+                  </div>
+                  <h3 className="mt-2 truncate text-lg font-medium text-gray-900 group-hover:text-blue-600">
+                    {skill.title}
+                  </h3>
+
+                  <p className="mt-1 text-gray-500 flex-1">
+                    {skill.description}
+                  </p>
+                </div>
+              </Link>
+            </li>
+          ))}
         </ul>
       </div>
     </div>

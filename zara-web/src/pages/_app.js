@@ -6,12 +6,7 @@ import { Toaster } from "react-hot-toast";
 import "@/styles/globals.css";
 
 export default function App({ Component, pageProps }) {
-  const [supabaseClient] = useState(() =>
-    createBrowserSupabaseClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL,
-      process.env.NEXT_PUBLIC_SUPABASE_KEY
-    )
-  );
+  const [supabaseClient] = useState(() => createBrowserSupabaseClient());
 
   return (
     <>
@@ -24,7 +19,7 @@ export default function App({ Component, pageProps }) {
           <Toaster />
         </>
       </SessionContextProvider>
-      <Analytics id="prj_iEN3cqwHipb90ikWR8rc7ilJIoy1" />
+      <Analytics />
     </>
   );
 }

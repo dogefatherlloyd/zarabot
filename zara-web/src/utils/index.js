@@ -1,12 +1,10 @@
+import { useRouter } from "next/router";
+
 export function makeDisplayName(profile) {
   if (profile.first_name && profile.last_name) {
     return `${profile.first_name} ${profile.last_name}`;
-  } else if (profile.first_name) {
-    return profile.first_name;
-  } else if (profile.last_name) {
-    return profile.last_name;
   } else {
-    return "Unknown Name";
+    return profile.first_name;
   }
 }
 
@@ -16,4 +14,28 @@ export function isJson(myVar) {
   } else {
     return false;
   }
+}
+
+export function useLoginDialog() {
+  const router = useRouter();
+  const { action } = router.query;
+  const isLoginOpen = action === "login";
+  const setLoginOpen = (open) => {
+    const query = { ...router.query };
+
+    if (!open && query.action === "login") {
+      delete query.action;
+    }
+
+    if (open) {
+      query.action = "login";
+    }
+
+    router.push({
+      pathname: router.pathname,
+      query,
+    });
+  };
+
+  return { isLoginOpen, setLoginOpen };
 }

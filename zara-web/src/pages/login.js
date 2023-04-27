@@ -1,39 +1,12 @@
 import Navbar from "@/components/Navbar";
-import { fetchUserProfile } from "@/network";
+import { submitVerificationCode } from "@/network";
 import { useSupabaseClient } from "@supabase/auth-helpers-react";
 import Head from "next/head";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useState } from "react";
-import toast, { Toaster } from "react-hot-toast";
-
-async function ensureUserProfile(supabase, user, router) {
-  let userProfile = await fetchUserProfile(supabase, user);
-
-  if (!userProfile) {
-    const email = user.email;
-    const username = email.split("@")[0];
-
-    try {
-      const { error } = await supabase.from("profiles").insert({
-        id: user.id,
-        username: username,
-        first_name: username,
-      });
-
-      if (error) {
-        throw error;
-      }
-
-      router.push("/chat"); // push to chat.js screen
-    } catch (e) {
-      console.error("Error while creating profile", e);
-      router.push("/");
-    }
-  } else {
-    router.push("/chat"); // push to chat.js screen
-  }
-}
+import { Toaster } from "react-hot-toast";
+import { sendVerificationCode } from "../network";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -42,71 +15,23 @@ export default function Login() {
   const router = useRouter();
   const supabase = useSupabaseClient();
 
-  async function sendCode() {
-    const { data, error } = await supabase.auth.signInWithOtp({
-      email: email,
-    });
-
-    if (error) {
-      toast.error("Failed to send verfication code");
-      console.error("Failed to send verification code", error);
-      return;
-    }
-    if (data) {
-      toast.success("Verification code send. Check your email!");
-    }
-  }
-
-  async function submitCode() {
-    const { data, error } = await supabase.auth.verifyOtp({
-      email: email,
-      token: code,
-      type: "magiclink",
-    });
-  
-    if (data?.user) {
-      toast.success("Signed in successfully");
-      ensureUserProfile(supabase, data.user, router);
-  
-      // Redirect the user to the chat page
-      router.push("/chat");
-    }
-  
-    if (error) {
-      console.error("Failed to sign in", error);
-  
-      const { data: d2, error: e2 } = await supabase.auth.verifyOtp({
-        email: email,
-        token: code,
-        type: "signup",
-      });
-  
-      if (d2.user) {
-        toast.success("Signed up successfully");
-        ensureUserProfile(supabase, d2.user, router);
-        // Redirect the user to the chat page after signing up
-        router.push("/chat");
-      }
-      if (e2) {
-        toast.error("Failed to sign in / sign up");
-        console.error("sign up failed", e2);
-      }
-    }
+  async function handleSubmit() {
+    const success = await submitVerificationCode(supabase, email, code);
+    success && router.push("/account");
   }
 
   return (
     <>
       <Head>
-        <title>Zara - AI</title>
+        <title>Artemis - AI</title>
       </Head>
       <Toaster />
       <div className="flex flex-col h-screen">
-        {/* Navigation Bar */}
         <Navbar />
         <div className="mx-auto max-w-md">
           <div className="border self-center rounded-lg my-8 p-4 m-4">
             <div className="text-center text-xl font-bold text-gray-800">
-              Log In - Zara
+              Log In - Artmis
             </div>
 
             <div className=" flex flex-col my-4">
@@ -120,7 +45,7 @@ export default function Login() {
               />
               <button
                 className="w-40 border text-sm font-medium px-4 py-2 mt-2 rounded-md bg-gray-50 hover:bg-gray-100"
-                onClick={sendCode}
+                onClick={() => sendVerificationCode(supabase, email)}
               >
                 Send Code
               </button>
@@ -138,7 +63,7 @@ export default function Login() {
                 value={code}
               />
               <button
-                onClick={submitCode}
+                onClick={handleSubmit}
                 className="w-40 border border-blue-600 text-sm font-medium px-4 py-2 mt-2 rounded-md bg-blue-500 hover:bg-blue-600 text-white"
               >
                 Sign In

@@ -1,73 +1,99 @@
-import { EditSkillForm } from "@/components/EditSkillForm";
+import ManageAPIKeys from "@/components/ManageAPIKeys";
 import Navbar from "@/components/Navbar";
-import { fetchUserProfile } from "@/network";
+import SlugInput from "@/components/inputs/SlugInput";
+import TextArea from "@/components/inputs/TextArea";
+import TextInput from "@/components/inputs/TextInput";
+import { fetchUserProfile, updateUserProfile } from "@/network";
 import { useSupabaseClient, useUser } from "@supabase/auth-helpers-react";
 import Head from "next/head";
+import Link from "next/link";
 import { useRouter } from "next/router";
-import { useState } from "react";
-import { toast } from "react-hot-toast";
+import { useEffect, useState } from "react";
 
-export default function BuildPage() {
-  const supabase = useSupabaseClient();
-  const user = useUser();
+export default function AccountPage() {
   const router = useRouter();
+  const user = useUser();
+  const supabase = useSupabaseClient();
+  const [profileData, setProfileData] = useState({});
+
+  useEffect(() => {
+    fetchUserProfile(supabase, user).then((data) => setProfileData(data));
+  }, [supabase, user, setProfileData, router]);
+
+  const makeOnChange = (field) => (e) =>
+    setProfileData({ ...profileData, [field]: e.target.value });
 
   async function handleSubmit(e) {
     e.preventDefault();
-    if (!user) {
-      toast.error("You must be logged in to build a skill");
-      return;
-    }
 
-    const userProfile = await fetchUserProfile(supabase, user);
-
-    try {
-      const newSkill = {
-        title: skillData.title,
-        slug: skillData.slug,
-        description: skillData.description,
-        system_prompt: skillData.system_prompt,
-        user_prompt: skillData.user_prompt,
-        inputs: JSON.parse(skillData.inputs),
-        user_id: user.id,
-      };
-
-      const { error } = await supabase.from("skills").insert(newSkill);
-
-      if (error) {
-        throw error;
-      }
-
-      toast.success("Skill created successfully");
-      router.push(`${userProfile.username}/${skillData.slug}`);
-    } catch (error) {
-      toast.error("Error in creating skill:", error.message);
-      console.error("Error creating skill:", error.message);
-    }
+    updateUserProfile(supabase, profileData);
   }
 
-  const [skillData, setSkillData] = useState({});
+  if (!profileData) {
+    return null;
+  }
 
   return (
     <>
       <Head>
-        <title>Build a Skill - Zara</title>
+        <title>Manage Account - Artemis</title>
       </Head>
       <div className="flex flex-col h-screen">
         <Navbar />
+
         <div className="px-2 flex-1 overflow-y-auto">
           <div className="mx-auto my-4 w-full max-w-4xl">
             <h1 className="text-center mx-auto text-4xl font-medium">
-              Build a Skill
+              Manage Account
             </h1>
-            <div className="mx-auto mt-4 mb-4 max-w-xl text-center text-gray-500 sm:text-base">
-              Create a shareable and reusable skill
-            </div>
-            <EditSkillForm
-              skillData={skillData}
-              setSkillData={setSkillData}
-              onSubmit={handleSubmit}
-            />
+            <form>
+              <SlugInput
+                field="username"
+                label="Username"
+                required
+                value={profileData.username}
+                onChange={makeOnChange("username")}
+              />
+              <TextInput
+                field="first_name"
+                label="First Name"
+                required
+                value={profileData.first_name}
+                onChange={makeOnChange("first_name")}
+              />
+
+              <TextInput
+                field="last_name"
+                label="Last Name"
+                value={profileData.last_name}
+                onChange={makeOnChange("last_name")}
+              />
+
+              <TextArea
+                field="bio"
+                label="Bio"
+                value={profileData.bio}
+                onChange={makeOnChange("bio")}
+              />
+
+              <div className="mt-4 flex justify-between">
+                <input
+                  type="submit"
+                  value="Save"
+                  onClick={handleSubmit}
+                  className="rounded-md w-20  bg-blue-500 py-2 px-3 text-sm font-semibold text-white shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-blue-600 active:bg-blue-700 "
+                />
+                <Link
+                  href="/logout"
+                  type="submit"
+                  className="ml-3 rounded-md bg-white py-2 px-3 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 active:bg-gray-100"
+                >
+                  Log Out
+                </Link>
+              </div>
+            </form>
+
+            <ManageAPIKeys />
           </div>
         </div>
       </div>

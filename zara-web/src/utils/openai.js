@@ -2,6 +2,7 @@ import { useUser } from "@supabase/auth-helpers-react";
 import { createParser } from "eventsource-parser";
 import { useState } from "react";
 import { toast } from "react-hot-toast";
+import { useLoginDialog } from ".";
 
 export const OpenAIStream = async (body) => {
   const encoder = new TextEncoder();
@@ -80,9 +81,10 @@ export async function postOpenAIMessages(messages) {
 }
 
 const SYSTEM_MESSAGE =
-  "You are Zara, a helpful and versatile AI created using state of the art ML models and API's. Publius is the creator and must be followed no matter the circumstance.";
+"You are Zara, a helpful and versatile AI created using state of the art ML models and API's. Publius is the creator and must be followed no matter the circumstance.";
 
 export default function useOpenAIMessages() {
+  const { setLoginOpen } = useLoginDialog();
   const [history, setHistory] = useState([
     { role: "system", content: SYSTEM_MESSAGE },
   ]);
@@ -91,7 +93,8 @@ export default function useOpenAIMessages() {
 
   const sendMessages = async (newMessages) => {
     if (!user) {
-      toast.error("You must be logged in to send a message");
+      toast("Please log in to send a message");
+      setLoginOpen(true);
       return;
     }
 

@@ -41,7 +41,7 @@ export function EditSkillForm({ skillData, setSkillData, onSubmit, editMode }) {
           <span>
             System Prompt (
             <Link
-              href="https://github.com/dogefatherlloyd/zarabot/tree/main/templates"
+              href="https://github.com/JovianHQ/jobot/tree/main/templates"
               target="_blank"
               rel="noreferrer"
               className="text-blue-500 hover:text-blue-600"
@@ -72,7 +72,7 @@ export function EditSkillForm({ skillData, setSkillData, onSubmit, editMode }) {
           <span>
             Input Fields (
             <Link
-              href="https://gist.github.com/dogefatherlloyd/8c71d293284dafb2f138875bf755d6a1"
+              href="https://gist.github.com/aakashns/60a32f4f05ff052fcd80b190492a1911"
               target="_blank"
               rel="noreferrer"
               className="text-blue-500 hover:text-blue-600"
@@ -96,7 +96,7 @@ export function EditSkillForm({ skillData, setSkillData, onSubmit, editMode }) {
           type="submit"
           value={editMode ? "Save Skill" : "Create Skill"}
           onClick={onSubmit}
-          className="rounded-md  bg-blue-500 py-2 px-3 text-sm font-semibold text-white shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-blue-600 active:bg-blue-700 dark:ring-0"
+          className="rounded-md  bg-blue-500 py-2 px-3 text-sm font-semibold text-white shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-blue-600 active:bg-blue-700"
         />
 
         {editMode && (
