@@ -40,7 +40,8 @@ export default function SkillPage({ skill }) {
 }
 
 export async function getServerSideProps(context) {
-  const supabase = createServerSupabaseClient(context);
+  const { req, res } = context; // destructuring req and res from context
+  const supabase = createServerSupabaseClient({ req, res }); // passing req and res as an object
   const slug = context.params.slug;
   const username = context.params.username;
 
@@ -61,4 +62,4 @@ export async function getServerSideProps(context) {
   return {
     props: { skill: skills[0] },
   };
-}
+};
