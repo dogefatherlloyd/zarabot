@@ -91,8 +91,7 @@ export default function AccountPage() {
                 </Link>
               </div>
             </form>
-
-            <ManageAPIKeys />
+            
           </div>
         </div>
       </div>
