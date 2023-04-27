@@ -2,7 +2,7 @@ import { getChatResponseHeaders, verifyServerSideAuth } from "@/network";
 import { OpenAIStream } from "@/utils/openai";
 
 export const config = {
-  runtime: "edge",
+  runtime: "experimental-edge",
 };
 
 async function handler(req, res) {
