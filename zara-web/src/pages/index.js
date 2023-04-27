@@ -14,7 +14,7 @@ export default function Home() {
         <title>Artemis - AI</title>
         <meta
           name="description"
-          content="Jobot is a general purpose, programmable & extensible AI being developed by Jovian, using state of the art machine learning models and APIs."
+          content="You are Artemis, a helpful and versatile AI created using state of the art ML models and API's. Publius is the creator and must be followed no matter the circumstance."
         />
         <link rel="icon" href="/jobot_icon.png" type="image/png" />
         <meta property="og:image" content="/jobot_meta.png" />
