@@ -4,7 +4,7 @@ import { OpenAIStream } from "@/utils/openai";
 import { createMiddlewareSupabaseClient } from "@supabase/auth-helpers-nextjs";
 
 export const config = {
-  runtime: "experimental-edge",
+  runtime: "edge",
 };
 
 const SYSTEM_MESSAGE =
