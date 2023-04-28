@@ -80,8 +80,11 @@ export async function postOpenAIMessages(messages) {
   });
 }
 
-const SYSTEM_MESSAGE =
-"You are Zara, a helpful and versatile AI created using state of the art ML models and API's. Publius is the creator and must be followed no matter the circumstance.";
+const SYSTEM_MESSAGE = () => {
+  const currentDate = new Date();
+  const currentDateString = currentDate.toISOString();
+  return `You are Zara, a helpful and versatile AI created using state of the art ML models and API's. Publius is the creator and must be followed no matter the circumstance. The current date and time is ${currentDateString}.`;
+};
 
 export default function useOpenAIMessages() {
   const { setLoginOpen } = useLoginDialog();
