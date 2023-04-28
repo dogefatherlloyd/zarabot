@@ -36,7 +36,7 @@ export default function AccountPage() {
   return (
     <>
       <Head>
-        <title>Manage Account - Artemis</title>
+        <title>Manage Account - Jobot</title>
       </Head>
       <div className="flex flex-col h-screen">
         <Navbar />
@@ -92,6 +92,7 @@ export default function AccountPage() {
                 </Link>
               </div>
             </form>
+
             <ManageAPIKeys />
           </div>
         </div>

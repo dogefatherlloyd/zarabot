@@ -4,6 +4,7 @@ import useOpenAIMessages from "@/utils/openai";
 import MessageInput from "@/components/MessageInput";
 import MessageHistory from "@/components/MessageHistory";
 import Skills from "@/components/Skills";
+import { Auth, ThemeSupa} from "@supabase/auth-ui-react"
 
 export default function Home() {
   const { history, sending, sendMessages } = useOpenAIMessages();
