@@ -1,3 +1,4 @@
+import ManageAPIKeys from "@/components/ManageAPIKeys";
 import Navbar from "@/components/Navbar";
 import SlugInput from "@/components/inputs/SlugInput";
 import TextArea from "@/components/inputs/TextArea";
@@ -91,7 +92,7 @@ export default function AccountPage() {
                 </Link>
               </div>
             </form>
-            
+            <ManageAPIKeys />
           </div>
         </div>
       </div>
