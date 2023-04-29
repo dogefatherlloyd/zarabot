@@ -37,8 +37,6 @@ export default function Login() {
   
     if (error) {
       console.log('Error: ', error.message);
-    } else {
-      
     }
   }
 
