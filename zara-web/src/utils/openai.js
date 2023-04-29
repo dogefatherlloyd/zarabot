@@ -1,5 +1,4 @@
 import { useUser } from "@supabase/auth-helpers-react";
-importimport { useUser } from "@supabase/auth-helpers-react";
 import { createParser } from "eventsource-parser";
 import { useState } from "react";
 import { toast } from "react-hot-toast";
