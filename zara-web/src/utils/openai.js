@@ -4,6 +4,23 @@ import { useState } from "react";
 import { toast } from "react-hot-toast";
 import { useLoginDialog } from ".";
 
+// Add the Google API key and CSE ID here
+const GOOGLE_API_KEY = process.env.GOOGLE_API_KEY;
+const GOOGLE_CSE_ID = process.env.GOOGLE_CSE_ID;
+
+// Function to call the Google API
+async function callGoogleAPI(query) {
+  const url = 'https://www.googleapis.com/customsearch/v1';
+  const params = {
+    key: GOOGLE_API_KEY,
+    cx: GOOGLE_CSE_ID,
+    q: query
+  };
+
+  const response = await fetch(`${url}?key=${params.key}&cx=${params.cx}&q=${params.q}`);
+  return response.json();
+}
+
 export const OpenAIStream = async (body) => {
   const encoder = new TextEncoder();
   const decoder = new TextDecoder();
@@ -103,17 +120,24 @@ export default function useOpenAIMessages() {
     setSending(true);
     setHistory(newHistory);
 
-    const response = await postOpenAIMessages(newHistory);
+    if (newMessages[0].content.toLowerCase().startsWith("search google")) {
+      const searchQuery = newMessages[0].content.split(" ").slice(2).join(" ");
+      const googleResponse = await callGoogleAPI(searchQuery);
+      const searchResults = googleResponse.items.map(item => item.title + " - " + item.link).join("\n");
+      setHistory([...newHistory, { role: "assistant", content: searchResults }]);
+    } else {
+      const response = await postOpenAIMessages(newHistory);
 
-    if (!response.ok || !response.body) {
-      setSending(false);
-      setHistory(oldHistory);
-      toast.error("Failed to send:" + response.statusText);
+      if (!response.ok || !response.body) {
+        setSending(false);
+        setHistory(oldHistory);
+        toast.error("Failed to send:" + response.statusText);
+      }
+
+      await streamOpenAIResponse(response, (content) => {
+        setHistory([...newHistory, { role: "assistant", content }]);
+      });
     }
-
-    await streamOpenAIResponse(response, (content) => {
-      setHistory([...newHistory, { role: "assistant", content }]);
-    });
 
     setSending(false);
 
