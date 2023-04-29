@@ -2,6 +2,19 @@ import ReactMarkdown from "react-markdown";
 import Image from "next/image";
 
 const Message = ({ role, content }) => {
+  let textColor;
+  switch (role) {
+    case "user":
+      textColor = "text-blue-500"; // Change to the color you want for the user
+      break;
+    case "assistant":
+      textColor = "text-green-500"; // Change to the color you want for the assistant
+      break;
+    default:
+      textColor = "text-gray-500"; // Default text color
+      break;
+  }
+
   return (
     <div className="my-4 mx-auto flex w-full max-w-4xl ">
       <Image
@@ -20,12 +33,12 @@ const Message = ({ role, content }) => {
       />
       <div className="flex-1 overflow-x-hidden pl-2">
         <div>
-          <span className="text-base font-medium">
+          <span className={`text-base font-medium ${textColor}`}>
             {role === "user" ? "You " : role === "system" ? "System" : "Artemis "}
           </span>
         </div>
 
-        <div className="text-lg prose">
+        <div className={`text-lg prose ${textColor}`}>
           <ReactMarkdown>{content}</ReactMarkdown>
         </div>
       </div>
