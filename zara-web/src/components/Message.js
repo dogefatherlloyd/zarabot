@@ -5,7 +5,7 @@ const Message = ({ role, content }) => {
   let textColor;
   switch (role) {
     case "user":
-      textColor = "text-blue-500"; // Change to the color you want for the user
+      textColor = "text-blue-300"; // Change to the color you want for the user
       break;
     case "assistant":
       textColor = "text-green-500"; // Change to the color you want for the assistant
