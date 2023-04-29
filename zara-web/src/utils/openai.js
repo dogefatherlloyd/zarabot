@@ -1,18 +1,5 @@
 import { useUser } from "@supabase/auth-helpers-react";
-import { createParser } from "eventsource-parser";
-import { useState } from "react";
-import { toast } from "react-hot-toast";
-import { useLoginDialog } from ".";
-
-
-
-
-ChatGPT
-Implementing server-side session storage for short-term memory is a bit more involved than using client-side in-memory storage, but it provides better security and scalability. Here's an example of how you could modify the code to use server-side session storage:
-
-javascript
-Copy code
-import { useUser } from "@supabase/auth-helpers-react";
+importimport { useUser } from "@supabase/auth-helpers-react";
 import { createParser } from "eventsource-parser";
 import { useState } from "react";
 import { toast } from "react-hot-toast";
