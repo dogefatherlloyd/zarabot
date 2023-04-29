@@ -38,7 +38,7 @@ export default function Login() {
     if (error) {
       console.log('Error: ', error.message);
     } else {
-      Toaster.success('A verification code has been sent to your email. Please check your inbox.');
+      
     }
   }
 
@@ -54,8 +54,8 @@ export default function Login() {
       </Head>
       <Toaster />
       <div className="flex flex-col h-screen">
-        <Navbar />
-        <div className="mx-auto max-w-md">
+      <Navbar />
+                <div className="mx-auto max-w-md">
           <div className="border self-center rounded-lg my-8 p-4 m-4">
             <div className="text-center text-xl font-bold text-white">
               {isSignUp ? "Sign Up - Artemis" : "Log In - Artemis"}
@@ -65,7 +65,7 @@ export default function Login() {
               <label className="font-medium text-gray-600">Email</label>
               <input
                 type="email"
-                className="border p-2 rounded-md mt-1"
+                className="border p-2 rounded-md mt-1 text-black"
                 placeholder="john@doe.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -73,14 +73,14 @@ export default function Login() {
               <label className="font-medium text-gray-600 mt-4">Password</label>
               <input
                 type="password"
-                className="border p-2 rounded-md mt-1"
+                className="border p-2 rounded-md mt-1 text-black"
                 placeholder="Password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
               {isSignUp ? (
                 <button
-                  className="w-40 border text-sm font-medium px-4 py-2 mt-2 rounded-md bg-gray-50 hover:bg-gray-100"
+                  className="w-40 border border-blue-600 text-sm font-medium px-4 py-2 mt-2 rounded-md bg-blue-500 hover:bg-blue-600 text-white"
                   onClick={handleSignUp}
                 >
                   Sign Up
@@ -101,7 +101,7 @@ export default function Login() {
                 </label>
                 <input
                   type="text"
-                  className="border p-2 rounded-md mt-1"
+                  className="border p-2 rounded-md mt-1 text-black"
                   placeholder="123456"
                   onChange={(e) => setCode(e.target.value)}
                   value={code}
@@ -117,7 +117,7 @@ export default function Login() {
 
             {!isSignUp && (
               <button
-                className="w-40 border text-sm font-medium px-4 py-2 mt-2 rounded-md bg-gray-50 hover:bg-gray-100"
+                className="w-40 border border-blue-600 text-sm font-medium px-4 py-2 mt-2 rounded-md bg-blue-500 hover:bg-blue-600 text-white"
                 onClick={() => setIsSignUp(true)}
               >
                 Sign Up
