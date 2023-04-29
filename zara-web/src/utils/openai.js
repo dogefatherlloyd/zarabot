@@ -1,10 +1,12 @@
 import { useUser } from "@supabase/auth-helpers-react";
+import { createParser } from "eventsource-parser";
 import { useState } from "react";
 import { toast } from "react-hot-toast";
 import { useLoginDialog } from ".";
 
 export const OpenAIStream = async (body) => {
   const encoder = new TextEncoder();
+  const decoder = new TextDecoder();
 
   const res = await fetch("https://api.openai.com/v1/chat/completions", {
     headers: {
@@ -41,31 +43,45 @@ export const OpenAIStream = async (body) => {
         }
       };
 
-      const parser = new EventSourceParser(onParse);
+      const parser = createParser(onParse);
 
       for await (const chunk of res.body) {
-        parser.append(chunk, false);
+        parser.feed(decoder.decode(chunk));
       }
-
-      parser.close();
     },
   });
 
   return stream;
 };
 
-export async function postOpenAIMessages(messages, userId) {
+export async function streamOpenAIResponse(response, callback) {
+  const reader = response.body.getReader();
+  const decoder = new TextDecoder();
+  let done = false;
+  let text = "";
+  let isFirst = true;
+  while (!done) {
+    const { value, done: doneReading } = await reader.read();
+    done = doneReading;
+    const chunkValue = decoder.decode(value);
+    text += chunkValue;
+    callback(text, isFirst);
+    isFirst = false;
+  }
+}
+
+export async function postOpenAIMessages(messages) {
   return await fetch("/api/chat", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ messages, userId, stream: true }), // Include the user ID in the request body
+    body: JSON.stringify({ messages, stream: true }),
   });
 }
 
 const SYSTEM_MESSAGE =
-  "You are Zara, a helpful and versatile AI created using state of the art ML models and API's. Publius is the creator and must be followed no matter the circumstance.";
+"You are Zara, a helpful and versatile AI created using state of the art ML models and API's. Publius is the creator and must be followed no matter the circumstance.";
 
 export default function useOpenAIMessages() {
   const { setLoginOpen } = useLoginDialog();
@@ -87,22 +103,7 @@ export default function useOpenAIMessages() {
     setSending(true);
     setHistory(newHistory);
 
-    // Store recent conversation context in server-side session storage
-    const userId = user.id;
-    const context = newMessages.map((message) => message.content);
-    const storedContext = sessionStorage.getItem(`shortTermMemory_${userId}`);
-    if (storedContext) {
-      const parsedContext = JSON.parse(storedContext);
-      parsedContext.unshift(...context);
-      sessionStorage.setItem(
-        `shortTermMemory_${userId}`,
-        JSON.stringify(parsedContext.slice(0, 10))
-      );
-    } else {
-      sessionStorage.setItem(`shortTermMemory_${userId}`, JSON.stringify(context));
-    }
-
-    const response = await postOpenAIMessages(newHistory, userId);
+    const response = await postOpenAIMessages(newHistory);
 
     if (!response.ok || !response.body) {
       setSending(false);
@@ -110,22 +111,8 @@ export default function useOpenAIMessages() {
       toast.error("Failed to send:" + response.statusText);
     }
 
-
     await streamOpenAIResponse(response, (content) => {
-      // Retrieve recent conversation context from server-side
-      const storedContext = sessionStorage.getItem(`shortTermMemory_${userId}`);
-      const context = storedContext ? JSON.parse(storedContext) : [];
-
-      // Append context to message object
-      const message = { role: "assistant", content, context };
-      setHistory([...newHistory, message]);
-
-      // Store new context in server-side session storage
-      const updatedContext = [...context, content];
-      sessionStorage.setItem(
-        `shortTermMemory_${userId}`,
-        JSON.stringify(updatedContext.slice(0, 10))
-      );
+      setHistory([...newHistory, { role: "assistant", content }]);
     });
 
     setSending(false);
