@@ -5,7 +5,6 @@ import { useLoginDialog } from ".";
 
 export const OpenAIStream = async (body) => {
   const encoder = new TextEncoder();
-  const decoder = new TextDecoder();
 
   const res = await fetch("https://api.openai.com/v1/chat/completions", {
     headers: {
