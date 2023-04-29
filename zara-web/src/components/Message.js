@@ -34,7 +34,7 @@ const Message = ({ role, content }) => {
       <div className="flex-1 overflow-x-hidden pl-2">
         <div>
           <span className={`text-base font-medium ${textColor}`}>
-            {role === "user" ? "You " : role === "system" ? "System" : "Artemis "}
+            {role === "user" ? "You: " : role === "system" ? "System" : "Artemis: "}
           </span>
         </div>
 
