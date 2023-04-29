@@ -9,7 +9,7 @@ const TextInput = ({
   <div className="mt-4">
     <label
       htmlFor={field}
-      className="block text-sm font-medium leading-6 text-gray-900 "
+      className="block text-sm font-medium leading-6 text-white"
     >
       {label}
     </label>
