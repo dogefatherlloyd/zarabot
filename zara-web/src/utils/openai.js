@@ -1,16 +1,59 @@
 import { useUser } from "@supabase/auth-helpers-react";
-import { createParser } from "eventsource-parser";
 import { useState } from "react";
 import { toast } from "react-hot-toast";
 import { useLoginDialog } from ".";
 
 export const OpenAIStream = async (body) => {
-  // ...
-};
+  const encoder = new TextEncoder();
+  const decoder = new TextDecoder();
 
-export async function streamOpenAIResponse(response, callback) {
-  // ...
-}
+  const res = await fetch("https://api.openai.com/v1/chat/completions", {
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+    },
+    method: "POST",
+    body: JSON.stringify(body),
+  });
+
+  if (res.status !== 200) {
+    throw new Error("OpenAI API returned an error");
+  }
+
+  const stream = new ReadableStream({
+    async start(controller) {
+      const onParse = (event) => {
+        if (event.type === "event") {
+          const data = event.data;
+
+          if (data === "[DONE]") {
+            controller.close();
+            return;
+          }
+
+          try {
+            const json = JSON.parse(data);
+            const text = json.choices[0].delta.content;
+            const queue = encoder.encode(text);
+            controller.enqueue(queue);
+          } catch (e) {
+            controller.error(e);
+          }
+        }
+      };
+
+      const parser = new EventSourceParser(onParse);
+
+      for await (const chunk of res.body) {
+        parser.append(chunk, false);
+      }
+
+      parser.close();
+    },
+  });
+
+  return stream;
+};
 
 export async function postOpenAIMessages(messages, userId) {
   return await fetch("/api/chat", {
@@ -68,12 +111,22 @@ export default function useOpenAIMessages() {
       toast.error("Failed to send:" + response.statusText);
     }
 
+
     await streamOpenAIResponse(response, (content) => {
-      // Retrieve recent conversation context from server-side session storage
-      const userId = user.id;
+      // Retrieve recent conversation context from server-side
       const storedContext = sessionStorage.getItem(`shortTermMemory_${userId}`);
       const context = storedContext ? JSON.parse(storedContext) : [];
-      setHistory([...newHistory, { role: "assistant", content }, ...context]);
+
+      // Append context to message object
+      const message = { role: "assistant", content, context };
+      setHistory([...newHistory, message]);
+
+      // Store new context in server-side session storage
+      const updatedContext = [...context, content];
+      sessionStorage.setItem(
+        `shortTermMemory_${userId}`,
+        JSON.stringify(updatedContext.slice(0, 10))
+      );
     });
 
     setSending(false);
