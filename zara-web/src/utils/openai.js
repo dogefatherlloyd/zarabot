@@ -5,8 +5,8 @@ import { toast } from "react-hot-toast";
 import { useLoginDialog } from ".";
 
 // Add the Google API key and CSE ID here
-const GOOGLE_API_KEY = process.env.GOOGLE_API_KEY;
-const GOOGLE_CSE_ID = process.env.GOOGLE_CSE_ID;
+const GOOGLE_API_KEY = process.env.NEXT_PUBLIC_GOOGLE_API_KEY;
+const GOOGLE_CSE_ID = process.env.NEXT_PUBLIC_GOOGLE_CSE_ID;
 
 // Function to call the Google API
 async function callGoogleAPI(query) {
@@ -107,7 +107,6 @@ export default function useOpenAIMessages() {
   ]);
   const [sending, setSending] = useState(false);
   const user = useUser();
-
   const sendMessages = async (newMessages) => {
     if (!user) {
       toast("Please log in to send a message");
@@ -123,8 +122,32 @@ export default function useOpenAIMessages() {
     if (newMessages[0].content.toLowerCase().startsWith("search google")) {
       const searchQuery = newMessages[0].content.split(" ").slice(2).join(" ");
       const googleResponse = await callGoogleAPI(searchQuery);
-      const searchResults = googleResponse.items.map(item => item.title + " - " + item.link).join("\n");
-      setHistory([...newHistory, { role: "assistant", content: searchResults }]);
+      
+      // Check if items exist in the response
+      if (googleResponse.items) {
+        const searchResults = googleResponse.items.map(item => item.title + " - " + item.link).join("\n");
+
+        // Send the search results to GPT-4 for summarization
+        const summarizationRequest = {
+          role: "system",
+          content: `You are a helpful assistant. Summarize the following search results: \n${searchResults}`,
+        };
+        
+        const response = await postOpenAIMessages([...newHistory, summarizationRequest]);
+
+        if (!response.ok || !response.body) {
+          setSending(false);
+          setHistory(oldHistory);
+          toast.error("Failed to send:" + response.statusText);
+        }
+
+        await streamOpenAIResponse(response, (content) => {
+          setHistory([...newHistory, { role: "assistant", content }]);
+        });
+      } else {
+        // Add a message to the history to indicate that no results were found
+        setHistory([...newHistory, { role: "assistant", content: "No search results found." }]);
+      }
     } else {
       const response = await postOpenAIMessages(newHistory);
 
