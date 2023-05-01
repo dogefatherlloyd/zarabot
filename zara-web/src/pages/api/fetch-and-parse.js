@@ -5,7 +5,11 @@ export default async (req, res) => {
   const { url } = req.query;
 
   try {
-    const response = await fetch(url);
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000); // Set timeout to 10 seconds
+
+    const response = await fetch(url, { signal: controller.signal });
+    clearTimeout(timeoutId); // Clear the timeout if the response has returned in time
 
     if (response.ok) {
       const html = await response.text();
@@ -26,6 +30,10 @@ export default async (req, res) => {
     }
   } catch (error) {
     console.error(`Error fetching and parsing URL: ${url}`, error);
-    res.status(500).json({ error: error.message });
+    if (error.name === 'AbortError') {
+      res.status(504).json({ error: 'Timeout - The request took too long to complete.' });
+    } else {
+      res.status(500).json({ error: error.message });
+    }
   }
 };
