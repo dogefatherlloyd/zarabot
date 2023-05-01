@@ -199,4 +199,4 @@ export default function useOpenAIMessages() {
   return { history, sending, sendMessages, input, setInput };  // <-- Return input and setInput
 };
 
-export { callGoogleAPI };
+export { callGoogleAPI }
