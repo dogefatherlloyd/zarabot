@@ -6,16 +6,21 @@ export default async (req, res) => {
 
   try {
     const response = await fetch(url);
-    const html = await response.text();
-    const dom = new JSDOM(html);
-    const doc = dom.window.document;
-    const parsed = new Readability(doc).parse();
+    
+    if (response.headers.get("content-type")?.includes("application/json")) {
+      const html = await response.text();
+      const dom = new JSDOM(html);
+      const doc = dom.window.document;
+      const parsed = new Readability(doc).parse();
 
-    if (parsed) {
-      const sourceText = parsed.textContent.slice(0, 2000);
-      res.status(200).json({ text: sourceText });
+      if (parsed) {
+        const sourceText = parsed.textContent.slice(0, 2000);
+        res.status(200).json({ text: sourceText });
+      } else {
+        res.status(500).json({ error: "Failed to parse document" });
+      }
     } else {
-      res.status(500).json({ error: "Failed to parse document" });
+      res.status(500).json({ error: "Invalid content type. Expected JSON" });
     }
   } catch (error) {
     res.status(500).json({ error: error.message });
