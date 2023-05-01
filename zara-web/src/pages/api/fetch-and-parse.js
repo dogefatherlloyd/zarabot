@@ -1,7 +1,8 @@
 import { Readability } from "@mozilla/readability";
 import { JSDOM } from "jsdom";
 
-export default async (req, res) => {
+// Assign the arrow function to a variable
+const fetchAndParse = async (req, res) => {
   const { url } = req.query;
 
   try {
@@ -37,3 +38,6 @@ export default async (req, res) => {
     }
   }
 };
+
+// Export the variable as the default export
+export default fetchAndParse;
