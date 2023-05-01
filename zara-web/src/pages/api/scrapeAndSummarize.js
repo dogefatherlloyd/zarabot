@@ -1,5 +1,6 @@
 import { callGoogleAPI } from "../utils/openai";
 import axios from "axios";
+import endent from "endent";
 
 export default async function handler(req, res) {
   const searchQuery = req.query.q;
