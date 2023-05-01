@@ -1,9 +1,8 @@
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import cn from "classnames";
 import { AiOutlineSend } from "react-icons/ai";
 import { HiOutlineDotsHorizontal } from "react-icons/hi";
 import TextArea from "react-textarea-autosize";
-import { useState } from "react";
 import { toast } from "react-hot-toast";
 
 const MessageInput = ({
@@ -13,16 +12,22 @@ const MessageInput = ({
 }) => {
   const inputRef = useRef(null);
   const [prompt, setPrompt] = useState("");
+
   const handleSendClick = () => {
     if (!prompt) {
       toast.error("Enter a message before you hit send.");
       return;
     }
 
-    sendMessages([{ role: "user", content: prompt }]).then(
-      (success) => !success && setPrompt(prompt)
-    );
+    sendMessages([{ role: "user", content: prompt }]);
     setPrompt("");
+  };
+
+  const handleKeyDown = (event) => {
+    if (event.key === "Enter" && !event.shiftKey) {
+      event.preventDefault();
+      handleSendClick();
+    }
   };
 
   const Icon = sending ? HiOutlineDotsHorizontal : AiOutlineSend;
@@ -48,12 +53,7 @@ const MessageInput = ({
             )}
             value={prompt}
             onChange={(e) => setPrompt(e.target.value)}
-            onKeyDown={(event) => {
-              if (event.key === "Enter" && !event.shiftKey) {
-                event.preventDefault();
-                handleSendClick();
-              }
-            }}
+            onKeyDown={handleKeyDown}
           />
           <button
             className="rounded-full flex items-center justify-center p-2 bg-blue-500 hover:bg-blue-600 text-white text-lg"
