@@ -1,4 +1,4 @@
-import { callGoogleAPI } from "../utils/openai";
+import { callGoogleAPI } from "@/utils/openai";
 import axios from "axios";
 import endent from "endent";
 
