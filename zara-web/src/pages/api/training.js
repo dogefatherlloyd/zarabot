@@ -23,7 +23,7 @@ export default async function handler(req, res) {
         const [{ embedding }] = embeddingResponse.data.data;
 
         // Save to Supabase
-        const { data, error } = await supabase
+        const { error } = await supabase
             .from('documents')
             .insert([
                 { content: text, embedding: embedding }
