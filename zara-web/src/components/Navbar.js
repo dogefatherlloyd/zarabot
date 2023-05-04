@@ -15,8 +15,8 @@ export default function Navbar() {
             <Link href="/">
               <Image
                 src="/jobot_text_logo.png"
-                height={32}
-                width={117}
+                height={25}
+                width={50}
                 className="hidden md:block object-contain"
                 alt="logo"
                 unoptimized
@@ -32,43 +32,43 @@ export default function Navbar() {
             </Link>
           </div>
           <div>
-            <Link href="/" className="text-gray-500 hover:text-blue-600 ml-4">
-              Home
-            </Link>
-            <Link
-              href="/build"
-              className="text-gray-500 hover:text-blue-600 ml-4"
-            >
-              Build
-            </Link>
-            <Link
-              href="https://github.com/dogefatherlloyd/zarabot"
-              className="text-gray-500 hover:text-blue-600 ml-4"
-              target="_blank"
-              rel="noreferrer"
-            >
-              Docs
-            </Link>
-            {user ? (
-              <Link
-                href="/account"
-                className="text-gray-500 hover:text-blue-600 ml-4"
-              >
-                Account
-              </Link>
-            ) : (
-              <Link
-                href="/login"
-                onClick={(e) => {
-                  e.preventDefault();
-                  setLoginOpen(true);
-                }}
-                className="text-gray-500 hover:text-blue-600 ml-4"
-              >
-                Log In
-              </Link>
-            )}
-          </div>
+    <Link href="/" className="text-gray-500 hover:text-blue-600 ml-4">
+        Home
+    </Link>
+    <Link href="/build" className="text-gray-500 hover:text-blue-600 ml-4">
+        Build
+    </Link>
+    <Link href="/training" className="text-gray-500 hover:text-blue-600 ml-4">
+        Training
+    </Link>
+    <Link
+        href="https://github.com/dogefatherlloyd/zarabot"
+        className="text-gray-500 hover:text-blue-600 ml-4"
+        target="_blank"
+        rel="noreferrer"
+    >
+        Docs
+    </Link>
+    {user ? (
+        <Link
+            href="/account"
+            className="text-gray-500 hover:text-blue-600 ml-4"
+        >
+            Account
+        </Link>
+    ) : (
+        <Link
+            href="/login"
+            onClick={(e) => {
+                e.preventDefault();
+                setLoginOpen(true);
+            }}
+            className="text-gray-500 hover:text-blue-600 ml-4"
+        >
+            Log In
+        </Link>
+    )}
+</div>
         </div>
       </nav>
       {!user && <LoginModal />}

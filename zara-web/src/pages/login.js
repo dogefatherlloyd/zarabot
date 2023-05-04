@@ -6,41 +6,16 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import { Toaster } from "react-hot-toast";
+import { sendVerificationCode } from "../network";
 
 export default function Login() {
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [code, setCode] = useState("");
-  const [isSignUp, setIsSignUp] = useState(false);
 
   const router = useRouter();
   const supabase = useSupabaseClient();
 
-  async function handleLogin() {
-    const { error } = await supabase.auth.signIn({
-      email: email,
-      password: password,
-    });
-
-    if (error) {
-      console.log('Error: ', error.message);
-    } else {
-      router.push("/account");
-    }
-  }
-
-  async function handleSignUp() {
-    const { error } = await supabase.auth.signUp({
-      email: email,
-      password: password,
-    });
-  
-    if (error) {
-      console.log('Error: ', error.message);
-    }
-  }
-
-  async function handleVerification() {
+  async function handleSubmit() {
     const success = await submitVerificationCode(supabase, email, code);
     success && router.push("/account");
   }
@@ -52,11 +27,11 @@ export default function Login() {
       </Head>
       <Toaster />
       <div className="flex flex-col h-screen">
-      <Navbar />
-                <div className="mx-auto max-w-md">
+        <Navbar />
+        <div className="mx-auto max-w-md">
           <div className="border self-center rounded-lg my-8 p-4 m-4">
             <div className="text-center text-xl font-bold text-white">
-              {isSignUp ? "Sign Up - Artemis" : "Log In - Artemis"}
+              Log In - Artemis
             </div>
 
             <div className=" flex flex-col my-4">
@@ -68,70 +43,38 @@ export default function Login() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
-              <label className="font-medium text-gray-600 mt-4">Password</label>
+              <button
+                className="w-40 border text-sm font-medium px-4 py-2 mt-2 rounded-md bg-gray-50 hover:bg-gray-100"
+                onClick={() => sendVerificationCode(supabase, email)}
+              >
+                Send Code
+              </button>
+            </div>
+
+            <div className=" flex flex-col my-4">
+              <label className="font-medium text-gray-600">
+                Verification Code
+              </label>
               <input
                 type="password"
                 className="border p-2 rounded-md mt-1 text-black"
-                placeholder="Password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                placeholder="123456"
+                onChange={(e) => setCode(e.target.value)}
+                value={code}
               />
-              {isSignUp ? (
-                <button
-                  className="w-40 border border-blue-600 text-sm font-medium px-4 py-2 mt-2 rounded-md bg-blue-500 hover:bg-blue-600 text-white"
-                  onClick={handleSignUp}
-                >
-                  Sign Up
-                </button>
-              ) : (
-                <button
-                  onClick={handleLogin}
-                  className="w-40 border border-blue-600 text-sm font-medium px-4 py-2 mt-2 rounded-md bg-blue-500 hover:bg-blue-600 text-white"
-                >
-                  Log In
-                </button>
-              )}
-            </div>
-            {isSignUp && (
-              <div className=" flex flex-col my-4">
-                <label className="font-medium text-gray-600">
-                  Verification Code
-                </label>
-                <input
-                  type="text"
-                  className="border p-2 rounded-md mt-1 text-black"
-                  placeholder="123456"
-                  onChange={(e) => setCode(e.target.value)}
-                  value={code}
-                />
-                <button
-                  onClick={handleVerification}
-                  className="w-40 border border-blue-600 text-sm font-medium px-4 py-2 mt-2 rounded-md bg-blue-500 hover:bg-blue-600 text-white"
-                >
-                  Verify
-                </button>
-              </div>
-            )}
-
-            {!isSignUp && (
               <button
+                onClick={handleSubmit}
                 className="w-40 border border-blue-600 text-sm font-medium px-4 py-2 mt-2 rounded-md bg-blue-500 hover:bg-blue-600 text-white"
-                onClick={() => setIsSignUp(true)}
               >
-                Sign Up
+                Sign In
               </button>
-            )}
+            </div>
 
             <p className="text-white text-sm prose">
               {"By signing in, you agree to our "}
-              <Link href="/terms" className="text-blue-500 hover:text-blue-600">
-                terms of use
-              </Link>
+              <Link href="/terms">terms of use</Link>
               {" and "}
-              <Link href="/privacy" className="text-blue-500 hover:text-blue-600">
-                privacy policy
-              </Link>
-              .
+              <Link href="/privacy">privacy policy</Link>.
             </p>
           </div>
         </div>

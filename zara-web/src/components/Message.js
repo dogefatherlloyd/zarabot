@@ -15,6 +15,9 @@ const Message = ({ role, content }) => {
       break;
   }
 
+  // Convert content to a string if it's an array
+  const messageContent = Array.isArray(content) ? content.join(' ') : content;
+
   return (
     <div className="my-4 mx-auto flex w-full max-w-4xl ">
       <Image
@@ -39,7 +42,7 @@ const Message = ({ role, content }) => {
         </div>
 
         <div className={`text-lg prose ${textColor}`}>
-          <ReactMarkdown>{content}</ReactMarkdown>
+          <ReactMarkdown>{messageContent}</ReactMarkdown>
         </div>
       </div>
     </div>

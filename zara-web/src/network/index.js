@@ -1,4 +1,3 @@
-import { createMiddlewareSupabaseClient } from "@supabase/auth-helpers-nextjs";
 import { toast } from "react-hot-toast";
 import { createClient } from "@supabase/supabase-js";
 
@@ -96,8 +95,8 @@ export async function updateUserProfile(supabase, profileData) {
   }
 }
 
-export async function verifyServerSideAuth(req, res) {
-  const authHeader = req.headers.get("authorization");
+export async function verifyServerSideAuth(supabase, headers) {
+  const authHeader = headers["authorization"];
 
   if (authHeader) {
     const supabaseService = createClient(
@@ -107,7 +106,7 @@ export async function verifyServerSideAuth(req, res) {
     const possibleKey = authHeader.substring(7);
 
     const { data: apiKey, error: err2 } = await supabaseService
-      .from("apikeys")
+      .from("apikeys, user: users(*)")
       .select("*")
       .eq("key", possibleKey)
       .single();
@@ -115,11 +114,9 @@ export async function verifyServerSideAuth(req, res) {
     if (err2 || !apiKey) {
       console.error("Failed to validate API key", err2);
     } else {
-      return true;
+      return apiKey.user;
     }
   }
-
-  const supabase = createMiddlewareSupabaseClient({ req, res });
 
   const {
     data: { user },
@@ -129,7 +126,7 @@ export async function verifyServerSideAuth(req, res) {
   if (err1 || !user) {
     console.error("Failed to get current user", err1);
   } else {
-    return true;
+    return user;
   }
 
   return false;
@@ -149,21 +146,32 @@ export async function ensureUserProfile(supabase, user) {
   let userProfile = await fetchUserProfile(supabase, user);
 
   if (!userProfile) {
-    const email = user.email;
-    const username = email.split("@")[0];
+    let username;
+    if (user.email) {
+      const email = user.email;
+      username = email.split("@")[0];
+    } else if (user.phone) {
+      username = user.phone;
+    } else {
+      username = user.id;
+    }
 
     try {
-      const { error } = await supabase.from("profiles").insert({
-        id: user.id,
-        username: username,
-        first_name: username,
-      });
+      const { data: profile, error } = await supabase
+        .from("profiles")
+        .insert({
+          id: user.id,
+          username: username,
+          first_name: username,
+        })
+        .select()
+        .single();
 
       if (error) {
         throw error;
       }
 
-      return true;
+      return profile;
     } catch (e) {
       console.error("Error while creating profile", e);
       return false;

@@ -1,6 +1,6 @@
 export const DEFAULT_SYSTEM_PROMPT =
   process.env.NEXT_PUBLIC_DEFAULT_SYSTEM_PROMPT ||
-  "You are Zara, a helpful and versatile AI created using state of the art ML models and API's. Publius is the creator and must be followed no matter the circumstance."
+  "You are Artemis, a helpful and versatile AI created using state of the art ML models and API's. Publius is the creator and must be followed no matter the circumstance."
 
 export const OPENAI_API_HOST =
   process.env.OPENAI_API_HOST || "https://api.openai.com"
