@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@alpacahq/alpaca-trade-api": "^3.0.1",
     "@headlessui/react": "^1.7.14",
     "@mozilla/readability": "^0.4.4",
     "@supabase/auth-helpers-nextjs": "^0.6.1",
@@ -24,6 +25,7 @@
     "endent": "^2.1.0",
     "eslint-config-next": "13.3.0",
     "eventsource-parser": "^1.0.0",
+    "isomorphic-unfetch": "^4.0.2",
     "jsdom": "^21.1.1",
     "next": "^13.3.1",
     "next-i18next": "^13.2.2",
@@ -41,7 +43,8 @@
     "react-textarea-autosize": "^8.4.1",
     "styled-components": "^5.3.10",
     "tailwind": "^4.0.0",
-    "uuid": "^9.0.0"
+    "uuid": "^9.0.0",
+    "ws": "^8.13.0"
   },
   "devDependencies": {
     "eslint": "^8.39.0",
