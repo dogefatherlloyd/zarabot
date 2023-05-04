@@ -6,14 +6,8 @@ export default function Dashboard() {
 
   const fetchAccountData = async () => {
     try {
-      const res = await fetch("https://paper-api.alpaca.markets/v2/account", {
-        method: "GET",
-        headers: {
-          "APCA-API-KEY-ID": process.env.NEXT_PUBLIC_APCA_API_KEY_ID,
-          "APCA-API-SECRET-KEY": process.env.NEXT_PUBLIC_APCA_API_SECRET_KEY,
-        },
-      });
-
+      const res = await fetch("/api/account"); // Update the URL here
+  
       if (res.ok) {
         const account = await res.json();
         setAccountData(account);
