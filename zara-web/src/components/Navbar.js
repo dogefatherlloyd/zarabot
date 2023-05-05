@@ -41,7 +41,7 @@ export default function Navbar() {
             <Link href="/training" className="text-gray-500 hover:text-blue-600 ml-4">
               Training
             </Link>
-            <Link href="/finance" className="text-gray-500 hover:text-blue-600 ml-4">
+            <Link href="/trade" className="text-gray-500 hover:text-blue-600 ml-4">
               Trade
             </Link>
             <Link

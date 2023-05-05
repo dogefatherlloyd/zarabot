@@ -30,7 +30,7 @@ wss.on('open', function() {
     if (currentEvent.T === "n") {
       let companyImpact = 0;
       const apiRequestBody = {
-        "model": "gpt-3.5-turbo",
+        "model": "gpt-4",
         "messages": [
           { role: "system", content: "Only respond with a number from 1-100 detailing the impact of the headline."},
           { role: "user", content: "given the headline '" + currentEvent.headline + "', show me a number from 1-100 detailing the impact of this headline."}
