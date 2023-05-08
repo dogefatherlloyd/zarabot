@@ -66,7 +66,7 @@ const startTradeBot = () => {
 
       // From here, adjust the logic
       if (companyImpact >= 70) {
-        let order = await alpaca.createOrder({
+        await alpaca.createOrder({
           symbol: tickerSymbol,
           qty: 1,
           side: 'buy',
@@ -74,7 +74,7 @@ const startTradeBot = () => {
           time_in_force: 'day',
         });
       } else if (companyImpact <= 30) {
-        let closePosition = alpaca.closePosition(tickerSymbol);
+        await alpaca.closePosition(tickerSymbol);
       }
     }
     

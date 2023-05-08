@@ -23,12 +23,22 @@ export const config = {
   },
 };
 
-export default (req, res) => {
+const handler = (req, res) => {
   if (!res.socket.server.io) {
     console.log("Initializing socket.io...");
     res.socket.server.io = io;
     io.attach(res.socket.server);
+
+    io.on("connection", (socket) => {
+      console.log("Socket connected:", socket.id);
+
+      socket.on("disconnect", () => {
+        console.log("Socket disconnected:", socket.id);
+      });
+    });
   }
 
   res.end();
 };
+
+export default handler;
