@@ -28,27 +28,35 @@ export default function Finance() {
   }
 
   const toggleBot = async () => {
-    if (!socket) {
-      const newSocket = io.connect('https://dogefatherlloyd-shiny-capybara-5wxwg65jwqqcqxp-3000.preview.app.github.dev', {
-  path: '/api/socket'
-});
-      newSocket.on('tradeEvent', (tradeEvent) => {
-        setTradeEvents((prevTradeEvents) => [...prevTradeEvents, tradeEvent]);
-      });
-      setSocket(newSocket);
+    const newBotStatus = !botStatus;
+  
+    if (newBotStatus) {
+      if (!socket) {
+        const newSocket = io.connect(`${window.location.protocol}//${window.location.host}`, {
+          path: '/api/socket'
+        });
+        newSocket.on('tradeEvent', (tradeEvent) => {
+          setTradeEvents((prevTradeEvents) => [...prevTradeEvents, tradeEvent]);
+        });
+        setSocket(newSocket);
+      }
+    } else {
+      if (socket) {
+        socket.disconnect();
+        setSocket(null);
+      }
     }
-
+  
     try {
-      const response = await fetch('/api/tradingbot', {
+      await fetch('/api/tradingbot', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ status: !botStatus }),
+        body: JSON.stringify({ status: newBotStatus }),
       });
-
-      const result = await response.json();
-      setBotStatus(result.status);
+  
+      setBotStatus(newBotStatus);
     } catch (error) {
       console.error('Failed to toggle bot:', error);
     }
@@ -73,11 +81,14 @@ export default function Finance() {
           </div>
 
           <button
-  onClick={toggleBot}
-  className="mx-auto my-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
->
-  {botStatus ? 'Stop' : 'Start'} Bot
-</button>
+            onClick={toggleBot}
+            className={`mx-auto my-4 font-bold py-2 px-4 rounded ${
+              botStatus ? 'bg-red-500 hover:bg-red-700' : 'bg-green-500 hover:bg-green-700'
+            } text-white`}
+            style={{ display: 'block' }}
+          >
+            {botStatus ? 'Stop' : 'Start'} Bot
+          </button>
           <ul>
             {tradeEvents.map((event, index) => (
               <li key={index}>{event}</li>

@@ -5,7 +5,8 @@ let wss;
 let botStatus = false;
 
 const startTradeBot = () => {
-  const wss = new WebSocket('wss://stream.data.alpaca.markets/v1beta1/news');
+  console.log("Starting trade bot");
+  wss = new WebSocket('wss://stream.data.alpaca.markets/v1beta1/news');
 
   wss.on('open', function () {
     console.log('Websocket connected!');
@@ -64,7 +65,6 @@ const startTradeBot = () => {
 
       const tickerSymbol = currentEvent.symbols[0];
 
-      // From here, adjust the logic
       if (companyImpact >= 70) {
         await alpaca.createOrder({
           symbol: tickerSymbol,
@@ -77,7 +77,10 @@ const startTradeBot = () => {
         await alpaca.closePosition(tickerSymbol);
       }
     }
-    
+  });
+
+  wss.on('close', function() {
+    console.log('WebSocket closed');
   });
 
   return wss;
@@ -85,21 +88,22 @@ const startTradeBot = () => {
 
 const handler = async (req, res) => {
   if (req.method === 'POST') {
-    botStatus = req.body.status;
+    const requestedStatus = req.body.status;
+    console.log("Requested status:", requestedStatus);
+    console.log("Current bot status:", botStatus);
 
-    if (botStatus && !wss) {
-      // Start the tradebot
+    if (requestedStatus && !botStatus && !wss) {
       wss = startTradeBot();
-    } else if (!botStatus && wss) {
-      // Stop the tradebot
-      wss.close();
+      botStatus = true;
+    } else if (!requestedStatus && botStatus && wss) {
+      wss.close(1000, 'Trade bot stopped by user');
       wss = null;
+      botStatus = false;
     }
 
-    res.status(200).json({ status: botStatus });
+    res.status(200).json({ success: true });
   } else {
-    res.setHeader('Allow', ['POST']);
-    res.status(405).end(`Method ${req.method} Not Allowed`);
+    res.status(405).json({ success: false, message: 'Method not supported' });
   }
 };
 
