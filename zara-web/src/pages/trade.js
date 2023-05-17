@@ -95,7 +95,7 @@ export default function Finance() {
           >
             {botStatus ? 'Stop' : 'Start'} Bot
           </button>
-          <TradeEventsWindow tradeEvents={consoleLogs} />
+          <TradeEventsWindow tradeEvents={tradeEvents} />
           <MessageInput
             sending={sending}
             sendMessages={handleSend}
