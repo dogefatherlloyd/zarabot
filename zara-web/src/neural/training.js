@@ -1,4 +1,5 @@
 import * as tf from '@tensorflow/tfjs';
+import * as tfvis from '@tensorflow/tfjs-vis';  // Add this line
 import { createClient } from "@supabase/supabase-js";
 
 const supabaseUrl = "https://gwsmfmqtmuhmglnfzqma.supabase.co";
@@ -29,12 +30,7 @@ async function saveModelData(modelData) {
   }
 }
 
-async function trainModel() {
-  // Load and normalize the data
-  const data = await fetchDataFromSupabase();
-  const tensorData = convertToTensor(data);
-  const {inputs, labels} = tensorData;
-
+async function trainModel(inputs, labels) {
   // Create the model
   const model = createModel();  
   model.summary();
@@ -109,14 +105,6 @@ function convertToTensor(data) {
     const normalizedInputs = inputTensor.sub(inputMin).div(inputMax.sub(inputMin));
     const normalizedLabels = labelTensor.sub(labelMin).div(labelMax.sub(labelMin));
 
-    trainModel().then((model) => {
-      console.log("Model training complete");
-      // Here you could add any code that you want to run after training is complete.
-      // For instance, you might want to save the model, evaluate it, or make predictions.
-    }).catch((error) => {
-      console.error("Error during model training:", error);
-    });
-
     return {
       inputs: normalizedInputs,
       labels: normalizedLabels,
@@ -127,5 +115,23 @@ function convertToTensor(data) {
       labelMin,
     }
   }); 
-  
 }
+
+// This is where you should call the trainModel function
+async function run() {
+  // Load and normalize the data
+  const data = await fetchDataFromSupabase();
+  const tensorData = convertToTensor(data);
+  const {inputs, labels} = tensorData;
+
+  // Train the model
+  await trainModel(inputs, labels);
+}
+
+run().then(() => {
+  console.log("Model training complete");
+  // Here you could add any code that you want to run after training is complete.
+  // For instance, you might want to save the model, evaluate it, or make predictions.
+}).catch((error) => {
+  console.error("Error during model training:", error);
+});

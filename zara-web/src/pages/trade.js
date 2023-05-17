@@ -13,7 +13,6 @@ export default function Finance() {
   const { history, sending, sendMessages } = useOpenAIMessages();
   const [botStatus, setBotStatus] = useState(false);
   const [tradeEvents, setTradeEvents] = useState([]);
-  const [consoleLogs, setConsoleLogs] = useState([]);
   const [socket, setSocket] = useState(null);
 
   useEffect(() => {
@@ -38,10 +37,6 @@ export default function Finance() {
           path: '/api/socket'
         });
         newSocket.on('tradeEvent', (tradeEvent) => {
-          setConsoleLogs((prevConsoleLogs) => [
-            ...prevConsoleLogs,
-            `Trade event received: ${tradeEvent}`,
-          ]);
           setTradeEvents((prevTradeEvents) => [...prevTradeEvents, tradeEvent]);
         });
         setSocket(newSocket);
