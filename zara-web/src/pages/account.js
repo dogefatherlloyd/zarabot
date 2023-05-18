@@ -1,9 +1,9 @@
-import ManageAPIKeys from "@/components/ManageAPIKeys";
-import Navbar from "@/components/Navbar";
-import SlugInput from "@/components/inputs/SlugInput";
-import TextArea from "@/components/inputs/TextArea";
-import TextInput from "@/components/inputs/TextInput";
-import { fetchUserProfile, updateUserProfile } from "@/network";
+import ManageAPIKeys from "../components/ManageAPIKeys";
+import Navbar from "../components/Navbar";
+import SlugInput from "../components/inputs/SlugInput";
+import TextArea from "../components/inputs/TextArea";
+import TextInput from "../components/inputs/TextInput";
+import { fetchUserProfile, updateUserProfile } from "../network";
 import { useSupabaseClient, useUser } from "@supabase/auth-helpers-react";
 import Head from "next/head";
 import Link from "next/link";

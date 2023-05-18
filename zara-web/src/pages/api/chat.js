@@ -1,5 +1,5 @@
-import { getChatResponseHeaders, verifyServerSideAuth } from "@/network";
-import { OpenAIStream } from "@/utils/openai";
+import { getChatResponseHeaders, verifyServerSideAuth } from "../../network";
+import { OpenAIStream } from "../../utils/openai";
 import { createMiddlewareSupabaseClient } from "@supabase/auth-helpers-nextjs";
 
 export const config = {

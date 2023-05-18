@@ -1,4 +1,4 @@
-import { makeDisplayName } from "@/utils";
+import { makeDisplayName } from "../utils";
 import { useSupabaseClient } from "@supabase/auth-helpers-react";
 import Image from "next/image";
 import Link from "next/link";

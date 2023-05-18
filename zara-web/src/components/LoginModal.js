@@ -1,8 +1,8 @@
 import { Fragment, useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
-import { sendVerificationCode, submitVerificationCode } from "@/network";
+import { sendVerificationCode, submitVerificationCode } from "../network";
 import { useSupabaseClient } from "@supabase/auth-helpers-react";
-import { useLoginDialog } from "@/utils";
+import { useLoginDialog } from "../utils";
 
 export default function LoginModal() {
   const { isLoginOpen, setLoginOpen } = useLoginDialog();

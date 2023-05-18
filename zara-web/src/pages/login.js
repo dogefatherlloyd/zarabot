@@ -1,12 +1,12 @@
-import Navbar from "@/components/Navbar";
-import { submitVerificationCode } from "@/network";
+import Navbar from "../../../components/Navbar";
+import { submitVerificationCode } from "../../network";
 import { useSupabaseClient } from "@supabase/auth-helpers-react";
 import Head from "next/head";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import { Toaster } from "react-hot-toast";
-import { sendVerificationCode } from "../network";
+import { sendVerificationCode } from "../../network";
 
 export default function Login() {
   const [email, setEmail] = useState("");

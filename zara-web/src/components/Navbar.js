@@ -2,7 +2,7 @@ import { useUser } from "@supabase/auth-helpers-react";
 import Image from "next/image";
 import Link from "next/link";
 import LoginModal from "./LoginModal";
-import { useLoginDialog } from "@/utils";
+import { useLoginDialog } from "../utils";
 
 export default function Navbar() {
   const { setLoginOpen } = useLoginDialog();
