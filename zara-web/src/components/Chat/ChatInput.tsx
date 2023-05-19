@@ -7,6 +7,7 @@ import {
   IconSend,
 } from '@tabler/icons-react';
 import {
+  ChangeEvent,
   KeyboardEvent,
   MutableRefObject,
   useCallback,
@@ -69,7 +70,7 @@ export const ChatInput = ({
     prompt.name.toLowerCase().includes(promptInputValue.toLowerCase()),
   );
 
-  const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+  const handleChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
     const value = e.target.value;
     const maxLength = selectedConversation?.model.maxLength;
 
@@ -91,16 +92,16 @@ export const ChatInput = ({
     if (messageIsStreaming) {
       return;
     }
-
+  
     if (!content) {
       alert(t('Please enter a message'));
       return;
     }
-
-    onSend({ role: 'user', content }, plugin);
+  
+    onSend({ role: 'user', content }, plugin); // Here you use `onSend`, `message` and `plugin`
     setContent('');
     setPlugin(null);
-
+  
     if (window.innerWidth < 640 && textareaRef && textareaRef.current) {
       textareaRef.current.blur();
     }
@@ -233,10 +234,9 @@ export const ChatInput = ({
     if (textareaRef && textareaRef.current) {
       textareaRef.current.style.height = 'inherit';
       textareaRef.current.style.height = `${textareaRef.current?.scrollHeight}px`;
-      textareaRef.current.style.overflow = `${
-        textareaRef?.current?.scrollHeight > 400 ? 'auto' : 'hidden'
-      }`;
+      textareaRef.current.style.overflow = `${textareaRef?.current?.scrollHeight > 400 ? 'auto' : 'hidden'}`;
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [content]);
 
   useEffect(() => {
@@ -283,7 +283,6 @@ export const ChatInput = ({
           <button
             className="absolute left-2 top-2 rounded-sm p-1 text-neutral-800 opacity-60 hover:bg-neutral-200 hover:text-neutral-900 dark:bg-opacity-50 dark:text-neutral-100 dark:hover:text-neutral-200"
             onClick={() => setShowPluginSelect(!showPluginSelect)}
-            onKeyDown={(e) => {}}
           >
             {plugin ? <IconBrandGoogle size={20} /> : <IconBolt size={20} />}
           </button>
