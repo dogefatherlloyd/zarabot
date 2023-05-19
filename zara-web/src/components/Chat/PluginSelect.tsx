@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-vars */
-
+import React from 'react';
 import { FC, useEffect, useRef } from 'react';
 
 import { useTranslation } from 'next-i18next';

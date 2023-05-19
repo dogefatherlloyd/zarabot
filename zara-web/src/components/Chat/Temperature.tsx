@@ -1,3 +1,5 @@
+import React from 'react';
+
 import { FC, useContext, useState } from 'react';
 
 import { useTranslation } from 'next-i18next';
