@@ -49,7 +49,6 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
       apiKey,
       pluginKeys,
       serverSideApiKeyIsSet,
-      messageIsStreaming,
       modelError,
       loading,
       prompts,
@@ -259,15 +258,9 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
       pluginKeys,
       selectedConversation,
       stopConversationRef,
+      homeDispatch,  // Add this line
     ],
-  );
-
-  const scrollToBottom = useCallback(() => {
-    if (autoScrollEnabled) {
-      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-      textareaRef.current?.focus();
-    }
-  }, [autoScrollEnabled]);
+   );
 
   const handleScroll = () => {
     if (chatContainerRef.current) {

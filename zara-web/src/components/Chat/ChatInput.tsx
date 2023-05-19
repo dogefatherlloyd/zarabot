@@ -50,7 +50,7 @@ export const ChatInput = ({
   const {
     state: { selectedConversation, messageIsStreaming, prompts },
 
-    dispatch: homeDispatch,
+    
   } = useContext(HomeContext);
 
   const [content, setContent] = useState<string>();
