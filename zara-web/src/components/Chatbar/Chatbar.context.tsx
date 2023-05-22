@@ -1,3 +1,5 @@
+/* eslint-disable no-unused-vars */
+
 import { Dispatch, createContext } from 'react';
 
 import { ActionType } from '../../hooks/useCreateReducer';

@@ -1,3 +1,5 @@
+/* eslint-disable no-unused-vars */
+
 import { FC, MutableRefObject } from 'react';
 
 import { Prompt } from '../../types/prompt';

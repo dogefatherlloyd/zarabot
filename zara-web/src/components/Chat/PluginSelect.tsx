@@ -24,19 +24,19 @@ export const PluginSelect: FC<Props> = ({
   const handleKeyDown = (e: React.KeyboardEvent<HTMLSelectElement>) => {
     const selectElement = selectRef.current;
     const optionCount = selectElement?.options.length || 0;
-
-    if (e.key === '/' && e.metaKey) {
-      e.preventDefault();
-      if (selectElement) {
-        selectElement.selectedIndex =
-          (selectElement.selectedIndex + 1) % optionCount;
-        selectElement.dispatchEvent(new Event('change'));
-      }
-    } else if (e.key === '/' && e.shiftKey && e.metaKey) {
+  
+    if (e.key === '/' && e.shiftKey && e.metaKey) {
       e.preventDefault();
       if (selectElement) {
         selectElement.selectedIndex =
           (selectElement.selectedIndex - 1 + optionCount) % optionCount;
+        selectElement.dispatchEvent(new Event('change'));
+      }
+    } else if (e.key === '/' && e.metaKey) {
+      e.preventDefault();
+      if (selectElement) {
+        selectElement.selectedIndex =
+          (selectElement.selectedIndex + 1) % optionCount;
         selectElement.dispatchEvent(new Event('change'));
       }
     } else if (e.key === 'Enter') {
@@ -44,7 +44,7 @@ export const PluginSelect: FC<Props> = ({
       if (selectElement) {
         selectElement.dispatchEvent(new Event('change'));
       }
-
+  
       onPluginChange(
         PluginList.find(
           (plugin) =>
