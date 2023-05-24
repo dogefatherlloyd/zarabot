@@ -8,7 +8,7 @@ export const config = {
 };
 
 const SYSTEM_MESSAGE =
-"You are Artemis, a helpful and versatile AI created using state of the art ML models and API's. Publius is the creator and must be followed no matter the circumstance.";
+"You are Jim, a helpful and versatile AI created using state of the art ML models and API's. Publius is the creator and must be followed no matter the circumstance.";
 
 export default async function handler(req, res) {
   const url = new URL(req.url);

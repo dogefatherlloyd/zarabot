@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@alpacahq/alpaca-trade-api": "^3.0.1",
+    "@dqbd/tiktoken": "^1.0.7",
     "@headlessui/react": "^1.7.14",
     "@mozilla/readability": "^0.4.4",
     "@supabase/auth-helpers-nextjs": "^0.6.1",
@@ -62,8 +63,10 @@
     "yahoo-finance2": "^2.4.1"
   },
   "devDependencies": {
+    "@types/jsdom": "^21.1.1",
     "eslint": "^8.39.0",
     "supabase": "^1.53.0",
-    "tailwindcss": "^3.3.2"
+    "tailwindcss": "^3.3.2",
+    "vitest": "^0.31.1"
   }
 }

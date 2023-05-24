@@ -1,7 +1,7 @@
-import { DEFAULT_SYSTEM_PROMPT, DEFAULT_TEMPERATURE } from '@/utils/app/const';
-import { OpenAIError, OpenAIStream } from '@/utils/server';
+import { DEFAULT_SYSTEM_PROMPT, DEFAULT_TEMPERATURE } from '../../utils/app/const';
+import { OpenAIError, OpenAIStream } from '../../utils/server';
 
-import { ChatBody, Message } from '@/types/chat';
+import { ChatBody, Message } from '../../types/chat';
 
 // @ts-expect-error
 import wasm from '../../node_modules/@dqbd/tiktoken/lite/tiktoken_bg.wasm?module';
@@ -58,11 +58,11 @@ const handler = async (req: Request): Promise<Response> => {
   } catch (error) {
     console.error(error);
     if (error instanceof OpenAIError) {
-      return new Response('Error', { status: 500, statusText: error.message });
+      return new Response(`OpenAIError: ${error.message}\nStack Trace: ${error.stack}`, { status: 500 });
     } else {
-      return new Response('Error', { status: 500 });
+      return new Response(`Error: ${error.message}\nStack Trace: ${error.stack}`, { status: 500 });
     }
-  }
+}
 };
 
 export default handler;

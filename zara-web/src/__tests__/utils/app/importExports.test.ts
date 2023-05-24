@@ -1,4 +1,4 @@
-import { DEFAULT_SYSTEM_PROMPT, DEFAULT_TEMPERATURE } from '@/utils/app/const';
+import { DEFAULT_SYSTEM_PROMPT, DEFAULT_TEMPERATURE } from '../../../utils/app/const';
 import {
   cleanData,
   isExportFormatV1,
@@ -6,10 +6,10 @@ import {
   isExportFormatV3,
   isExportFormatV4,
   isLatestExportFormat,
-} from '@/utils/app/importExport';
+} from '../../../utils/app/importExport';
 
-import { ExportFormatV1, ExportFormatV2, ExportFormatV4 } from '@/types/export';
-import { OpenAIModelID, OpenAIModels } from '@/types/openai';
+import { ExportFormatV1, ExportFormatV2, ExportFormatV4 } from '../../../types/export';
+import { OpenAIModelID, OpenAIModels } from '../../../types/openai';
 
 import { describe, expect, it } from 'vitest';
 

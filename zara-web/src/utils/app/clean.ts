@@ -53,12 +53,6 @@ export const cleanSelectedConversation = (conversation: Conversation) => {
 };
 
 export const cleanConversationHistory = (history: any[]): Conversation[] => {
-  // added model for each conversation (3/20/23)
-  // added system prompt for each conversation (3/21/23)
-  // added folders (3/23/23)
-  // added prompts (3/26/23)
-  // added messages (4/16/23)
-
   if (!Array.isArray(history)) {
     console.warn('history is not an array. Returning an empty array.');
     return [];
@@ -66,27 +60,8 @@ export const cleanConversationHistory = (history: any[]): Conversation[] => {
 
   return history.reduce((acc: any[], conversation) => {
     try {
-      if (!conversation.model) {
-        conversation.model = OpenAIModels[OpenAIModelID.GPT_3_5];
-      }
-
-      if (!conversation.prompt) {
-        conversation.prompt = DEFAULT_SYSTEM_PROMPT;
-      }
-
-      if (!conversation.temperature) {
-        conversation.temperature = DEFAULT_TEMPERATURE;
-      }
-
-      if (!conversation.folderId) {
-        conversation.folderId = null;
-      }
-
-      if (!conversation.messages) {
-        conversation.messages = [];
-      }
-
-      acc.push(conversation);
+      let cleanedConversation = cleanSelectedConversation(conversation);
+      acc.push(cleanedConversation);
       return acc;
     } catch (error) {
       console.warn(

@@ -5,7 +5,7 @@ import MessageHistory from "../../../components/MessageHistory";
 import MessageInput from "../../../components/MessageInput";
 import SkillForm from "../../../components/SkillForm";
 import { createServerSupabaseClient } from "@supabase/auth-helpers-nextjs";
-import Layout from "@/components/Layout";
+import Layout from "../../components/Layout";
 import { useSupabaseClient, useUser } from "@supabase/auth-helpers-react";
 import { toast } from "react-hot-toast";
 import { useRouter } from "next/router";

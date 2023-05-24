@@ -1,8 +1,8 @@
-import Layout from "@/components/Layout";
-import MessageHistory from "@/components/MessageHistory";
-import MessageInput from "@/components/MessageInput";
-import Navbar from "@/components/Navbar";
-import useOpenAIMessages from "@/utils/openai";
+import Layout from "../../components/Layout";
+import MessageHistory from "../../components/MessageHistory";
+import MessageInput from "../../components/MessageInput";
+import Navbar from "../../components/Navbar";
+import useOpenAIMessages from "../../utils/openai";
 import { createServerSupabaseClient } from "@supabase/auth-helpers-nextjs";
 import { useSupabaseClient } from "@supabase/auth-helpers-react";
 import Head from "next/head";

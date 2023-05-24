@@ -2,12 +2,12 @@ import React, { useState, useEffect } from 'react';
 import io from 'socket.io-client';
 import Head from 'next/head';
 import Navbar from '../components/Navbar';
-import useOpenAIMessages from '@/utils/openai';
-import MessageInput from '@/components/MessageInput';
-import MessageHistory from '@/components/MessageHistory';
-import Layout from '@/components/Layout';
-import Dashboard from '@/components/Dashboard';
-import TradeEventsWindow from '@/components/TradeEventsWindow';
+import useOpenAIMessages from '../utils/openai';
+import MessageInput from '../components/MessageInput';
+import MessageHistory from '../components/MessageHistory';
+import Layout from '../components/Layout';
+import Dashboard from '../components/Dashboard';
+import TradeEventsWindow from '../components/TradeEventsWindow';
 
 export default function Finance() {
   const { history, sending, sendMessages } = useOpenAIMessages();
