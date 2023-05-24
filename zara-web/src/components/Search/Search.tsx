@@ -1,3 +1,5 @@
+/* eslint-disable no-unused-vars */
+
 import { IconX } from '@tabler/icons-react';
 import { FC } from 'react';
 

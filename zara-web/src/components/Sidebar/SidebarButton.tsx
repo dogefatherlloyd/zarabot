@@ -1,3 +1,5 @@
+/* eslint-disable no-unused-vars */
+
 import { FC } from 'react';
 
 interface Props {

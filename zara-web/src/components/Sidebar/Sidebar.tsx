@@ -1,3 +1,5 @@
+/* eslint-disable no-unused-vars */
+
 import { IconFolderPlus, IconMistOff, IconPlus } from '@tabler/icons-react';
 import { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';

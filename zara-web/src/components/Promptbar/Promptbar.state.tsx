@@ -1,4 +1,6 @@
-import { Prompt } from '@/types/prompt';
+/* eslint-disable no-unused-vars */
+
+import { Prompt } from '../../types/prompt';
 
 export interface PromptbarInitialState {
   searchTerm: string;

@@ -6,6 +6,8 @@ import { useCreateReducer } from '../../hooks/useCreateReducer';
 import { savePrompts } from '../../utils/app/prompts';
 
 import { OpenAIModels } from '../../types/openai';
+/* eslint-disable no-unused-vars */
+
 import { Prompt } from '../../types/prompt';
 
 import HomeContext from '../../pages/api/home/home.context';

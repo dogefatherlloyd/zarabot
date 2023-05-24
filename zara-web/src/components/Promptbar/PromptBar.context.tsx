@@ -1,8 +1,10 @@
+/* eslint-disable no-unused-vars */
+
 import { Dispatch, createContext } from 'react';
 
-import { ActionType } from '@/hooks/useCreateReducer';
+import { ActionType } from '../../hooks/useCreateReducer';
 
-import { Prompt } from '@/types/prompt';
+import { Prompt } from '../../types/prompt';
 
 import { PromptbarInitialState } from './Promptbar.state';
 

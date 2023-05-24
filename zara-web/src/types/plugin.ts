@@ -1,3 +1,5 @@
+/* eslint-disable no-unused-vars */
+
 import { KeyValuePair } from './data';
 
 export interface Plugin {

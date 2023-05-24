@@ -1,6 +1,6 @@
 import { FC } from 'react';
 
-import { Prompt } from '@/types/prompt';
+import { Prompt } from '../../../types/prompt';
 
 import { PromptComponent } from './Prompt';
 

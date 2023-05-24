@@ -1,3 +1,5 @@
+/* eslint-disable no-unused-vars */
+
 import { IconCheck, IconKey, IconX } from '@tabler/icons-react';
 import { FC, KeyboardEvent, useEffect, useRef, useState } from 'react';
 

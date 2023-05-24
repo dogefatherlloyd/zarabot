@@ -1,3 +1,5 @@
+/* eslint-disable no-unused-vars */
+
 import { IconFileExport, IconSettings } from '@tabler/icons-react';
 import { useContext, useState } from 'react';
 
