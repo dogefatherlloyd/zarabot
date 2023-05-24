@@ -230,7 +230,8 @@ const Home = ({
     if (window.innerWidth < 640) {
       dispatch({type: 'change', field: 'showChatbar', value: false });
     }
-  }, [selectedConversation]);
+  }, [selectedConversation, dispatch]);
+
 
   useEffect(() => {
     defaultModelId &&
@@ -245,29 +246,25 @@ const Home = ({
         field: 'serverSidePluginKeysSet',
         value: serverSidePluginKeysSet,
       });
-  }, [defaultModelId, serverSideApiKeyIsSet, serverSidePluginKeysSet]);
+  }, [defaultModelId, serverSideApiKeyIsSet, serverSidePluginKeysSet, dispatch]);
 
   // ON LOAD --------------------------------------------
 
   useEffect(() => {
     const settings = getSettings();
     if (settings.theme) {
-      dispatch({type: 'change',
-        field: 'lightMode',
-        value: settings.theme,
-      });
+      dispatch({type: 'change', field: 'lightMode', value: settings.theme });
     }
-
+  
     const apiKey = localStorage.getItem('apiKey');
-
+  
     if (serverSideApiKeyIsSet) {
       dispatch({type: 'change', field: 'apiKey', value: '' });
-
       localStorage.removeItem('apiKey');
     } else if (apiKey) {
       dispatch({type: 'change', field: 'apiKey', value: apiKey });
     }
-
+  
     const pluginKeys = localStorage.getItem('pluginKeys');
     if (serverSidePluginKeysSet) {
       dispatch({type: 'change', field: 'pluginKeys', value: [] });
@@ -275,32 +272,32 @@ const Home = ({
     } else if (pluginKeys) {
       dispatch({type: 'change', field: 'pluginKeys', value: pluginKeys });
     }
-
+  
     if (window.innerWidth < 640) {
       dispatch({type: 'change', field: 'showChatbar', value: false });
       dispatch({type: 'change', field: 'showPromptbar', value: false });
     }
-
+  
     const showChatbar = localStorage.getItem('showChatbar');
     if (showChatbar) {
       dispatch({type: 'change', field: 'showChatbar', value: showChatbar === 'true' });
     }
-
+  
     const showPromptbar = localStorage.getItem('showPromptbar');
     if (showPromptbar) {
       dispatch({type: 'change', field: 'showPromptbar', value: showPromptbar === 'true' });
     }
-
+  
     const folders = localStorage.getItem('folders');
     if (folders) {
       dispatch({type: 'change', field: 'folders', value: JSON.parse(folders) });
     }
-
+  
     const prompts = localStorage.getItem('prompts');
     if (prompts) {
       dispatch({type: 'change', field: 'prompts', value: JSON.parse(prompts) });
     }
-
+  
     const conversationHistory = localStorage.getItem('conversationHistory');
     if (conversationHistory) {
       const parsedConversationHistory: Conversation[] =
@@ -308,10 +305,10 @@ const Home = ({
       const cleanedConversationHistory = cleanConversationHistory(
         parsedConversationHistory,
       );
-
+  
       dispatch({type: 'change', field: 'conversations', value: cleanedConversationHistory });
     }
-
+  
     const selectedConversation = localStorage.getItem('selectedConversation');
     if (selectedConversation) {
       const parsedSelectedConversation: Conversation =
@@ -319,31 +316,27 @@ const Home = ({
       const cleanedSelectedConversation = cleanSelectedConversation(
         parsedSelectedConversation,
       );
-
-      dispatch({type: 'change',
-        field: 'selectedConversation',
-        value: cleanedSelectedConversation,
-      });
+  
+      dispatch({type: 'change', field: 'selectedConversation', value: cleanedSelectedConversation });
     } else {
       const lastConversation = conversations[conversations.length - 1];
-      dispatch({type: 'change',
-        field: 'selectedConversation',
-        value: {
-          id: uuidv4(),
-          name: t('New Conversation'),
-          messages: [],
-          model: OpenAIModels[defaultModelId],
-          prompt: DEFAULT_SYSTEM_PROMPT,
-          temperature: lastConversation?.temperature ?? DEFAULT_TEMPERATURE,
-          folderId: null,
-        },
-      });
+      dispatch({type: 'change', field: 'selectedConversation', value: {
+        id: uuidv4(),
+        name: t('New Conversation'),
+        messages: [],
+        model: OpenAIModels[defaultModelId],
+        prompt: DEFAULT_SYSTEM_PROMPT,
+        temperature: lastConversation?.temperature ?? DEFAULT_TEMPERATURE,
+        folderId: null,
+      } });
     }
   }, [
-    defaultModelId,
-    dispatch,
-    serverSideApiKeyIsSet,
-    serverSidePluginKeysSet,
+      defaultModelId,
+      dispatch,
+      serverSideApiKeyIsSet,
+      serverSidePluginKeysSet,
+      conversations,
+      t
   ]);
 
   return (

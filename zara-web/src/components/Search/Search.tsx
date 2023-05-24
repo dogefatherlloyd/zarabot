@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
 
 import { IconX } from '@tabler/icons-react';
-import { FC } from 'react';
+import { FC, ChangeEvent } from 'react';
 
 import { useTranslation } from 'next-i18next';
 
@@ -13,7 +13,7 @@ interface Props {
 const Search: FC<Props> = ({ placeholder, searchTerm, onSearch }) => {
   const { t } = useTranslation('sidebar');
 
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleSearchChange = (e: ChangeEvent<HTMLInputElement>) => {
     onSearch(e.target.value);
   };
 

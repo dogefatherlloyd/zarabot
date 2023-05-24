@@ -1,10 +1,8 @@
-/* eslint-disable no-unused-vars */
-
-import { FC } from 'react';
+import { FC, ReactElement } from 'react';
 
 interface Props {
   text: string;
-  icon: JSX.Element;
+  icon: ReactElement;
   onClick: () => void;
 }
 

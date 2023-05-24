@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect} from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { useCreateReducer } from '../../hooks/useCreateReducer';
@@ -101,7 +101,8 @@ const Promptbar = () => {
 
   useEffect(() => {
     if (searchTerm) {
-      promptDispatch({type: 'change',
+      promptDispatch({
+        type: 'change',
         field: 'filteredPrompts',
         value: prompts.filter((prompt) => {
           const searchable =
@@ -114,9 +115,9 @@ const Promptbar = () => {
         }),
       });
     } else {
-      promptDispatch({type: 'change', field: 'filteredPrompts', value: prompts });
+      promptDispatch({ type: 'change', field: 'filteredPrompts', value: prompts });
     }
-  }, [searchTerm, prompts]);
+  }, [searchTerm, prompts, promptDispatch]);
 
   return (
     <PromptbarContext.Provider
