@@ -1,7 +1,7 @@
-import { EditSkillForm } from "../../components/EditSkillForm";
-import Navbar from "../../components/Navbar";
-import { fetchUserProfile } from "../../network";
-import { useLoginDialog } from "../../utils";
+import { EditSkillForm } from "@/components/EditSkillForm";
+import Navbar from "@/components/Navbar";
+import { fetchUserProfile } from "@/network";
+import { useLoginDialog } from "@/utils";
 import { useSupabaseClient, useUser } from "@supabase/auth-helpers-react";
 import Head from "next/head";
 import { useRouter } from "next/router";

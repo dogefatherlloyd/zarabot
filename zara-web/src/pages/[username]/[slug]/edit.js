@@ -1,6 +1,6 @@
-import { EditSkillForm } from "../../components/EditSkillForm";
-import Navbar from "../../components/Navbar";
-import { isJson } from "../../utils";
+import { EditSkillForm } from "@/components/EditSkillForm";
+import Navbar from "@/components/Navbar";
+import { isJson } from "@/utils";
 import { createServerSupabaseClient } from "@supabase/auth-helpers-nextjs";
 import { useSupabaseClient, useUser } from "@supabase/auth-helpers-react";
 import Head from "next/head";
