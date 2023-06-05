@@ -18,16 +18,16 @@ module.exports = async (req, res) => {
     let embeddingResponse = null;
 
     try {
-        embeddingResponse = await axios.post(
-            'https://api.openai.com/v1/engines/text-embedding-ada-002/completions',
-            { input },
-            {
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
-                },
-            }
-        );
+      embeddingResponse = await axios.post(
+        'https://api.openai.com/v1/embeddings',
+        { input },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+          },
+        }
+      );
       } catch (err) {
         console.error('Error during OpenAI API call:', err);
         res.status(500).json({ error: 'An error occurred during the OpenAI API call.' });
