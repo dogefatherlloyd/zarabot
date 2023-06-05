@@ -19,8 +19,11 @@ module.exports = async (req, res) => {
 
     try {
         embeddingResponse = await axios.post(
-            'https://api.openai.com/v1/engines/text-embedding-ada-002/completions',
-            { input },
+            'https://api.openai.com/v1/engines/davinci-codex/completions',
+            { 
+                prompt: input,
+                max_tokens: 60 // choose a suitable value
+            },
             {
                 headers: {
                     'Content-Type': 'application/json',
@@ -29,7 +32,7 @@ module.exports = async (req, res) => {
             }
         );
     } catch (err) {
-        console.error('Error during OpenAI API call:', err);
+        console.error('Error during OpenAI API call:', err, err.response?.data);
         res.status(500).json({ error: 'An error occurred during the OpenAI API call.' });
         return;
     }
