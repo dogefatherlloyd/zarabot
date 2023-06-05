@@ -28,8 +28,9 @@ module.exports = async (req, res) => {
                 },
             }
         );
-    } catch(err) {
-        res.status(500).json({ error: err.toString() });
+      } catch (err) {
+        console.error('Error during OpenAI API call:', err);
+        res.status(500).json({ error: 'An error occurred during the OpenAI API call.' });
         return;
     }
 
