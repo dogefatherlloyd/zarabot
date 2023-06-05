@@ -1,5 +1,5 @@
 
-import { createClient } from '@supabase/supabase-js';
+import { SupabaseClient, createClient } from '@supabase/supabase-js';
 import { Configuration, OpenAIApi } from 'openai';
 
 const supabaseUrl = 'https://gwsmfmqtmuhmglnfzqma.supabase.co';
@@ -38,3 +38,12 @@ export default async function handler(req, res) {
         res.status(405).json({ error: 'Method not allowed.' });
     }
 }
+
+async function askQuestion() {
+    const {data} = await SupabaseClient.functions.invoke('ask-custom-data', {
+        body: JSON.stringify({ query: "Who is Toni Cannoli?" })
+    });
+    console.log(data);
+}
+
+askQuestion();
