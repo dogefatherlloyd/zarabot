@@ -39,13 +39,13 @@ export default function Navbar() {
               Build
             </Link>
             <Link href="/training" className="text-gray-200 hover:text-blue-600 ml-4">
-            Cannoli
+              Cannoli
             </Link>
             <Link href="/chat" className="text-gray-200 hover:text-blue-600 ml-4">
               Training
             </Link>
             <Link href="/trade" className="text-gray-200 hover:text-blue-600 ml-4">
-                          Trade
+              Trade
             </Link>
             <Link
               href="https://github.com/dogefatherlloyd/zarabot"
