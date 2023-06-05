@@ -32,21 +32,24 @@ export default function Navbar() {
             </Link>
           </div>
           <div>
-            <Link href="/" className="text-gray-500 hover:text-blue-600 ml-4">
+            <Link href="/" className="text-gray-200 hover:text-blue-600 ml-4">
               Home
             </Link>
-            <Link href="/build" className="text-gray-500 hover:text-blue-600 ml-4">
+            <Link href="/build" className="text-gray-200 hover:text-blue-600 ml-4">
               Build
             </Link>
-            <Link href="/training" className="text-gray-500 hover:text-blue-600 ml-4">
+            <Link href="/training" className="text-gray-200 hover:text-blue-600 ml-4">
+            Cannoli
+            </Link>
+            <Link href="/chat" className="text-gray-200 hover:text-blue-600 ml-4">
               Training
             </Link>
-            <Link href="/trade" className="text-gray-500 hover:text-blue-600 ml-4">
-              Trade
+            <Link href="/trade" className="text-gray-200 hover:text-blue-600 ml-4">
+                          Trade
             </Link>
             <Link
               href="https://github.com/dogefatherlloyd/zarabot"
-              className="text-gray-500 hover:text-blue-600 ml-4"
+              className="text-gray-200 hover:text-blue-600 ml-4"
               target="_blank"
               rel="noreferrer"
             >
@@ -55,7 +58,7 @@ export default function Navbar() {
             {user ? (
               <Link
                 href="/account"
-                className="text-gray-500 hover:text-blue-600 ml-4"
+                className="text-gray-200 hover:text-blue-600 ml-4"
               >
                 Account
               </Link>
