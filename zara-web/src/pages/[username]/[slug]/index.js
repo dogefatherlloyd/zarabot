@@ -1,11 +1,11 @@
 import Head from "next/head";
-import Navbar from "@/components/Navbar";
-import useOpenAIMessages from "@/utils/openai";
-import MessageHistory from "@/components/MessageHistory";
-import MessageInput from "@/components/MessageInput";
-import SkillForm from "@/components/SkillForm";
+import Navbar from "../../../components/Navbar";
+import useOpenAIMessages from "../../../utils/openai";
+import MessageHistory from "../../../components/MessageHistory";
+import MessageInput from "../../../components/MessageInput";
+import SkillForm from "../../../components/SkillForm";
 import { createServerSupabaseClient } from "@supabase/auth-helpers-nextjs";
-import Layout from "@/components/Layout";
+import Layout from "../../../components/Layout";
 import { useSupabaseClient, useUser } from "@supabase/auth-helpers-react";
 import { toast } from "react-hot-toast";
 import { useRouter } from "next/router";
