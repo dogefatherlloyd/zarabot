@@ -1,18 +1,10 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState } from 'react';
 import Navbar from "../components/Navbar";
 
 export default function Chat() {
   const [query, setQuery] = useState('');
   const [loading, setLoading] = useState(false);
   const [chatHistory, setChatHistory] = useState([]);
-
-  const chatHistoryRef = useRef();
-
-  useEffect(() => {
-    if (chatHistoryRef.current) {
-      chatHistoryRef.current.scrollTop = chatHistoryRef.current.scrollHeight;
-    }
-  }, [chatHistory]);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -47,7 +39,7 @@ export default function Chat() {
       <Navbar />
       <div className="flex justify-center items-center h-screen">
         <form onSubmit={handleSubmit} className="flex flex-col items-center space-y-4">
-          <div className="border border-gray-300 rounded p-4 chat-window">
+          <div className="border border-gray-300 rounded p-4 chat-window message-history-window">
             {chatHistory.map((chat, index) => (
               <div key={index} className={`chat-item ${chat.type} mb-2`}>
                 {chat.type === 'query' ? (

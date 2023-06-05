@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { AiOutlinePlus } from "react-icons/ai";
+import { AiOutlinePlus, AiOutlineDelete } from "react-icons/ai";
 import { HiOutlineChatBubbleLeftRight as ChatIcon } from "react-icons/hi2";
 import { RiMenuUnfoldLine, RiMenuFoldLine } from "react-icons/ri";
 import cn from "classnames";
@@ -54,6 +54,29 @@ const LeftSidebar = () => {
     );
   }
 
+  async function handleDeleteConversation(conversationId) {
+    try {
+      const { data, error } = await supabase
+        .from("conversations")
+        .delete()
+        .eq("id", conversationId);
+
+      if (error) {
+        throw new Error(error.message);
+      }
+
+      // Update the conversations state after successful deletion
+      setConversations((prevConversations) =>
+        prevConversations.filter((conversation) => conversation.id !== conversationId)
+      );
+
+      toast.success("Conversation deleted successfully!");
+    } catch (error) {
+      toast.error("Failed to delete conversation. " + error.message);
+      console.error("Failed to delete conversation", error);
+    }
+  }
+
   return (
     <div className="hidden h-full lg:inset-y-0 lg:z-50 lg:flex w-72">
       <div
@@ -88,13 +111,17 @@ const LeftSidebar = () => {
             key={conversation.id}
             className={cn(
               "flex cursor-pointer items-center rounded-md p-3 text-gray-500 hover:bg-gray-50 hover:text-gray-900",
-              conversation.id == query.id &&
-                "bg-gray-100 font-semibold text-gray-600"
+              conversation.id === query.id && "bg-gray-100 font-semibold text-gray-600"
             )}
             href={`/conversations/${conversation.id}`}
           >
             <ChatIcon size={20} className="inline flex-shrink-0" />
             <div className="truncate">&nbsp;&nbsp;{conversation.title}</div>
+            <AiOutlineDelete
+              size={16}
+              className="ml-2 text-gray-400 cursor-pointer"
+              onClick={() => handleDeleteConversation(conversation.id)}
+            />
           </Link>
         ))}
       </div>
