@@ -9,7 +9,7 @@ export default function Chat() {
     const handleSubmit = async (event) => {
       event.preventDefault();
       setLoading(true);
-      const res = await fetch('../api/cannoli', {  // Make sure this URL is correctly pointing to your serverless function
+      const res = await fetch('/api/cannoli', {  // Make sure this URL is correctly pointing to your serverless function
         method: 'POST', 
         headers: {
           'Content-Type': 'application/json'
