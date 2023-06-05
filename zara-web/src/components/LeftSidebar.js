@@ -56,7 +56,7 @@ const LeftSidebar = () => {
 
   async function handleDeleteConversation(conversationId) {
     try {
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from("conversations")
         .delete()
         .eq("id", conversationId);

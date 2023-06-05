@@ -1,5 +1,5 @@
 
-import { SupabaseClient, createClient } from '@supabase/supabase-js';
+import { createClient } from '@supabase/supabase-js';
 import { Configuration, OpenAIApi } from 'openai';
 
 const supabaseUrl = 'https://gwsmfmqtmuhmglnfzqma.supabase.co';
