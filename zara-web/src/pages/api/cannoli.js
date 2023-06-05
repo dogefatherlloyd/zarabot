@@ -6,7 +6,7 @@ const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 module.exports = async (req, res) => {
-    if(req.method === "OPTIONS") {
+    if (req.method === "OPTIONS") {
         res.status(200).json({ message: 'ok' });
         return;
     }
@@ -18,17 +18,17 @@ module.exports = async (req, res) => {
     let embeddingResponse = null;
 
     try {
-      embeddingResponse = await axios.post(
-        'https://api.openai.com/v1/embeddings',
-        { input },
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
-          },
-        }
-      );
-      } catch (err) {
+        embeddingResponse = await axios.post(
+            'https://api.openai.com/v1/engines/text-embedding-ada-002/completions',
+            { input },
+            {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+                },
+            }
+        );
+    } catch (err) {
         console.error('Error during OpenAI API call:', err);
         res.status(500).json({ error: 'An error occurred during the OpenAI API call.' });
         return;
@@ -40,13 +40,14 @@ module.exports = async (req, res) => {
     let documents = null;
 
     try {
-        ({ data: documents } = await supabase.rpc('match_documents' , {
+        ({ data: documents } = await supabase.rpc('match_documents', {
             query_embedding: embedding,
-            match_threshold: .73,
-            match_count: 10
+            match_threshold: 0.73,
+            match_count: 10,
         }));
-    } catch(err) {
-        res.status(500).json({ error: err.toString() });
+    } catch (err) {
+        console.error('Error during Supabase RPC call:', err);
+        res.status(500).json({ error: 'An error occurred during the Supabase RPC call.' });
         return;
     }
 
