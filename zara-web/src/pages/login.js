@@ -1,5 +1,5 @@
-import Navbar from "@/components/Navbar";
-import { submitVerificationCode } from "@/network";
+import Navbar from "../components/Navbar";
+import { submitVerificationCode } from "../network";
 import { useSupabaseClient } from "@supabase/auth-helpers-react";
 import Head from "next/head";
 import Link from "next/link";
