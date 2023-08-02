@@ -9,7 +9,7 @@ export default function Navbar() {
   const user = useUser();
   return (
     <>
-      <nav className="shadow px-2 z-40">
+      <nav className="white-shadow px-2 z-40">
         <div className="flex w-full max-w-4xl py-3 items-center justify-between mx-auto">
           <div className="text-2xl font-medium text-gray-800 flex items-center">
             <Link href="/">
