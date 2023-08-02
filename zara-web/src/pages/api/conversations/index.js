@@ -1,4 +1,4 @@
-import { verifyServerSideAuth } from "../../network";
+import { verifyServerSideAuth } from "../../../network";
 import { createServerSupabaseClient } from "@supabase/auth-helpers-nextjs";
 
 async function getAllConversations(supabase, user, res) {
