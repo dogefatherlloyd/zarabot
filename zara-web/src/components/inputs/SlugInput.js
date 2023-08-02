@@ -4,6 +4,7 @@ export function slugify(text) {
     .replace(/\s+/gi, "-")
     .toLowerCase();
 }
+
 const SlugInput = ({
   field,
   placeholder,
@@ -19,11 +20,12 @@ const SlugInput = ({
 
     if (onChange) onChange(modifiedEvent);
   }
+  
   return (
     <div className="mt-4">
       <label
         htmlFor={field}
-        className="block text-sm font-medium leading-6 text-gray-900 "
+        className="block text-sm font-medium leading-6 text-white" // Changed text-gray-900 to text-white
       >
         {label}
       </label>

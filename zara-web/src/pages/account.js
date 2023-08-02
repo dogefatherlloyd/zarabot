@@ -49,14 +49,14 @@ export default function AccountPage() {
             <form>
               <SlugInput
                 field="username"
-                label="Username"
+                label="Username:"
                 required
                 value={profileData.username}
                 onChange={makeOnChange("username")}
               />
               <TextInput
                 field="first_name"
-                label="First Name"
+                label="First Name:"
                 required
                 value={profileData.first_name}
                 onChange={makeOnChange("first_name")}
@@ -64,14 +64,14 @@ export default function AccountPage() {
 
               <TextInput
                 field="last_name"
-                label="Last Name"
+                label="Last Name:"
                 value={profileData.last_name}
                 onChange={makeOnChange("last_name")}
               />
 
               <TextArea
                 field="bio"
-                label="Bio"
+                label="Bio:"
                 value={profileData.bio}
                 onChange={makeOnChange("bio")}
               />

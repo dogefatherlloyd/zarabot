@@ -1,5 +1,4 @@
 import classNames from "classnames";
-
 import TextAreaAutosize from "react-textarea-autosize";
 
 const TextArea = ({
@@ -14,7 +13,7 @@ const TextArea = ({
   <div>
     <label
       htmlFor={field}
-      className="block text-sm font-medium leading-6 text-gray-900"
+      className="block text-sm font-medium leading-6 text-white" // Changed text-gray-900 to text-white
     >
       {label}
     </label>
