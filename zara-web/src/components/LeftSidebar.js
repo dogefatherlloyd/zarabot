@@ -28,7 +28,8 @@ async function getConversations(supabase, user) {
 
 const LeftSidebar = () => {
   const [show, setShow] = useState(true);
-  const { query } = useRouter();
+  const router = useRouter();  // <---- Added this
+  const { query } = router;
   const supabase = useSupabaseClient();
   const user = useUser();
 
@@ -56,19 +57,35 @@ const LeftSidebar = () => {
 
   async function handleDeleteConversation(conversationId) {
     try {
-      const { error } = await supabase
+      // Delete messages associated with the conversation
+      const { error: deleteMessagesError } = await supabase
+        .from("messages")
+        .delete()
+        .eq("conversation_id", conversationId);
+
+      if (deleteMessagesError) {
+        throw new Error(deleteMessagesError.message);
+      }
+
+      // Delete the conversation
+      const { error: deleteConversationError } = await supabase
         .from("conversations")
         .delete()
         .eq("id", conversationId);
 
-      if (error) {
-        throw new Error(error.message);
+      if (deleteConversationError) {
+        throw new Error(deleteConversationError.message);
       }
 
       // Update the conversations state after successful deletion
       setConversations((prevConversations) =>
         prevConversations.filter((conversation) => conversation.id !== conversationId)
       );
+
+      // If the deleted conversation is the one being viewed, navigate back to the homepage
+      if (query.id === conversationId) {
+        router.push('/');  // <---- Navigate to homepage
+      }
 
       toast.success("Conversation deleted successfully!");
     } catch (error) {
