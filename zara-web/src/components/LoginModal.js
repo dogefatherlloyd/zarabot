@@ -57,13 +57,13 @@ export default function LoginModal() {
                   <label className="font-medium text-gray-600">Email</label>
                   <input
                     type="email"
-                    className="border p-2 rounded-md mt-1"
+                    className="border p-2 rounded-md mt-1 text-black"
                     placeholder="john@doe.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                   />
                   <button
-                    className="w-40 border text-sm font-medium px-4 py-2 mt-2 rounded-md bg-gray-50 hover:bg-gray-100"
+                    className="w-40 border border-blue-600 text-sm font-medium px-4 py-2 mt-2 rounded-md bg-blue-500 hover:bg-blue-600 text-white"
                     onClick={() => sendVerificationCode(supabase, email)}
                   >
                     Send Code
@@ -76,7 +76,7 @@ export default function LoginModal() {
                   </label>
                   <input
                     type="password"
-                    className="border p-2 rounded-md mt-1"
+                    className="border p-2 rounded-md mt-1 text-black"
                     placeholder="123456"
                     onChange={(e) => setCode(e.target.value)}
                     value={code}
