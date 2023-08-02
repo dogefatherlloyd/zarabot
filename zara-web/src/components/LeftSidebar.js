@@ -95,14 +95,14 @@ const LeftSidebar = () => {
   }
 
   return (
-    <div className="hidden h-full lg:inset-y-0 lg:z-50 lg:flex w-72">
+    <div className="hidden h-full lg:inset-y-0 lg:z-50 lg:flex w-72 white-shadow">
       <div
         className={cn(
-          "flex grow flex-col gap-2 overflow-y-auto border-r border-gray-200 bg-white p-2 pt-0 ",
+          "flex grow flex-col gap-2 overflow-y-auto p-2 pt-0 ",
           !show && "invisible"
         )}
       >
-        <div className="sticky top-0 flex items-center bg-white pt-2 ">
+        <div className="sticky top-0 flex items-center pt-2 ">
           <Link
             className={cn(
               "flex flex-1 cursor-pointer items-center rounded-md border p-2 text-gray-500 hover:bg-gray-50 hover:text-gray-900 ",

@@ -38,7 +38,7 @@ const MessageInput = ({
 
   return (
     <div className="px-2 pb-2">
-      <div className="mx-auto w-full max-w-4xl">
+      <div className="mx-auto w-full max-w-4xl white-shadow">
         <div className="flex items-end rounded-md border p-4 pr-2">
           <TextArea
             ref={inputRef}

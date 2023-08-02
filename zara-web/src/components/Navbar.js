@@ -13,66 +13,59 @@ export default function Navbar() {
         <div className="flex w-full max-w-4xl py-3 items-center justify-between mx-auto">
           <div className="text-2xl font-medium text-gray-800 flex items-center">
             <Link href="/">
-              <Image
-                src="/jobot_text_logo.png"
-                height={25}
-                width={50}
-                className="hidden md:block object-contain"
-                alt="logo"
-                unoptimized
-              />
-              <Image
-                src="/jobot_icon.png"
-                height={32}
-                width={32}
-                className="md:hidden object-contain"
-                alt="logo"
-                unoptimized
-              />
+              <div>
+                <Image
+                  src="/jobot_text_logo.png"
+                  height={25}
+                  width={50}
+                  className="hidden md:block object-contain"
+                  alt="logo"
+                  unoptimized
+                />
+                <Image
+                  src="/jobot_icon.png"
+                  height={32}
+                  width={32}
+                  className="md:hidden object-contain"
+                  alt="logo"
+                  unoptimized
+                />
+              </div>
             </Link>
           </div>
-          <div>
-            <Link href="/" className="text-gray-200 hover:text-blue-600 ml-4">
+          <div className="flex items-center space-x-8 divide-x divide-white divide-opacity-40">
+            <Link href="/" className="px-2 text-gray-200 hover:text-blue-600">
               Home
             </Link>
-            <Link href="/build" className="text-gray-200 hover:text-blue-600 ml-4">
+            <Link href="/build" className="px-2 text-gray-200 hover:text-blue-600">
               Build
             </Link>
-            <Link href="/training" className="text-gray-200 hover:text-blue-600 ml-4">
+            <Link href="/training" className="px-2 text-gray-200 hover:text-blue-600">
               Cannoli
             </Link>
-            <Link href="/chat" className="text-gray-200 hover:text-blue-600 ml-4">
+            <Link href="/chat" className="px-2 text-gray-200 hover:text-blue-600">
               Training
             </Link>
-            <Link href="/trade" className="text-gray-200 hover:text-blue-600 ml-4">
+            <Link href="/trade" className="px-2 text-gray-200 hover:text-blue-600">
               Trade
             </Link>
-            <Link
-              href="https://github.com/dogefatherlloyd/zarabot"
-              className="text-gray-200 hover:text-blue-600 ml-4"
-              target="_blank"
-              rel="noreferrer"
-            >
+            <Link href="https://github.com/dogefatherlloyd/zarabot" className="px-2 text-gray-200 hover:text-blue-600" target="_blank" rel="noreferrer">
               Docs
             </Link>
             {user ? (
-              <Link
-                href="/account"
-                className="text-gray-200 hover:text-blue-600 ml-4"
-              >
+              <Link href="/account" className="px-2 text-gray-200 hover:text-blue-600">
                 Account
               </Link>
             ) : (
-              <Link
-                href="/login"
+              <div
                 onClick={(e) => {
                   e.preventDefault();
                   setLoginOpen(true);
                 }}
-                className="text-gray-500 hover:text-blue-600 ml-4"
+                className="px-2 text-gray-500 hover:text-blue-600 cursor-pointer"
               >
                 Log In
-              </Link>
+              </div>
             )}
           </div>
         </div>
