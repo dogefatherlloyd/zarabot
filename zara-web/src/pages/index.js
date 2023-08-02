@@ -1,10 +1,10 @@
 import Head from "next/head";
 import Navbar from "../components/Navbar";
-import useOpenAIMessages from "@/utils/openai";
-import MessageInput from "@/components/MessageInput";
-import MessageHistory from "@/components/MessageHistory";
-import Skills from "@/components/Skills";
-import Layout from "@/components/Layout";
+import useOpenAIMessages from "../utils/openai";
+import MessageInput from "../components/MessageInput";
+import MessageHistory from "../components/MessageHistory";
+import Skills from "../components/Skills";
+import Layout from "../components/Layout";
 import { useSupabaseClient, useUser } from "@supabase/auth-helpers-react";
 import { toast } from "react-hot-toast";
 import { useRouter } from "next/router";
