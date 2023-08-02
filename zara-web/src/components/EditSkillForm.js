@@ -1,4 +1,4 @@
-import { isJson } from "@/utils";
+import { isJson } from "./utils";
 import SlugInput from "./inputs/SlugInput";
 import TextArea from "./inputs/TextArea";
 import TextInput from "./inputs/TextInput";

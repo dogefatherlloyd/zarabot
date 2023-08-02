@@ -1,4 +1,4 @@
-import { verifyServerSideAuth } from "@/network";
+import { verifyServerSideAuth } from "../../network";
 import { createServerSupabaseClient } from "@supabase/auth-helpers-nextjs";
 
 export default async function handler(req, res) {
