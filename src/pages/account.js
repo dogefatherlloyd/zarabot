@@ -15,10 +15,31 @@ export default function AccountPage() {
   const user = useUser();
   const supabase = useSupabaseClient();
   const [profileData, setProfileData] = useState({});
+  const [tokenBalance, setTokenBalance] = useState(0); // State to store token balance
   const [isEditable, setIsEditable] = useState(false); // Edit mode state
 
   useEffect(() => {
-    fetchUserProfile(supabase, user).then((data) => setProfileData(data));
+    // Fetch profile data and token balance
+    async function fetchProfileAndTokenBalance() {
+      const profile = await fetchUserProfile(supabase, user);
+      setProfileData(profile);
+
+      // Fetch the token balance from the "users" table
+      const { data, error } = await supabase
+        .from("users")
+        .select("token_balance")
+        .eq("id", user.id)
+        .single();
+      
+      if (error) {
+        console.error("Failed to fetch token balance:", error);
+      } else {
+        console.log("Fetched token balance:", data.token_balance); // Debugging log
+        setTokenBalance(data.token_balance); // Set the token balance state
+      }
+    }
+
+    fetchProfileAndTokenBalance();
   }, [supabase, user, setProfileData, router]);
 
   const makeOnChange = (field) => (e) =>
@@ -87,6 +108,12 @@ export default function AccountPage() {
                 onChange={makeOnChange("bio")}
                 disabled={!isEditable} // Disable input unless editable
               />
+
+              {/* Display token balance */}
+              <div className="mt-4 text-center">
+                <h2 className="text-lg font-medium text-gray-700">Token Balance:</h2>
+                <p className="text-2xl font-semibold text-blue-500">{tokenBalance}</p>
+              </div>
 
               {isEditable && (
                 <div className="mt-4 flex justify-between">
