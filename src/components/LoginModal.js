@@ -1,4 +1,4 @@
-import { Fragment, useState } from "react";
+import { useState } from "react";
 import { Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField, Slide } from "@mui/material";
 import { sendVerificationCode, submitVerificationCode } from "../network";
 import { useSupabaseClient } from "@supabase/auth-helpers-react";
