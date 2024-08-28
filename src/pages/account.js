@@ -1,7 +1,7 @@
 import ManageAPIKeys from "../components/ManageAPIKeys";
 import Navbar from "../components/Navbar";
 import SlugInput from "../components/inputs/SlugInput";
-import TextArea from "../components/inputs/TextArea";
+import TextArea from "../components/inputs/inputs";
 import TextInput from "../components/inputs/TextInput";
 import { fetchUserProfile, updateUserProfile } from "../network";
 import { useSupabaseClient, useUser } from "@supabase/auth-helpers-react";
@@ -18,25 +18,28 @@ export default function AccountPage() {
   const [tokenBalance, setTokenBalance] = useState(0); // State to store token balance
   const [isEditable, setIsEditable] = useState(false); // Edit mode state
 
+  // Function to fetch the token balance
+  async function fetchTokenBalance() {
+    const { data, error } = await supabase
+      .from("users")
+      .select("token_balance")
+      .eq("id", user.id)
+      .single();
+
+    if (error) {
+      console.error("Failed to fetch token balance:", error);
+    } else {
+      console.log("Fetched token balance:", data.token_balance); // Debugging log
+      setTokenBalance(data.token_balance); // Set the token balance state
+    }
+  }
+
   useEffect(() => {
     // Fetch profile data and token balance
     async function fetchProfileAndTokenBalance() {
       const profile = await fetchUserProfile(supabase, user);
       setProfileData(profile);
-
-      // Fetch the token balance from the "users" table
-      const { data, error } = await supabase
-        .from("users")
-        .select("token_balance")
-        .eq("id", user.id)
-        .single();
-      
-      if (error) {
-        console.error("Failed to fetch token balance:", error);
-      } else {
-        console.log("Fetched token balance:", data.token_balance); // Debugging log
-        setTokenBalance(data.token_balance); // Set the token balance state
-      }
+      await fetchTokenBalance();
     }
 
     fetchProfileAndTokenBalance();
@@ -109,10 +112,20 @@ export default function AccountPage() {
                 disabled={!isEditable} // Disable input unless editable
               />
 
-              {/* Display token balance */}
+              {/* Display token balance with refresh button */}
               <div className="mt-4 text-center">
                 <h2 className="text-lg font-medium text-gray-700">Token Balance:</h2>
                 <p className="text-2xl font-semibold text-blue-500">{tokenBalance}</p>
+                <button
+                  type="button"
+                  onClick={async () => {
+                    await fetchTokenBalance(); // Fetch the latest token balance
+                    console.log("Refreshed token balance"); // Log when refresh is clicked
+                  }}
+                  className="mt-2 rounded-md bg-gray-200 py-1 px-3 text-sm font-semibold text-gray-700 shadow-sm hover:bg-gray-300"
+                >
+                  Refresh Balance
+                </button>
               </div>
 
               {isEditable && (
