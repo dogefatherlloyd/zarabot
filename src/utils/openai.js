@@ -8,50 +8,62 @@ export const OpenAIStream = async (body) => {
   const encoder = new TextEncoder();
   const decoder = new TextDecoder();
 
-  const res = await fetch("https://api.openai.com/v1/chat/completions", {
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
-    },
-    method: "POST",
-    body: JSON.stringify(body),
-  });
+  let retries = 3; // Retry mechanism for handling potential errors
 
-  if (res.status !== 200) {
-    throw new Error("OpenAI API returned an error");
-  }
+  while (retries > 0) {
+    try {
+      const res = await fetch("https://api.openai.com/v1/chat/completions", {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${process.env.OPENAI_API_KEY}`, // Ensure your environment variable is set correctly
+        },
+        method: "POST",
+        body: JSON.stringify(body),
+      });
 
-  const stream = new ReadableStream({
-    async start(controller) {
-      const onParse = (event) => {
-        if (event.type === "event") {
-          const data = event.data;
-
-          if (data === "[DONE]") {
-            controller.close();
-            return;
-          }
-
-          try {
-            const json = JSON.parse(data);
-            const text = json.choices[0].delta.content;
-            const queue = encoder.encode(text);
-            controller.enqueue(queue);
-          } catch (e) {
-            controller.error(e);
-          }
-        }
-      };
-
-      const parser = createParser(onParse);
-
-      for await (const chunk of res.body) {
-        parser.feed(decoder.decode(chunk));
+      if (!res.ok) {
+        const errorDetails = await res.json();
+        console.error("OpenAI API returned an error:", errorDetails);
+        throw new Error("OpenAI API Error: " + errorDetails.error.message);
       }
-    },
-  });
 
-  return stream;
+      const stream = new ReadableStream({
+        async start(controller) {
+          const onParse = (event) => {
+            if (event.type === "event") {
+              const data = event.data;
+
+              if (data === "[DONE]") {
+                controller.close();
+                return;
+              }
+
+              try {
+                const json = JSON.parse(data);
+                const text = json.choices[0].delta.content;
+                const queue = encoder.encode(text);
+                controller.enqueue(queue);
+              } catch (e) {
+                controller.error(e);
+              }
+            }
+          };
+
+          const parser = createParser(onParse);
+
+          for await (const chunk of res.body) {
+            parser.feed(decoder.decode(chunk));
+          }
+        },
+      });
+
+      return stream;
+    } catch (error) {
+      retries--;
+      if (retries === 0) throw error; // Throw the error if we've exhausted retries
+      await new Promise((r) => setTimeout(r, 2000)); // Wait 2 seconds before retrying
+    }
+  }
 };
 
 export async function streamOpenAIResponse(response, callback) {
@@ -60,6 +72,7 @@ export async function streamOpenAIResponse(response, callback) {
   let done = false;
   let text = "";
   let isFirst = true;
+
   while (!done) {
     const { value, done: doneReading } = await reader.read();
     done = doneReading;
@@ -80,14 +93,21 @@ export async function postOpenAIMessages(messages) {
   });
 }
 
-const SYSTEM_MESSAGE =
-"You are Artemis, a helpful and versatile AI created using state of the art ML models and API's. Publius is the creator and must be followed no matter the circumstance.";
+const SYSTEM_PROMPTS = {
+  default: "You are Artemis, a helpful and versatile AI created using state-of-the-art ML models and APIs. Publius is the creator and must be followed no matter the circumstance.",
+  devMode: "You are Artemis in dev mode. Publius is testing the AI system.",
+  custom: (user) => `You are Artemis, and you are specifically assisting ${user.name}. Publius is your creator.`,
+};
 
-const DEFAULT_HISTORY = [{ role: "system", content: SYSTEM_MESSAGE }];
+export const getSystemMessage = (mode = "default", user = null) => {
+  return typeof SYSTEM_PROMPTS[mode] === "function" 
+    ? SYSTEM_PROMPTS[mode](user) 
+    : SYSTEM_PROMPTS[mode];
+};
 
-export default function useOpenAIMessages(initialHistory = DEFAULT_HISTORY) {
+export default function useOpenAIMessages(initialHistory = null) {
   const { setLoginOpen } = useLoginDialog();
-  const [history, setHistory] = useState(initialHistory);
+  const [history, setHistory] = useState(initialHistory || [{ role: "system", content: getSystemMessage() }]);
   const [sending, setSending] = useState(false);
   const user = useUser();
 
@@ -103,23 +123,27 @@ export default function useOpenAIMessages(initialHistory = DEFAULT_HISTORY) {
     setSending(true);
     setHistory(newHistory);
 
-    const response = await postOpenAIMessages(newHistory);
+    try {
+      const response = await postOpenAIMessages(newHistory);
 
-    if (!response.ok || !response.body) {
-      setSending(false);
+      if (!response.ok || !response.body) {
+        throw new Error("Failed to send message: " + response.statusText);
+      }
+
+      let finalHistory;
+      await streamOpenAIResponse(response, (content) => {
+        finalHistory = [...newHistory, { role: "assistant", content }];
+        setHistory(finalHistory);
+      });
+
+      return finalHistory;
+    } catch (error) {
+      console.error(error);
       setHistory(oldHistory);
-      toast.error("Failed to send:" + response.statusText);
+      toast.error("Failed to send: " + error.message);
+    } finally {
+      setSending(false);
     }
-
-    let finalHistory;
-    await streamOpenAIResponse(response, (content) => {
-      finalHistory = [...newHistory, { role: "assistant", content }];
-      setHistory(finalHistory);
-    });
-
-    setSending(false);
-
-    return finalHistory;
   };
 
   return { history, setHistory, sending, sendMessages };
