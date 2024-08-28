@@ -1,4 +1,4 @@
-import { useUser } from "@supabase/auth-helpers-react";
+import { useUser, useSessionContext } from "@supabase/auth-helpers-react"; // Ensure correct hooks are used
 import { createParser } from "eventsource-parser";
 import { useState } from "react";
 import { toast } from "react-hot-toast";
@@ -107,12 +107,14 @@ export const getSystemMessage = (mode = "default", user = null) => {
 
 export default function useOpenAIMessages(initialHistory = null) {
   const { setLoginOpen } = useLoginDialog();
+  const { isLoading, session } = useSessionContext(); // Using the session context to get the session
+  const user = useUser();
   const [history, setHistory] = useState(initialHistory || [{ role: "system", content: getSystemMessage() }]);
   const [sending, setSending] = useState(false);
-  const user = useUser();
 
   const sendMessages = async (newMessages) => {
-    if (!user) {
+    if (isLoading) return; // Avoid sending messages while loading session data
+    if (!session || !user) {
       toast("Please log in to send a message");
       setLoginOpen(true);
       return;
