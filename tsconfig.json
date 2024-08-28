@@ -1,13 +1,9 @@
 {
   "compilerOptions": {
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
+    "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "skipLibCheck": true,
-    "strict": false,
+    "strict": false,  // Change to true for stricter type checking
     "forceConsistentCasingInFileNames": true,
     "noEmit": true,
     "incremental": true,
@@ -16,14 +12,13 @@
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "jsx": "preserve"
+    "jsx": "preserve",  // Try "react-jsx" for React 17+
+    "baseUrl": ".",  // Optional: Set base URL for path aliases
+    "paths": {  // Optional: Define path aliases if you're using them
+      "@components/*": ["components/*"],
+      "@lib/*": ["lib/*"]
+    }
   },
-  "include": [
-    "next-env.d.ts",
-    "**/*.ts",
-    "**/*.tsx"
-  ],
-  "exclude": [
-    "node_modules"
-  ]
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
+  "exclude": ["node_modules"]
 }
