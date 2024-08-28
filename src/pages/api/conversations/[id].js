@@ -1,8 +1,11 @@
 import { verifyServerSideAuth } from "../../../network";
-import { createServerSupabaseClient } from "@supabase/auth-helpers-nextjs";
+import { createMiddlewareClient } from "@supabase/auth-helpers-nextjs";
 
 export default async function handler(req, res) {
-  const supabase = createServerSupabaseClient({ req, res });
+  // Use createMiddlewareClient for API routes
+  const supabase = createMiddlewareClient({ req, res });
+
+  // Verify the server-side auth
   const user = await verifyServerSideAuth(supabase, req.headers);
 
   if (!user) {
@@ -27,21 +30,22 @@ async function getConversation(supabase, user, req, res) {
     .eq("id", id)
     .single();
 
-  if (!data || !data.user_id == user.id) {
-    res.status(404).json({ message: "Conversation not found" });
+  if (!data || data.user_id !== user.id) {
+    return res.status(404).json({ message: "Conversation not found" });
   }
 
   if (error) {
-    res.status(400).json({ message: error.message });
+    return res.status(400).json({ message: error.message });
   }
 
-  res.status(200).json({ data });
+  return res.status(200).json({ data });
 }
 
 async function updateConversation(supabase, user, req, res) {
   const { id } = req.query;
   let { messages } = req.body;
 
+  // Ensure each message has the correct conversation_id
   messages = messages.map((message) => ({
     ...message,
     conversation_id: id,
@@ -53,12 +57,12 @@ async function updateConversation(supabase, user, req, res) {
     .eq("id", id)
     .single();
 
-  if (!data || !data.user_id == user.id) {
-    res.status(404).json({ message: "Conversation not found" });
+  if (!data || data.user_id !== user.id) {
+    return res.status(404).json({ message: "Conversation not found" });
   }
 
   if (error) {
-    res
+    return res
       .status(400)
       .json({ message: "Conversation not found. " + error.message });
   }
@@ -68,8 +72,9 @@ async function updateConversation(supabase, user, req, res) {
     .insert(messages);
 
   if (messagesError) {
-    res.status(500).json({ message: messagesError.message });
+    return res.status(500).json({ message: messagesError.message });
   }
 
+  // Return the updated conversation
   return getConversation(supabase, user, req, res);
 }

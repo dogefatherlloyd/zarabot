@@ -1,7 +1,7 @@
 import { EditSkillForm } from "../../../components/EditSkillForm";
 import Navbar from "../../../components/Navbar";
 import { isJson } from "../../../utils";
-import { createServerSupabaseClient } from "@supabase/auth-helpers-nextjs";
+import { createPagesServerClient } from "@supabase/auth-helpers-nextjs"; // Updated import
 import { useSupabaseClient, useUser } from "@supabase/auth-helpers-react";
 import Head from "next/head";
 import { useRouter } from "next/router";
@@ -42,7 +42,7 @@ export default function EditSkillPage({ skill }) {
       toast.success("Skill updated successfully");
       router.push(`/${skill.profiles.username}/${updatedSkill.slug}`);
     } catch (error) {
-      toast.error("Failed to update skill:" + error.message);
+      toast.error("Failed to update skill: " + error.message);
       console.error("Error updating skill:", error);
     }
   }
@@ -50,6 +50,7 @@ export default function EditSkillPage({ skill }) {
   if (!skill) {
     return null;
   }
+
   return (
     <>
       <Head>
@@ -76,7 +77,7 @@ export default function EditSkillPage({ skill }) {
 }
 
 export async function getServerSideProps(context) {
-  const supabase = createServerSupabaseClient(context);
+  const supabase = createPagesServerClient(context); // Updated function
   const slug = context.params.slug;
   const username = context.params.username;
 
@@ -106,9 +107,9 @@ export async function getServerSideProps(context) {
       "User is not the author",
       e2,
       "user.id",
-      user.id,
+      user?.id,
       "skill.user_id",
-      skill.user_id
+      skill?.user_id
     );
     return {
       notFound: true,

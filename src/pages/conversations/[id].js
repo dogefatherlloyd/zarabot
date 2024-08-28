@@ -3,7 +3,7 @@ import MessageHistory from "../../components/MessageHistory";
 import MessageInput from "../../components/MessageInput";
 import Navbar from "../../components/Navbar";
 import useOpenAIMessages from "../../utils/openai";
-import { createServerSupabaseClient } from "@supabase/auth-helpers-nextjs";
+import { createPagesServerClient } from "@supabase/auth-helpers-nextjs";
 import { useSupabaseClient } from "@supabase/auth-helpers-react";
 import Head from "next/head";
 import { useRouter } from "next/router";
@@ -86,7 +86,7 @@ export default function ConversationPage({ conversation }) {
 }
 
 export async function getServerSideProps(context) {
-  const supabase = createServerSupabaseClient(context);
+  const supabase = createPagesServerClient(context); // Updated function
 
   const { id } = context.params;
 
@@ -107,7 +107,7 @@ export async function getServerSideProps(context) {
     .eq("id", id)
     .single();
 
-  if (!data || !data.user_id == user.id || error) {
+  if (!data || data.user_id !== user.id || error) {
     return {
       notFound: true,
     };

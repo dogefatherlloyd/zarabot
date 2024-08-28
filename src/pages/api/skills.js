@@ -1,7 +1,7 @@
-import { createServerSupabaseClient } from "@supabase/auth-helpers-nextjs";
+import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs";
 
 export default async function handler(req, res) {
-  const supabase = createServerSupabaseClient({ req, res });
+  const supabase = createRouteHandlerClient({ req, res }); // Updated method
   const { data: skills, error } = await supabase.from("skills").select(`
     *,
     profile:profiles (
@@ -12,7 +12,7 @@ export default async function handler(req, res) {
   `);
 
   if (error) {
-    res.status(404).json({ error: error });
+    res.status(404).json({ error: error.message });
     return;
   }
 

@@ -1,5 +1,5 @@
 import { ensureUserProfile, getChatResponseHeaders } from "../../../network";
-import { createServerSupabaseClient } from "@supabase/auth-helpers-nextjs";
+import { createMiddlewareClient } from "@supabase/auth-helpers-nextjs";
 
 export default async function handler(req, res) {
   const headers = getChatResponseHeaders();
@@ -11,14 +11,14 @@ export default async function handler(req, res) {
     res.status(405).send("Method not supported");
     return;
   }
+
   const { email, phone, code } = req.body || {};
 
   if (!(email || phone) || !code) {
     res.status(400).send("The fields `email`/`phone` and `code` are required");
     return;
   }
-
-  const supabase = createServerSupabaseClient({ req, res });
+  const supabase = createMiddlewareClient({ req, res });
 
   const supabaseBody = {
     token: code,
@@ -33,31 +33,26 @@ export default async function handler(req, res) {
     supabaseBody.phone = phone;
   }
 
-  const { data: data1, error: error1 } = await supabase.auth.verifyOtp(
-    supabaseBody
-  );
+  const { data: data1, error: error1 } = await supabase.auth.verifyOtp(supabaseBody);
 
   if (error1) {
     console.error("Failed to verify code for login", error1);
-    res
-      .status(400)
-      .json({ message: "Failed to verify code. " + error1.message });
-
+    res.status(400).json({ message: "Failed to verify code. " + error1.message });
     return;
   }
 
   const user = data1?.user;
 
   if (!user) {
-    console.error("unable to retrieve user");
+    console.error("Unable to retrieve user");
     res.status(400).json({ message: "Unable to retrieve user" });
     return;
   }
 
-  const profile = ensureUserProfile(supabase, user);
+  const profile = await ensureUserProfile(supabase, user);
 
   if (!profile) {
-    console.log("unable to create user profile");
+    console.log("Unable to create user profile");
     res.status(500).json({ message: "Unable to create user profile" });
     return;
   }
@@ -76,9 +71,7 @@ export default async function handler(req, res) {
     .single();
 
   if (error3) {
-    res
-      .status(500)
-      .json({ message: "Failed to create API key. " + error3.message });
+    res.status(500).json({ message: "Failed to create API key. " + error3.message });
     return;
   }
 

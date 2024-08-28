@@ -1,5 +1,5 @@
 import { verifyServerSideAuth } from "../../../network";
-import { createServerSupabaseClient } from "@supabase/auth-helpers-nextjs";
+import { createMiddlewareClient } from "@supabase/auth-helpers-nextjs";
 
 async function getAllConversations(supabase, user, res) {
   const { data, error } = await supabase
@@ -8,22 +8,19 @@ async function getAllConversations(supabase, user, res) {
     .eq("user_id", user.id);
 
   if (error) {
-    res.status(500).json({ message: error.message });
+    return res.status(500).json({ message: error.message });
   }
 
   res.status(200).json({ data });
 }
 
 async function createNewConversation(supabase, user, req, res) {
-  // get message from body
-  let { messages, title } = req.body;
+  const { messages, title } = req.body;
 
-  // if messages is empty list return 400
   if (!messages || messages.length === 0) {
-    res.status(400).json({ message: "No messages provided" });
+    return res.status(400).json({ message: "No messages provided" });
   }
 
-  // create new conversation
   const { data: conversationData, error: conversationError } = await supabase
     .from("conversations")
     .insert({
@@ -34,23 +31,20 @@ async function createNewConversation(supabase, user, req, res) {
     .single();
 
   if (conversationError) {
-    res.status(500).json({ message: conversationError.message });
+    return res.status(500).json({ message: conversationError.message });
   }
 
-  // add conversation id into all messages
-  messages = messages.map((message) => ({
-    ...message,
-    conversation_id: conversationData.id,
-  }));
+  messages.forEach((message) => {
+    message.conversation_id = conversationData.id;
+  });
 
-  // insert messages using supabase
   const { data: messagesData, error: messagesError } = await supabase
     .from("messages")
     .insert(messages)
     .select();
 
   if (messagesError) {
-    res.status(500).json({ message: messagesError.message });
+    return res.status(500).json({ message: messagesError.message });
   }
 
   conversationData.messages = messagesData;
@@ -59,7 +53,7 @@ async function createNewConversation(supabase, user, req, res) {
 }
 
 export default async function handler(req, res) {
-  const supabase = createServerSupabaseClient({ req, res });
+  const supabase = createMiddlewareClient({ req, res });
   const user = await verifyServerSideAuth(supabase, req.headers);
 
   if (!user) {

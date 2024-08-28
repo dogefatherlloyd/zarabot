@@ -1,29 +1,35 @@
 import { getChatResponseHeaders, verifyServerSideAuth } from "../../network";
 import { OpenAIStream } from "../../utils/openai";
-import { createMiddlewareSupabaseClient } from "@supabase/auth-helpers-nextjs";
+import { createMiddlewareClient } from "@supabase/auth-helpers-nextjs";
 
 export const config = {
   runtime: "edge",
 };
 
-async function handler(req, res) {
-  const supabase = createMiddlewareSupabaseClient({ req, res });
+async function handler(req) {
+  const supabase = createMiddlewareClient({ req });
+
+  // Verify authentication
   const authenticated = await verifyServerSideAuth(supabase, req.headers);
 
   if (!authenticated) {
     return new Response("Unauthorized", { status: 401 });
   }
 
+  // Parse the request body
   const body = await req.json();
   body.model = "gpt-4";
 
+  // Set headers
   const headers = getChatResponseHeaders();
 
+  // Format messages
   body.messages = (body.messages || []).map((m) => ({
     role: m.role,
     content: m.content,
   }));
 
+  // Stream response handling
   if (body.stream) {
     const stream = await OpenAIStream(body);
     return new Response(stream, { status: 200, headers });
@@ -36,8 +42,10 @@ async function handler(req, res) {
       method: "POST",
       body: JSON.stringify(body),
     });
+
     const resText = await res.text();
     headers["Content-Type"] = "application/json";
+
     return new Response(resText, { status: 200, headers });
   }
 }

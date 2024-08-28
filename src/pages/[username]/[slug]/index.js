@@ -4,7 +4,7 @@ import useOpenAIMessages from "../../../utils/openai";
 import MessageHistory from "../../../components/MessageHistory";
 import MessageInput from "../../../components/MessageInput";
 import SkillForm from "../../../components/SkillForm";
-import { createServerSupabaseClient } from "@supabase/auth-helpers-nextjs";
+import { createPagesServerClient } from "@supabase/auth-helpers-nextjs"; // Updated method
 import Layout from "../../../components/Layout";
 import { useSupabaseClient, useUser } from "@supabase/auth-helpers-react";
 import { toast } from "react-hot-toast";
@@ -93,7 +93,7 @@ export default function SkillPage({ skill }) {
 }
 
 export async function getServerSideProps(context) {
-  const supabase = createServerSupabaseClient(context);
+  const supabase = createPagesServerClient(context); // Updated method
   const slug = context.params.slug;
   const username = context.params.username;
 
