@@ -15,15 +15,11 @@ export default function Home() {
   const supabase = useSupabaseClient();
   const user = useUser();
   const router = useRouter();
-  const [loading, setLoading] = useState(false); // Loading state to handle UI feedback
+  const [loading, setLoading] = useState(false); // Loading state
 
+  // Helper to safely handle send messages logic
   async function handleSend(newMessages) {
-    // Optimistically add the message to the history
-    const optimisticHistory = [...history, ...newMessages];
-    setHistory(optimisticHistory); // Update UI optimistically
-
-    setLoading(true); // Set loading state
-
+    setLoading(true); // Set loading state to true
     try {
       const finalHistory = await sendMessages(newMessages);
 
@@ -63,8 +59,6 @@ export default function Home() {
       // Navigate to the conversation page
       router.push(`/conversations/${conversationData.id}`);
     } catch (error) {
-      // Rollback the optimistic updates in case of failure
-      setHistory(history);
       toast.error("Failed to send messages: " + error.message);
     } finally {
       setLoading(false); // Turn off loading state
@@ -90,7 +84,8 @@ export default function Home() {
       <Layout>
         <Navbar />
 
-        {history.length <= 1 && (
+        {/* Render only if history is available */}
+        {history && history.length <= 1 && (
           <div className="flex-1 overflow-y-auto">
             <div className="mx-auto max-w-4xl overflow-y-auto w-full">
               <h1 className="mx-auto mt-4 my-6 w-full max-w-4xl text-3xl md:text-4xl font-medium text-center">
@@ -109,7 +104,8 @@ export default function Home() {
           </div>
         )}
 
-        {history.length > 1 && (
+        {/* Only render message history if there are more than 1 messages */}
+        {history && history.length > 1 && (
           <>
             <MessageHistory history={history} />
             <MessageInput
