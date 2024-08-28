@@ -1,27 +1,26 @@
 import ManageAPIKeys from "../components/ManageAPIKeys";
 import Navbar from "../components/Navbar";
 import SlugInput from "../components/inputs/SlugInput";
-import TextArea from "../components/inputs/inputs";
+import TextArea from "../components/inputs/TextArea";
 import TextInput from "../components/inputs/TextInput";
 import { fetchUserProfile, updateUserProfile } from "../network";
 import { useSupabaseClient, useUser } from "@supabase/auth-helpers-react";
 import Head from "next/head";
 import Link from "next/link";
-import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 
 export default function AccountPage() {
-  const router = useRouter();
   const user = useUser();
   const supabase = useSupabaseClient();
   const [profileData, setProfileData] = useState({});
   const [tokenBalance, setTokenBalance] = useState(0); // State to store token balance
   const [isEditable, setIsEditable] = useState(false); // Edit mode state
 
-  // Function to fetch the token balance
-  async function fetchTokenBalance() {
+  const fetchTokenBalance = useCallback(async () => {
+    if (!user) return; // Ensure user is available
+    console.log(`Fetching token balance for user ID: ${user.id}`);
     const { data, error } = await supabase
-      .from("users")
+      .from("profiles")  // Fetching from the correct table
       .select("token_balance")
       .eq("id", user.id)
       .single();
@@ -32,18 +31,20 @@ export default function AccountPage() {
       console.log("Fetched token balance:", data.token_balance); // Debugging log
       setTokenBalance(data.token_balance); // Set the token balance state
     }
-  }
+  }, [supabase, user]);
+
+  const fetchProfileAndTokenBalance = useCallback(async () => {
+    if (!user) return;
+    const profile = await fetchUserProfile(supabase, user);
+    setProfileData(profile);
+    fetchTokenBalance();  // Fetch the token balance
+  }, [supabase, user, fetchTokenBalance]);
 
   useEffect(() => {
-    // Fetch profile data and token balance
-    async function fetchProfileAndTokenBalance() {
-      const profile = await fetchUserProfile(supabase, user);
-      setProfileData(profile);
-      await fetchTokenBalance();
+    if (user) {
+      fetchProfileAndTokenBalance();
     }
-
-    fetchProfileAndTokenBalance();
-  }, [supabase, user, setProfileData, router]);
+  }, [user, fetchProfileAndTokenBalance]);
 
   const makeOnChange = (field) => (e) =>
     setProfileData({ ...profileData, [field]: e.target.value });
@@ -54,7 +55,8 @@ export default function AccountPage() {
     setIsEditable(false); // Turn off edit mode after saving
   }
 
-  if (!profileData) {
+  // Return null if user data hasn't loaded yet to prevent rendering
+  if (!user) {
     return null;
   }
 
@@ -112,17 +114,14 @@ export default function AccountPage() {
                 disabled={!isEditable} // Disable input unless editable
               />
 
-              {/* Display token balance with refresh button */}
+              {/* Display token balance */}
               <div className="mt-4 text-center">
                 <h2 className="text-lg font-medium text-gray-700">Token Balance:</h2>
                 <p className="text-2xl font-semibold text-blue-500">{tokenBalance}</p>
                 <button
                   type="button"
-                  onClick={async () => {
-                    await fetchTokenBalance(); // Fetch the latest token balance
-                    console.log("Refreshed token balance"); // Log when refresh is clicked
-                  }}
-                  className="mt-2 rounded-md bg-gray-200 py-1 px-3 text-sm font-semibold text-gray-700 shadow-sm hover:bg-gray-300"
+                  onClick={fetchTokenBalance}
+                  className="mt-2 rounded-md bg-blue-500 py-1 px-3 text-sm font-semibold text-white shadow-sm"
                 >
                   Refresh Balance
                 </button>
