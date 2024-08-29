@@ -17,8 +17,8 @@ import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
-import { supabase } from "../../../utils/supabaseClient";
-import { useAuthContext } from "../../../../context/auth";
+import { supabase } from "@supabase/supabaseClient";
+import { useAuthContext } from "@context/auth";
 import { useRouter } from "next/router";
 import Head from "next/head";
 
@@ -42,17 +42,19 @@ export default function AuthSigninSigninWithEmailRoute() {
     resolver: yupResolver(schema),
   });
 
-  const onSubmit = async ({
-    email,
-    password,
-  }) => {
+  const onSubmit = async ({ email, password }) => {
     try {
       const { user, error } = await supabase.auth.signIn({
         email,
         password,
       });
 
+      if (error) {
+        throw error;
+      }
+
       if (user) {
+        console.log("User successfully logged in:", user);
         authContext?.loadUserSession();
         toast({
           title: "Authentication",
@@ -63,21 +65,20 @@ export default function AuthSigninSigninWithEmailRoute() {
         });
         router.replace("/");
       }
-
-      if (error) {
-        toast({
-          title: "Authentication Error",
-          description: error.message,
-          status: "error",
-          duration: 5000,
-          isClosable: true,
-        });
-      }
-      reset({ email: "", password: "" });
     } catch (error) {
-      console.log(error);
+      console.error("Login Error:", error);
+      toast({
+        title: "Authentication Error",
+        description: error.message || "An unexpected error occurred.",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
+    } finally {
+      reset({ email: "", password: "" });
     }
   };
+
   return (
     <Container>
       <Head>

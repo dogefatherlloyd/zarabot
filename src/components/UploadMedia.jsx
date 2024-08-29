@@ -22,7 +22,7 @@ import {
 } from "@chakra-ui/react";
 import { FiImage } from "react-icons/fi";
 import { AiOutlineDelete } from "react-icons/ai";
-import { supabase } from "../utils/supabaseClient";
+import { supabase } from "../../supabase/supabaseClient";
 import shortid from "shortid";
 
 export default function UploadMedia({

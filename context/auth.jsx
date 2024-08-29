@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState, createContext, useContext, useMemo } from "react";
 import { useRouter } from "next/router";
-import { supabase } from "../src/utils/supabaseClient"; // Corrected path to supabaseClient
+import { supabase } from "../supabase/supabaseClient"; // Corrected path to supabaseClient
 import { useToast } from "@chakra-ui/react";
 
 // Create AuthContext
