@@ -1,24 +1,38 @@
 {
   "compilerOptions": {
-    "lib": ["dom", "dom.iterable", "esnext"],
+    "target": "es5",
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
     "allowJs": true,
     "skipLibCheck": true,
-    "strict": false,  // Change to true for stricter type checking
+    "strict": false,
     "forceConsistentCasingInFileNames": true,
     "noEmit": true,
     "incremental": true,
     "esModuleInterop": true,
     "module": "esnext",
-    "moduleResolution": "node",
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "jsx": "preserve",  // Try "react-jsx" for React 17+
-    "baseUrl": ".",  // Optional: Set base URL for path aliases
-    "paths": {  // Optional: Define path aliases if you're using them
-      "@components/*": ["components/*"],
-      "@lib/*": ["lib/*"]
+    "jsx": "preserve",
+    "moduleResolution": "node",
+    "baseUrl": ".",  // Add this to set the base URL for resolving paths
+    "paths": {  // Add path aliases
+      "@components/*": ["src/components/*"],
+      "@services/*": ["src/services/*"],
+      "@layouts/*": ["layouts/*"],
+      "@context/*": ["context/*"],
+      "@*": ["src/*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
-  "exclude": ["node_modules"]
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
 }

@@ -7,12 +7,15 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import { toast } from "react-hot-toast";
+import { Heading, Text, Container, Flex } from "@chakra-ui/react";
 
 export default function BuildPage() {
   const supabase = useSupabaseClient();
   const user = useUser();
   const router = useRouter();
   const { setLoginOpen } = useLoginDialog();
+
+  const [skillData, setSkillData] = useState({});
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -49,31 +52,29 @@ export default function BuildPage() {
     }
   }
 
-  const [skillData, setSkillData] = useState({});
-
   return (
     <>
       <Head>
         <title>Build a Skill - Artemis</title>
       </Head>
-      <div className="flex flex-col h-screen">
+      <Flex direction="column" h="100vh">
         <Navbar />
-        <div className="px-2 flex-1 overflow-y-auto">
-          <div className="mx-auto my-4 w-full max-w-4xl">
-            <h1 className="text-center mx-auto text-4xl font-medium">
+        <Flex px={4} flex={1} overflowY="auto" justify="center" align="center">
+          <Container maxW="4xl" py={8}>
+            <Heading as="h1" textAlign="center" fontSize="4xl" mb={4}>
               Build a Skill
-            </h1>
-            <div className="mx-auto mt-4 mb-4 max-w-xl text-center text-gray-500 sm:text-base">
+            </Heading>
+            <Text textAlign="center" color="gray.500" mb={8}>
               Create a shareable and reusable skill
-            </div>
+            </Text>
             <EditSkillForm
               skillData={skillData}
               setSkillData={setSkillData}
               onSubmit={handleSubmit}
             />
-          </div>
-        </div>
-      </div>
+          </Container>
+        </Flex>
+      </Flex>
     </>
   );
 }

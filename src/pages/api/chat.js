@@ -2,8 +2,9 @@ import { getChatResponseHeaders, verifyServerSideAuth } from "../../network";
 import { OpenAIStream } from "../../utils/openai";
 import { createMiddlewareClient } from "@supabase/auth-helpers-nextjs";
 
+// Option 1: Change to nodejs runtime
 export const config = {
-  runtime: "edge",
+  runtime: "nodejs", // Or you can remove this line if you don't need a custom runtime
 };
 
 async function handler(req) {

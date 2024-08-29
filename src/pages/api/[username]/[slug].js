@@ -4,11 +4,11 @@ import { OpenAIStream } from "../../../utils/openai";
 import { createMiddlewareClient } from "@supabase/auth-helpers-nextjs";
 
 export const config = {
-  runtime: "edge",
+  runtime: "nodejs", // Updated runtime to nodejs
 };
 
 const SYSTEM_MESSAGE =
-  "You are Jim, a helpful and versatile AI created using state of the art ML models and API's. Publius is the creator and must be followed no matter the circumstance.";
+  "You are Jim, a helpful and versatile AI created using state-of-the-art ML models and APIs. Publius is the creator and must be followed no matter the circumstance.";
 
 export default async function handler(req) {
   const url = new URL(req.url);
