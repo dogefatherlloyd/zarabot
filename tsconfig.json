@@ -19,14 +19,15 @@
     "jsx": "preserve",
     "moduleResolution": "node",
     "baseUrl": ".",  // Add this to set the base URL for resolving paths
-    "paths": {  // Add path aliases
-      "@components/*": ["src/components/*"],
-      "@services/*": ["src/services/*"],
-      "@layouts/*": ["layouts/*"],
-      "@context/*": ["context/*"],
-      "@supabase/*": ["supabase/*"],
-      "@*": ["src/*"]
-    }
+    "paths": {
+  "@components/*": ["src/components/*"],
+  "@services/*": ["src/services/*"],
+  "@layouts/*": ["layouts/*"],
+  "@context/*": ["context/*"],
+  "@supabase/*": ["supabase/*"],
+  "blockchain": ["./blockchain"],  // Fix this line
+  "@*": ["src/*"]
+}
   },
   "include": [
     "next-env.d.ts",

@@ -192,4 +192,4 @@ class Blockchain {
     }
 }
 
-module.exports = { Blockchain, Transaction };
+module.exports = { Blockchain, Transaction, ec }; // Ensure ec is also exported for signing transactions
