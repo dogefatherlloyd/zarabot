@@ -24,6 +24,7 @@
       "@services/*": ["src/services/*"],
       "@layouts/*": ["layouts/*"],
       "@context/*": ["context/*"],
+      "@supabase/*": ["supabase/*"],
       "@*": ["src/*"]
     }
   },

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blockchain UI</title>
+</head>
+<body>
+    <h1>Blockchain Interface</h1>
+
+    <!-- Generate Wallet Section -->
+    <h2>Generate a New Wallet</h2>
+    <button onclick="generateWallet()">Generate Wallet</button>
+    <p id="walletInfo"></p>
+
+    <!-- Create Transaction Section -->
+    <h2>Create Transaction</h2>
+    <form onsubmit="createTransaction(event)">
+        <label for="fromAddress">From Address:</label>
+        <input type="text" id="fromAddress" required><br><br>
+
+        <label for="privateKey">Private Key:</label>
+        <input type="text" id="privateKey" required><br><br>
+
+        <label for="toAddress">To Address:</label>
+        <input type="text" id="toAddress" required><br><br>
+
+        <label for="amount">Amount:</label>
+        <input type="number" id="amount" required><br><br>
+
+        <button type="submit">Create Transaction</button>
+    </form>
+    <p id="transactionMessage"></p>
+
+    <!-- Mine Block Section -->
+    <h2>Mine Block</h2>
+    <form onsubmit="mineBlock(event)">
+        <label for="miningAddress">Mining Address:</label>
+        <input type="text" id="miningAddress" required><br><br>
+
+        <button type="submit">Mine Block</button>
+    </form>
+    <p id="mineMessage"></p>
+
+    <!-- Check Balance Section -->
+    <h2>Check Balance</h2>
+    <form onsubmit="checkBalance(event)">
+        <label for="balanceAddress">Wallet Address:</label>
+        <input type="text" id="balanceAddress" required><br><br>
+
+        <button type="submit">Check Balance</button>
+    </form>
+    <p id="balanceInfo"></p>
+
+    <script src="script.js"></script>
+</body>
+</html>

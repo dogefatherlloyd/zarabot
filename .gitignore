@@ -33,3 +33,8 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+echo "firebase-config.json" >> .gitignore
+git rm --cached firebase-config.json
+git add .gitignore
+git commit -m "Add firebase-config.json to .gitignore"

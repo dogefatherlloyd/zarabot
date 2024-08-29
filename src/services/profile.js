@@ -1,4 +1,4 @@
-import { supabase } from "../utils/supabaseClient";
+import { supabase } from "@supabase/supabaseClient";
 
 export async function fetchProfileDetails(profileId) {
   const { data: profileDetail, error } = await supabase

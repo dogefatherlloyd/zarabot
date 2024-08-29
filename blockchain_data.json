@@ -1,0 +1,12 @@
+{
+    "chain": [
+        {
+            "index": 0,
+            "timestamp": "2024-08-20T20:49:22.615Z",
+            "transactions": [],
+            "previousHash": "0",
+            "hash": "7cb7fa4b154564709fe69f37abed376271c4dc4b08d3c582a7b2761302d78f3f"
+        }
+    ],
+    "pendingTransactions": []
+}
