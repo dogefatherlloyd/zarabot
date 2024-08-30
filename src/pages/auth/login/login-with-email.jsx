@@ -13,9 +13,9 @@ import {
   FormLabel, 
   Input, 
   FormErrorMessage, 
-  Button, 
-  Link 
+  Button 
 } from "@chakra-ui/react";
+import Link from "next/link"; // Import Link from Next.js
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
@@ -53,7 +53,7 @@ export default function AuthSigninSigninWithEmailRoute() {
 
   const onSubmit = async ({ email, password }) => {
     try {
-      const { user, error } = await supabaseClient.auth.signIn({
+      const { data, error } = await supabaseClient.auth.signInWithPassword({
         email,
         password,
       });
@@ -62,8 +62,8 @@ export default function AuthSigninSigninWithEmailRoute() {
         throw error;
       }
 
-      if (user) {
-        console.log("User successfully logged in:", user);
+      if (data.user) {
+        console.log("User successfully logged in:", data.user);
         authContext?.loadUserSession();
         toast({
           title: "Authentication",
