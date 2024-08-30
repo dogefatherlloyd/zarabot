@@ -133,7 +133,7 @@ export default function AuthSigninSigninWithEmailRoute() {
           </Button>
         </Stack>
         <Link href={"/auth/login"} passHref>
-          <Button as="a" variant={"link"} colorScheme="twitter" w="full">
+          <Button variant={"link"} colorScheme="twitter" w="full">
             View other login options
           </Button>
         </Link>

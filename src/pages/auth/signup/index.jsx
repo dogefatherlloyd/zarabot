@@ -148,7 +148,7 @@ export default function AuthSignupRoute() {
           </Button>
         </Stack>
         <Link href={"/auth/login"} passHref>
-          <Button as="a" variant={"link"} colorScheme="twitter" w="full">
+          <Button variant={"link"} colorScheme="twitter" w="full">
             Login with existing account
           </Button>
         </Link>

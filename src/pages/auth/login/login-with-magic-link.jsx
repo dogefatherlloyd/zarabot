@@ -4,8 +4,8 @@ import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import supabaseClient from '@supabase/supabaseClient';
-import Head from "next/head"; // Import Head
-import { useColorModeValue } from "@chakra-ui/react"; // Import useColorModeValue
+import Head from "next/head";
+import { useColorModeValue } from "@chakra-ui/react";
 import { BsArrowRight } from "react-icons/bs";
 
 const schema = yup
@@ -23,7 +23,7 @@ export default function SigninSigninWithMagicLinkRoute() {
     formState: { errors, isSubmitting },
     setValue,
   } = useForm({ resolver: yupResolver(schema) });
-  const bgColor = useColorModeValue("white", "gray.700"); // Use useColorModeValue
+  const bgColor = useColorModeValue("white", "gray.700");
 
   useEffect(() => {
     setIsClient(true);
@@ -108,7 +108,7 @@ export default function SigninSigninWithMagicLinkRoute() {
           </Button>
         </Stack>
         <Link href={"/auth/login"} passHref>
-          <Button as="a" variant={"link"} colorScheme="twitter" w="full">
+          <Button variant={"link"} colorScheme="twitter" w="full">
             View other login options
           </Button>
         </Link>

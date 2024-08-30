@@ -6,7 +6,7 @@ import {
   Heading,
   Text,
   SimpleGrid,
-  useColorModeValue,  // Add this line
+  useColorModeValue,
 } from "@chakra-ui/react";
 import Head from "next/head";
 import Link from "next/link";
@@ -34,19 +34,19 @@ export default function AuthSigninRoute() {
         >
           <SimpleGrid columns={[1, 2]} spacing={4} mb={6}>
             <Link href="/auth/login/login-with-email" passHref>
-              <Button as="a" colorScheme="purple">
+              <Button colorScheme="purple">
                 Login With Email
               </Button>
             </Link>
             <Link href="/auth/login/login-with-magic-link" passHref>
-              <Button as="a" colorScheme="pink">
+              <Button colorScheme="pink">
                 Login With Magic Link
               </Button>
             </Link>
           </SimpleGrid>
 
           <Link href={"/auth/signup"} passHref>
-            <Button as="a" variant={"link"} colorScheme="twitter" w="full">
+            <Button variant={"link"} colorScheme="twitter" w="full">
               Create new account
             </Button>
           </Link>

@@ -10,6 +10,7 @@ import {
 } from "@chakra-ui/react";
 import Head from "next/head";
 import Link from "next/link";
+
 export default function AuthRoute() {
   return (
     <Container>
@@ -20,7 +21,7 @@ export default function AuthRoute() {
         <Stack align={"center"}>
           <Heading fontSize={"4xl"}>Authenticate</Heading>
           <Text fontSize={"lg"} maxW="md" textAlign={"center"}>
-            Authenticate your account using different type of authentication
+            Authenticate your account using different types of authentication
             providers
           </Text>
         </Stack>
@@ -33,12 +34,12 @@ export default function AuthRoute() {
         >
           <SimpleGrid columns={[1, 2]} spacing={4}>
             <Link href="/auth/login" passHref>
-              <Button as="a" colorScheme="blue">
+              <Button colorScheme="blue">
                 Login
               </Button>
             </Link>
             <Link href="/auth/signup" passHref>
-              <Button as="a" colorScheme="green">
+              <Button colorScheme="green">
                 Signup
               </Button>
             </Link>
