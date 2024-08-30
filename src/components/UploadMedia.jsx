@@ -25,22 +25,23 @@ import { AiOutlineDelete } from "react-icons/ai";
 import supabaseClient from '@supabase/supabaseClient';
 import shortid from "shortid";
 
-export default function UploadMedia({
-  children,
-  addMediaFile,
-  bucket,
-  tooltip,
-}) {
+export default function UploadMedia({ children, addMediaFile, bucket, tooltip }) {
+  const [isClient, setIsClient] = React.useState(false);
   const fileRef = React.useRef();
-  // relative file path for media in supabase storage
   const [mediaPath, setMediaPath] = React.useState("");
-  // signed media url for preview
   const [mediaUrl, setMediaUrl] = React.useState("");
   const [uploading, setUploading] = React.useState(false);
   const [deleting, setDeleting] = React.useState(false);
   const { isOpen, onOpen, onClose } = useDisclosure();
 
-  // open input file to select media
+  React.useEffect(() => {
+    setIsClient(true);  // Ensures the component only renders fully on the client side
+  }, []);
+
+  if (!isClient) {
+    return null;  // Prevents rendering on the server side
+  }
+
   const handleOpenFile = () => {
     fileRef.current?.click();
   };
@@ -48,16 +49,13 @@ export default function UploadMedia({
   const handleFileChange = async (e) => {
     setUploading(true);
     try {
-      // file path where media will upload
       const mediaPath = `public/${shortid()}.jpg`;
       setMediaPath(mediaPath);
       const file = e.target.files?.[0];
-      // upload file in supabase
       const { data: uploadData, error: uploadError } = await supabaseClient.storage
         .from(bucket)
         .upload(mediaPath, file);
       if (uploadData) {
-        // get signed url of uploaded media
         const { data: signedURL, error: signedUrlError } = await supabaseClient.storage
           .from(bucket)
           .createSignedUrl(mediaPath, 60 * 60 * 24 * 365);
@@ -83,7 +81,6 @@ export default function UploadMedia({
     setDeleting(true);
     try {
       if (mediaPath) {
-        // delete media file from supabase
         const { data: removeData, error: removeError } = await supabaseClient.storage
           .from(bucket)
           .remove([mediaPath]);
@@ -102,7 +99,6 @@ export default function UploadMedia({
     }
   };
 
-  // send media path to parent component
   const handleUpload = () => {
     addMediaFile({ url: mediaUrl, path: mediaPath });
     onClose();
@@ -129,7 +125,6 @@ export default function UploadMedia({
             {uploading ? (
               <Skeleton h={"200px"} w="full" rounded={"md"} />
             ) : mediaUrl ? (
-              // image preview with delete image options show when image upload from browser
               <Box pos={"relative"}>
                 <Image
                   src={mediaUrl}
@@ -154,7 +149,6 @@ export default function UploadMedia({
                 </Box>
               </Box>
             ) : (
-              // image upload interface show when there is no image for preview
               <Center
                 onClick={handleOpenFile}
                 borderWidth={"2px"}

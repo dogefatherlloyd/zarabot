@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Modal,
   ModalOverlay,
@@ -20,6 +20,15 @@ export default function LoginModal() {
   const [email, setEmail] = useState("");
   const [code, setCode] = useState("");
   const supabase = useSupabaseClient();
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);  // Ensures the component is fully rendered on the client side
+  }, []);
+
+  if (!isClient) {
+    return null;  // Prevents rendering on the server side
+  }
 
   async function handleSubmit() {
     const success = await submitVerificationCode(supabase, email, code);

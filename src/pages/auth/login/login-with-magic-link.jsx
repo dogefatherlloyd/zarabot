@@ -1,34 +1,7 @@
-import {
-  Box,
-  FormControl,
-  FormLabel,
-  Input,
-  Stack,
-  Button,
-  Heading,
-  Text,
-  useColorModeValue,
-  Container,
-  FormErrorMessage,
-  FormHelperText,
-  VStack,
-} from "@chakra-ui/react";
-import Link from "next/link";
-import { useForm } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
-import * as yup from "yup";
-import supabaseClient from '@supabase/supabaseClient';
-import { BsArrowRight } from "react-icons/bs";
-import { useToast } from "@chakra-ui/react";
-import Head from "next/head";
-
-const schema = yup
-  .object({
-    email: yup.string().required().email(),
-  })
-  .required();
+import { useState, useEffect } from 'react';
 
 export default function SigninSigninWithMagicLinkRoute() {
+  const [isClient, setIsClient] = useState(false);
   const toast = useToast();
   const {
     handleSubmit,
@@ -36,6 +9,14 @@ export default function SigninSigninWithMagicLinkRoute() {
     formState: { errors, isSubmitting },
     setValue,
   } = useForm({ resolver: yupResolver(schema) });
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  if (!isClient) {
+    return null;
+  }
 
   const onSubmit = async ({ email }) => {
     try {

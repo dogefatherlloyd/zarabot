@@ -1,35 +1,7 @@
-import {
-  Box,
-  FormControl,
-  FormLabel,
-  Input,
-  Stack,
-  Button,
-  Heading,
-  Text,
-  useColorModeValue,
-  Container,
-  FormErrorMessage,
-  useToast,
-  VStack,
-} from "@chakra-ui/react";
-import Link from "next/link";
-import { useForm } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
-import * as yup from "yup";
-import supabaseClient from '@supabase/supabaseClient';
-import { useAuthContext } from "@context/auth";
-import { useRouter } from "next/router";
-import Head from "next/head";
-
-const schema = yup
-  .object({
-    email: yup.string().required().email(),
-    password: yup.string().required().min(6),
-  })
-  .required();
+import { useState, useEffect } from 'react';
 
 export default function AuthSigninSigninWithEmailRoute() {
+  const [isClient, setIsClient] = useState(false);
   const router = useRouter();
   const authContext = useAuthContext();
   const toast = useToast();
@@ -41,6 +13,14 @@ export default function AuthSigninSigninWithEmailRoute() {
   } = useForm({
     resolver: yupResolver(schema),
   });
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  if (!isClient) {
+    return null;  // Prevents rendering on the server side.
+  }
 
   const onSubmit = async ({ email, password }) => {
     try {

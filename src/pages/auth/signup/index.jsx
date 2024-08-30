@@ -27,122 +27,131 @@ const schema = yup
   })
   .required();
 
-export default function AuthSignupRoute() {
-  const router = useRouter();
-  const toast = useToast();
-  const {
-    handleSubmit,
-    register,
-    formState: { errors, isSubmitting },
-  } = useForm({
-    resolver: yupResolver(schema),
-  });
-
-  const onSubmit = async ({ name, email, password }) => {
-    try {
-      const { user, error: signUpError } = await supabaseClient.auth.signUp({
-        email,
-        password,
-      });
+  export default function AuthSignupRoute() {
+    const [isClient, setIsClient] = useState(false);
+    const router = useRouter();
+    const toast = useToast();
+    const {
+      handleSubmit,
+      register,
+      formState: { errors, isSubmitting },
+    } = useForm({
+      resolver: yupResolver(schema),
+    });
   
-      if (signUpError) {
-        throw new Error(signUpError.message);
-      }
+    useEffect(() => {
+      setIsClient(true);
+    }, []);
   
-      if (user) {
-        const [first_name, last_name] = name.split(" ");
-        const { error: insertError } = await supabaseClient.from("profiles").insert([
-          {
-            id: user.id,
-            username: email.split("@")[0], // This assumes the username is the part before the @ in the email
-            first_name,
-            last_name,
-            email,
-            created_at: new Date().toISOString(),
-            token_balance: 0, // Initial balance
-          },
-        ]);
+    if (!isClient) {
+      return null;
+    }
   
-        if (insertError) {
-          throw new Error(insertError.message);
+    const onSubmit = async ({ name, email, password }) => {
+      try {
+        const { user, error: signUpError } = await supabaseClient.auth.signUp({
+          email,
+          password,
+        });
+  
+        if (signUpError) {
+          throw new Error(signUpError.message);
         }
   
+        if (user) {
+          const [first_name, last_name] = name.split(" ");
+          const { error: insertError } = await supabaseClient.from("profiles").insert([
+            {
+              id: user.id,
+              username: email.split("@")[0], // This assumes the username is the part before the @ in the email
+              first_name,
+              last_name,
+              email,
+              created_at: new Date().toISOString(),
+              token_balance: 0, // Initial balance
+            },
+          ]);
+  
+          if (insertError) {
+            throw new Error(insertError.message);
+          }
+  
+          toast({
+            title: "Authentication",
+            description: "Your account was created successfully",
+            status: "success",
+            duration: 5000,
+            isClosable: true,
+          });
+  
+          router.push("/auth/login/login-with-email");
+        }
+      } catch (error) {
         toast({
-          title: "Authentication",
-          description: "Your account was created successfully",
-          status: "success",
+          title: "Authentication Error",
+          description: error.message,
+          status: "error",
           duration: 5000,
           isClosable: true,
         });
-  
-        router.push("/auth/login/login-with-email");
+        console.log(error); // Log the error for debugging
       }
-    } catch (error) {
-      toast({
-        title: "Authentication Error",
-        description: error.message,
-        status: "error",
-        duration: 5000,
-        isClosable: true,
-      });
-      console.log(error); // Log the error for debugging
-    }
-  };
+    };
   
-  return (
-    <Container>
-      <Head>
-        <title>Signup</title>
-      </Head>
-      <Box
-        rounded={"lg"}
-        bg={useColorModeValue("white", "gray.700")}
-        boxShadow={"outline"}
-        p={8}
-        mt={4}
-      >
-        <Heading fontSize={"4xl"} textAlign="center">
-          Sign up
-        </Heading>
-        <Stack
-          as="form"
-          onSubmit={handleSubmit(onSubmit)}
-          spacing={4}
-          mt={8}
-          mb={6}
+    return (
+      <Container>
+        <Head>
+          <title>Signup</title>
+        </Head>
+        <Box
+          rounded={"lg"}
+          bg={useColorModeValue("white", "gray.700")}
+          boxShadow={"outline"}
+          p={8}
+          mt={4}
         >
-          <FormControl id="name" isInvalid={Boolean(errors.name)}>
-            <FormLabel>Name</FormLabel>
-            <Input type="text" {...register("name")} />
-            {errors?.name && (
-              <FormErrorMessage>{errors.name.message}</FormErrorMessage>
-            )}
-          </FormControl>
-          <FormControl id="email" isInvalid={Boolean(errors.email)}>
-            <FormLabel>Email address</FormLabel>
-            <Input type="email" {...register("email")} />
-            {errors?.email && (
-              <FormErrorMessage>{errors.email.message}</FormErrorMessage>
-            )}
-          </FormControl>
-          <FormControl id="password" isInvalid={Boolean(errors.password)}>
-            <FormLabel>Password</FormLabel>
-            <Input type="password" {...register("password")} />
-            {errors?.password && (
-              <FormErrorMessage>{errors.password.message}</FormErrorMessage>
-            )}
-          </FormControl>
-
-          <Button isLoading={isSubmitting} type="submit" colorScheme="green">
+          <Heading fontSize={"4xl"} textAlign="center">
             Sign up
-          </Button>
-        </Stack>
-        <Link href={"/auth/login"} passHref>
-          <Button as="a" variant={"link"} colorScheme="twitter" w="full">
-            Login with existing account
-          </Button>
-        </Link>
-      </Box>
-    </Container>
-  );
-}
+          </Heading>
+          <Stack
+            as="form"
+            onSubmit={handleSubmit(onSubmit)}
+            spacing={4}
+            mt={8}
+            mb={6}
+          >
+            <FormControl id="name" isInvalid={Boolean(errors.name)}>
+              <FormLabel>Name</FormLabel>
+              <Input type="text" {...register("name")} />
+              {errors?.name && (
+                <FormErrorMessage>{errors.name.message}</FormErrorMessage>
+              )}
+            </FormControl>
+            <FormControl id="email" isInvalid={Boolean(errors.email)}>
+              <FormLabel>Email address</FormLabel>
+              <Input type="email" {...register("email")} />
+              {errors?.email && (
+                <FormErrorMessage>{errors.email.message}</FormErrorMessage>
+              )}
+            </FormControl>
+            <FormControl id="password" isInvalid={Boolean(errors.password)}>
+              <FormLabel>Password</FormLabel>
+              <Input type="password" {...register("password")} />
+              {errors?.password && (
+                <FormErrorMessage>{errors.password.message}</FormErrorMessage>
+              )}
+            </FormControl>
+  
+            <Button isLoading={isSubmitting} type="submit" colorScheme="green">
+              Sign up
+            </Button>
+          </Stack>
+          <Link href={"/auth/login"} passHref>
+            <Button as="a" variant={"link"} colorScheme="twitter" w="full">
+              Login with existing account
+            </Button>
+          </Link>
+        </Box>
+      </Container>
+    );
+  }

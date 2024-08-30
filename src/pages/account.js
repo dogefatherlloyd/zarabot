@@ -1,3 +1,4 @@
+import { useEffect, useState, useCallback } from "react";
 import ManageAPIKeys from "../components/ManageAPIKeys";
 import Navbar from "../components/Navbar";
 import SlugInput from "../components/inputs/SlugInput";
@@ -7,20 +8,24 @@ import { fetchUserProfile, updateUserProfile } from "../network";
 import { useSupabaseClient, useUser } from "@supabase/auth-helpers-react";
 import Head from "next/head";
 import Link from "next/link";
-import { useEffect, useState, useCallback } from "react";
 
 export default function AccountPage() {
   const user = useUser();
   const supabase = useSupabaseClient();
   const [profileData, setProfileData] = useState({});
-  const [tokenBalance, setTokenBalance] = useState(0); // State to store token balance
-  const [isEditable, setIsEditable] = useState(false); // Edit mode state
+  const [tokenBalance, setTokenBalance] = useState(0);
+  const [isEditable, setIsEditable] = useState(false);
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   const fetchTokenBalance = useCallback(async () => {
-    if (!user) return; // Ensure user is available
+    if (!user) return;
     console.log(`Fetching token balance for user ID: ${user.id}`);
     const { data, error } = await supabase
-      .from("profiles")  // Fetching from the correct table
+      .from("profiles")
       .select("token_balance")
       .eq("id", user.id)
       .single();
@@ -28,8 +33,8 @@ export default function AccountPage() {
     if (error) {
       console.error("Failed to fetch token balance:", error);
     } else {
-      console.log("Fetched token balance:", data.token_balance); // Debugging log
-      setTokenBalance(data.token_balance); // Set the token balance state
+      console.log("Fetched token balance:", data.token_balance);
+      setTokenBalance(data.token_balance);
     }
   }, [supabase, user]);
 
@@ -37,7 +42,7 @@ export default function AccountPage() {
     if (!user) return;
     const profile = await fetchUserProfile(supabase, user);
     setProfileData(profile);
-    fetchTokenBalance();  // Fetch the token balance
+    fetchTokenBalance();
   }, [supabase, user, fetchTokenBalance]);
 
   useEffect(() => {
@@ -52,12 +57,11 @@ export default function AccountPage() {
   async function handleSubmit(e) {
     e.preventDefault();
     updateUserProfile(supabase, profileData);
-    setIsEditable(false); // Turn off edit mode after saving
+    setIsEditable(false);
   }
 
-  // Return null if user data hasn't loaded yet to prevent rendering
-  if (!user) {
-    return null;
+  if (!isClient || !user) {
+    return null; // Prevent rendering on the server side
   }
 
   return (
@@ -67,7 +71,6 @@ export default function AccountPage() {
       </Head>
       <div className="flex flex-col h-screen">
         <Navbar />
-
         <div className="px-2 flex-1 overflow-y-auto">
           <div className="mx-auto my-4 w-full max-w-4xl">
             <h1 className="text-center mx-auto text-4xl font-medium">
@@ -76,8 +79,12 @@ export default function AccountPage() {
             <div className="text-center mb-4">
               <button
                 type="button"
-                onClick={() => setIsEditable(!isEditable)} // Toggle edit mode
-                className={`rounded-md py-2 px-4 text-sm font-semibold shadow-sm ${isEditable ? "bg-gray-500 text-white" : "bg-blue-500 text-white"}`}
+                onClick={() => setIsEditable(!isEditable)}
+                className={`rounded-md py-2 px-4 text-sm font-semibold shadow-sm ${
+                  isEditable
+                    ? "bg-gray-500 text-white"
+                    : "bg-blue-500 text-white"
+                }`}
               >
                 {isEditable ? "Cancel Edit" : "Edit"}
               </button>
@@ -89,7 +96,7 @@ export default function AccountPage() {
                 required
                 value={profileData.username}
                 onChange={makeOnChange("username")}
-                disabled={!isEditable} // Disable input unless editable
+                disabled={!isEditable}
               />
               <TextInput
                 field="first_name"
@@ -97,27 +104,29 @@ export default function AccountPage() {
                 required
                 value={profileData.first_name}
                 onChange={makeOnChange("first_name")}
-                disabled={!isEditable} // Disable input unless editable
+                disabled={!isEditable}
               />
               <TextInput
                 field="last_name"
                 label="Last Name:"
                 value={profileData.last_name}
                 onChange={makeOnChange("last_name")}
-                disabled={!isEditable} // Disable input unless editable
+                disabled={!isEditable}
               />
               <TextArea
                 field="bio"
                 label="Bio:"
                 value={profileData.bio}
                 onChange={makeOnChange("bio")}
-                disabled={!isEditable} // Disable input unless editable
+                disabled={!isEditable}
               />
-
-              {/* Display token balance */}
               <div className="mt-4 text-center">
-                <h2 className="text-lg font-medium text-gray-700">Token Balance:</h2>
-                <p className="text-2xl font-semibold text-blue-500">{tokenBalance}</p>
+                <h2 className="text-lg font-medium text-gray-700">
+                  Token Balance:
+                </h2>
+                <p className="text-2xl font-semibold text-blue-500">
+                  {tokenBalance}
+                </p>
                 <button
                   type="button"
                   onClick={fetchTokenBalance}
@@ -126,7 +135,6 @@ export default function AccountPage() {
                   Refresh Balance
                 </button>
               </div>
-
               {isEditable && (
                 <div className="mt-4 flex justify-between">
                   <input
@@ -145,7 +153,6 @@ export default function AccountPage() {
                 </div>
               )}
             </form>
-
             <ManageAPIKeys />
           </div>
         </div>

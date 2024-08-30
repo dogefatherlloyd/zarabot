@@ -12,18 +12,16 @@ export default function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [isAuthenticating, setIsAuthenticating] = useState(true);
 
-  // Memoize protectedRoutes to ensure stability in useCallback
   const protectedRoutes = useMemo(() => ["/create-post", "/friends"], []);
 
-  // Define loadUserSession using useCallback inside the component
   const loadUserSession = useCallback(async () => {
     try {
       const {
         data: { session },
-      } = await supabase.auth.getSession(); // Updated to use getSession
+      } = await supabaseClient.auth.getSession();
 
       if (session?.user) {
-        const { data } = await supabase
+        const { data } = await supabaseClient
           .from("profiles")
           .select("id, user_id, username, first_name, last_name, avatar_url")
           .eq("user_id", session.user.id);
@@ -42,9 +40,8 @@ export default function AuthProvider({ children }) {
     } finally {
       setIsAuthenticating(false);
     }
-  }, [router, protectedRoutes]); // Added `router` and `protectedRoutes` to the dependencies
+  }, [router, protectedRoutes]);
 
-  // Call loadUserSession inside useEffect
   useEffect(() => {
     loadUserSession();
   }, [loadUserSession]);
@@ -52,7 +49,7 @@ export default function AuthProvider({ children }) {
   const logout = async () => {
     setUser(null);
 
-    const { error } = await supabase.auth.signOut();
+    const { error } = await supabaseClient.auth.signOut();
     if (error) {
       toast({
         title: "Logout error",
@@ -78,7 +75,11 @@ export default function AuthProvider({ children }) {
     <AuthContext.Provider
       value={{ logout, user, loadUserSession, isAuthenticating }}
     >
-      {children}
+      {isAuthenticating ? (
+        <div>Loading...</div>
+      ) : (
+        children
+      )}
     </AuthContext.Provider>
   );
 }
