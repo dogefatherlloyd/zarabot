@@ -4,14 +4,15 @@ import Navbar from "../src/components/Navbar";
 import { useAuthContext } from "../context/auth";
 
 export default function AppLayout({ children }) {
-  const authContext = useAuthContext();
+  const { user } = useAuthContext();
+
   return (
-    <Box minH={"100vh"}>
+    <Box minH="100vh">
       <Navbar />
       <Box as="main" py={20}>
         {children}
       </Box>
-      {authContext?.user && (
+      {user && (
         <Box display={["block", "none"]}>
           <BottomNav />
         </Box>

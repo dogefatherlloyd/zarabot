@@ -40,7 +40,7 @@ export default function Navbar() {
     >
       {/* logo */}
       <Link href={"/"} passHref>
-        <Box as="a" w={"40px"} h={"40px"}>
+        <Box w={"40px"} h={"40px"}>
           <Image
             alt={"Logo"}
             w="full"
@@ -66,7 +66,6 @@ export default function Navbar() {
                 variant={"ghost"}
                 rounded="full"
                 leftIcon={menu.icon}
-                as="a"
                 colorScheme={router.pathname === menu.href ? "green" : "gray"}
               >
                 {menu.name}
@@ -97,7 +96,6 @@ export default function Navbar() {
               size="sm"
               rounded="full"
               leftIcon={<BiLogIn size={16} />}
-              as="a"
               colorScheme="green"
             >
               <Box as="span">Authenticate</Box>
