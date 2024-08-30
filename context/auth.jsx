@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState, createContext, useContext, useMemo } from "react";
 import { useRouter } from "next/router";
-import { supabase } from "../supabase/supabaseClient"; // Corrected path to supabaseClient
+import { supabase } from '@supabase/supabaseClient';
 import { useToast } from "@chakra-ui/react";
 
 // Create AuthContext
@@ -18,12 +18,15 @@ export default function AuthProvider({ children }) {
   // Define loadUserSession using useCallback inside the component
   const loadUserSession = useCallback(async () => {
     try {
-      const session = await supabase.auth.session();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession(); // Updated to use getSession
+
       if (session?.user) {
         const { data } = await supabase
-          .from("profile")
-          .select("id, user_id, name, avatar")
-          .eq("user_id", session?.user.id);
+          .from("profiles")
+          .select("id, user_id, username, first_name, last_name, avatar_url")
+          .eq("user_id", session.user.id);
         setUser(data?.[0]);
 
         if (router.pathname.includes("auth")) {

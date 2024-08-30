@@ -17,7 +17,7 @@ import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
-import { supabase } from "@supabase/supabaseClient";
+import { supabase } from '@supabase/supabaseClient';
 import { useAuthContext } from "@context/auth";
 import { useRouter } from "next/router";
 import Head from "next/head";

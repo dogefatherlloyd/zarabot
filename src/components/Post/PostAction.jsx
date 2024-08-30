@@ -11,7 +11,7 @@ import { useRouter } from "next/router";
 import { useState } from "react";
 import { AiOutlineDelete } from "react-icons/ai";
 import { BiDotsHorizontalRounded } from "react-icons/bi";
-import { supabase } from "@supabase/supabaseClient";
+import { supabase } from '@supabase/supabaseClient';
 
 export default function PostAction({ id, media }) {
   const router = useRouter();

@@ -1,11 +1,7 @@
 {
   "compilerOptions": {
     "target": "es5",
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
+    "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": false,
@@ -18,23 +14,21 @@
     "isolatedModules": true,
     "jsx": "preserve",
     "moduleResolution": "node",
-    "baseUrl": ".",  // Add this to set the base URL for resolving paths
+    "baseUrl": ".", 
     "paths": {
-  "@components/*": ["src/components/*"],
-  "@services/*": ["src/services/*"],
-  "@layouts/*": ["layouts/*"],
-  "@context/*": ["context/*"],
-  "@supabase/*": ["supabase/*"],
-  "blockchain": ["./blockchain"],  // Fix this line
-  "@*": ["src/*"]
-}
+      "@components/*": ["src/components/*"],
+      "@services/*": ["src/services/*"],
+      "@layouts/*": ["layouts/*"],
+      "@context/*": ["context/*"],
+      "@supabase/*": ["supabase/*"],
+      "blockchain": ["./blockchain"],
+      "@*": ["src/*"]
+    }
   },
   "include": [
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx"
   ],
-  "exclude": [
-    "node_modules"
-  ]
+  "exclude": ["node_modules"]
 }

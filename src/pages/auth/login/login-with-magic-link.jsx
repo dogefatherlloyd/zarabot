@@ -17,7 +17,7 @@ import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
-import { supabase } from "@supabase/supabaseClient";
+import { supabase } from '@supabase/supabaseClient';
 import { BsArrowRight } from "react-icons/bs";
 import { useToast } from "@chakra-ui/react";
 import Head from "next/head";

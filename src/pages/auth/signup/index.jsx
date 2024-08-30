@@ -38,46 +38,54 @@ export default function AuthSignupRoute() {
     resolver: yupResolver(schema),
   });
 
-  const onSubmit = async ({
-    name,
-    email,
-    password,
-  }) => {
+  const onSubmit = async ({ name, email, password }) => {
     try {
-      const { user, error } = await supabase.auth.signUp({
+      const { user, error: signUpError } = await supabase.auth.signUp({
         email,
         password,
       });
-
+  
+      if (signUpError) {
+        throw new Error(signUpError.message);
+      }
+  
       if (user) {
-        await supabase.from("profile").insert([
+        const [first_name, last_name] = name.split(" ");
+        const { error: insertError } = await supabase.from("profiles").insert([
           {
-            name,
-            user_info: user,
-            user_id: user.id,
+            id: user.id,
+            username: email.split("@")[0], // This assumes the username is the part before the @ in the email
+            first_name,
+            last_name,
+            email,
+            created_at: new Date().toISOString(),
+            token_balance: 0, // Initial balance
           },
         ]);
+  
+        if (insertError) {
+          throw new Error(insertError.message);
+        }
+  
         toast({
           title: "Authentication",
-          description: "Your account created successfully",
+          description: "Your account was created successfully",
           status: "success",
           duration: 5000,
           isClosable: true,
         });
+  
         router.push("/auth/login/login-with-email");
       }
-
-      if (error) {
-        toast({
-          title: "Authentication Error",
-          description: error.message,
-          status: "error",
-          duration: 5000,
-          isClosable: true,
-        });
-      }
     } catch (error) {
-      console.log(error);
+      toast({
+        title: "Authentication Error",
+        description: error.message,
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
+      console.log(error); // Log the error for debugging
     }
   };
   return (

@@ -1,7 +1,7 @@
 import { Center, Container, SimpleGrid, Text } from "@chakra-ui/react";
 import Head from "next/head";
 import Post from "../components/Post";
-import { supabase } from "@supabase/supabaseClient";
+import { supabase } from '@supabase/supabaseClient';
 
 
 
