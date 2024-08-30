@@ -98,7 +98,7 @@ export default function Navbar() {
               leftIcon={<BiLogIn size={16} />}
               colorScheme="green"
             >
-              <Box as="span">Authenticate</Box>
+              <Box as="span">Login</Box>
             </Button>
           </Link>
         )}
