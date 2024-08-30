@@ -173,7 +173,7 @@ export default function SigninSigninWithMagicLinkRoute() {
         </Stack>
         {step === 'email' && (
           <NextLink href="/auth/login" passHref>
-            <Button as="a" variant={"link"} colorScheme="twitter" w="full">
+            <Button variant={"link"} colorScheme="twitter" w="full">
               View other login options
             </Button>
           </NextLink>
