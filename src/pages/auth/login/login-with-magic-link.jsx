@@ -112,7 +112,7 @@ export default function SigninSigninWithMagicLinkRoute() {
       });
 
       // Redirect to the homepage
-      router.push('/');
+      router.push('/home');
     } catch (error) {
       console.log(error);
     }
