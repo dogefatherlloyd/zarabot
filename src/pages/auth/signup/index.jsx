@@ -30,7 +30,7 @@ export default function AuthSignupRoute() {
   const [isClient, setIsClient] = useState(false);
   const router = useRouter();
   const toast = useToast();
-  const bgColor = useColorModeValue("white", "gray.700"); // Moved useColorModeValue outside of conditional logic
+  const bgColor = useColorModeValue("white", "gray.700");
 
   const {
     handleSubmit,
@@ -106,7 +106,7 @@ export default function AuthSignupRoute() {
       </Head>
       <Box
         rounded={"lg"}
-        bg={bgColor} // Applied the variable directly here
+        bg={bgColor}
         boxShadow={"outline"}
         p={8}
         mt={4}

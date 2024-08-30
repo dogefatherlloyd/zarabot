@@ -1,15 +1,15 @@
 import {
   Box,
+  Button,
+  Container,
   Stack,
   Heading,
   Text,
-  useColorModeValue,
-  Container,
-  Button,
   SimpleGrid,
 } from "@chakra-ui/react";
 import Head from "next/head";
 import Link from "next/link";
+
 export default function AuthSigninRoute() {
   return (
     <Container>
@@ -20,7 +20,8 @@ export default function AuthSigninRoute() {
         <Stack align={"center"}>
           <Heading fontSize={"4xl"}>Login</Heading>
           <Text fontSize={"lg"} maxW="md" textAlign={"center"}>
-            Login your account using different type of authentication providers
+            Login to your account using different types of authentication
+            providers
           </Text>
         </Stack>
         <Box
@@ -38,7 +39,7 @@ export default function AuthSigninRoute() {
             </Link>
             <Link href="/auth/login/login-with-magic-link" passHref>
               <Button as="a" colorScheme="pink">
-                Login With Maginc Link
+                Login With Magic Link
               </Button>
             </Link>
           </SimpleGrid>
