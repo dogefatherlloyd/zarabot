@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/router'; // Import useRouter
 import { useToast, Container, Box, VStack, Heading, Text, Stack, FormControl, FormLabel, Input, FormErrorMessage, FormHelperText, Button } from "@chakra-ui/react";
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -25,6 +26,7 @@ export default function SigninSigninWithMagicLinkRoute() {
   const [step, setStep] = useState('email'); // 'email' or 'otp'
   const [email, setEmail] = useState('');
   const toast = useToast();
+  const router = useRouter(); // Initialize useRouter
   const bgColor = useColorModeValue("white", "gray.700");
 
   const {
@@ -109,7 +111,8 @@ export default function SigninSigninWithMagicLinkRoute() {
         isClosable: true,
       });
 
-      // Redirect or update UI accordingly after successful login
+      // Redirect to the homepage
+      router.push('/');
     } catch (error) {
       console.log(error);
     }
