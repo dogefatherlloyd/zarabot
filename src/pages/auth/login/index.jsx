@@ -6,6 +6,7 @@ import {
   Heading,
   Text,
   SimpleGrid,
+  useColorModeValue,  // Add this line
 } from "@chakra-ui/react";
 import Head from "next/head";
 import Link from "next/link";
