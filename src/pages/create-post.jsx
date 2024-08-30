@@ -14,7 +14,7 @@ import { useState } from "react";
 import { FiImage } from "react-icons/fi";
 import UploadMedia from "../components/UploadMedia";
 import { useAuthContext } from "../../context/auth";  // Corrected path
-import { supabase } from '@supabase/supabaseClient';
+import supabaseClient from '@supabase/supabaseClient';
 
 export default function CreatePostRoute() {
   const router = useRouter();
@@ -27,7 +27,7 @@ export default function CreatePostRoute() {
     setInserting(true);
 
     try {
-      const { data: postCreateData, error: postCreateError } = await supabase
+      const { data: postCreateData, error: postCreateError } = await supabaseClient
         .from("post")
         .insert([
           {
@@ -50,6 +50,7 @@ export default function CreatePostRoute() {
       setInserting(false);
     }
   };
+
   return (
     <Container>
       <Head>

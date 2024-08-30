@@ -11,7 +11,7 @@ import { useRouter } from "next/router";
 import { useState } from "react";
 import { AiOutlineDelete } from "react-icons/ai";
 import { BiDotsHorizontalRounded } from "react-icons/bi";
-import { supabase } from '@supabase/supabaseClient';
+import supabaseClient from '@supabase/supabaseClient';
 
 export default function PostAction({ id, media }) {
   const router = useRouter();
@@ -21,7 +21,7 @@ export default function PostAction({ id, media }) {
   const deletePost = async () => {
     setLoading(id);
     try {
-      const { data, error } = await supabase
+      const { data, error } = await supabaseClient
         .from("post")
         .delete()
         .match({ id });
@@ -35,7 +35,7 @@ export default function PostAction({ id, media }) {
       }
       if (data) {
         if (media?.path) {
-          await supabase.storage.from("post").remove([media.path]);
+          await supabaseClient.storage.from("post").remove([media.path]);
         }
         toast({
           status: "success",
@@ -51,6 +51,7 @@ export default function PostAction({ id, media }) {
       setLoading("");
     }
   };
+
   return (
     <Menu>
       <MenuButton

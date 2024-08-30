@@ -26,9 +26,10 @@
     }
   },
   "include": [
-    "next-env.d.ts",
-    "**/*.ts",
-    "**/*.tsx"
-  ],
+  "next-env.d.ts",
+  "**/*.ts",
+  "**/*.tsx",
+  "**/*.jsx"
+, "src/services/profile.js"],
   "exclude": ["node_modules"]
 }

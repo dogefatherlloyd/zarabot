@@ -17,7 +17,7 @@ import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
-import { supabase } from '@supabase/supabaseClient';
+import supabaseClient from '@supabase/supabaseClient';
 import { BsArrowRight } from "react-icons/bs";
 import { useToast } from "@chakra-ui/react";
 import Head from "next/head";
@@ -39,7 +39,7 @@ export default function SigninSigninWithMagicLinkRoute() {
 
   const onSubmit = async ({ email }) => {
     try {
-      const { error } = await supabase.auth.signIn({
+      const { error } = await supabaseClient.auth.signIn({
         email,
       });
 

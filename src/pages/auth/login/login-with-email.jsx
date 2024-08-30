@@ -17,7 +17,7 @@ import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
-import { supabase } from '@supabase/supabaseClient';
+import supabaseClient from '@supabase/supabaseClient';
 import { useAuthContext } from "@context/auth";
 import { useRouter } from "next/router";
 import Head from "next/head";
@@ -44,7 +44,7 @@ export default function AuthSigninSigninWithEmailRoute() {
 
   const onSubmit = async ({ email, password }) => {
     try {
-      const { user, error } = await supabase.auth.signIn({
+      const { user, error } = await supabaseClient.auth.signIn({
         email,
         password,
       });

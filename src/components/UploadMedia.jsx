@@ -22,7 +22,7 @@ import {
 } from "@chakra-ui/react";
 import { FiImage } from "react-icons/fi";
 import { AiOutlineDelete } from "react-icons/ai";
-import { supabase } from '@supabase/supabaseClient';
+import supabaseClient from '@supabase/supabaseClient';
 import shortid from "shortid";
 
 export default function UploadMedia({
@@ -44,6 +44,7 @@ export default function UploadMedia({
   const handleOpenFile = () => {
     fileRef.current?.click();
   };
+
   const handleFileChange = async (e) => {
     setUploading(true);
     try {
@@ -51,13 +52,13 @@ export default function UploadMedia({
       const mediaPath = `public/${shortid()}.jpg`;
       setMediaPath(mediaPath);
       const file = e.target.files?.[0];
-      // uploa file in supabase
-      const { data: uploadData, error: uploadError } = await supabase.storage
+      // upload file in supabase
+      const { data: uploadData, error: uploadError } = await supabaseClient.storage
         .from(bucket)
         .upload(mediaPath, file);
       if (uploadData) {
         // get signed url of uploaded media
-        const { signedURL, error: signedUrlError } = await supabase.storage
+        const { data: signedURL, error: signedUrlError } = await supabaseClient.storage
           .from(bucket)
           .createSignedUrl(mediaPath, 60 * 60 * 24 * 365);
 
@@ -65,7 +66,7 @@ export default function UploadMedia({
           console.log(signedUrlError.message);
         }
         if (signedURL) {
-          setMediaUrl(signedURL);
+          setMediaUrl(signedURL.signedUrl);
         }
       }
       if (uploadError) {
@@ -78,28 +79,18 @@ export default function UploadMedia({
     }
   };
 
-  // React.useEffect(() => {
-  //   return () => {
-  //     if (mediaUrl) {
-  //       // remove blob url object from memory
-  //       URL.revokeObjectURL(mediaUrl);
-  //     }
-  //   };
-  // }, []);
-
   const handleRemoveMedia = async () => {
     setDeleting(true);
     try {
       if (mediaPath) {
-        // delete media file friom supabase
-        const { data: removeData, error: removeError } = await supabase.storage
+        // delete media file from supabase
+        const { data: removeData, error: removeError } = await supabaseClient.storage
           .from(bucket)
           .remove([mediaPath]);
         if (removeError) {
           console.log(removeError.message);
         }
         if (removeData) {
-          // URL.revokeObjectURL(mediaUrl);
           setMediaUrl("");
           setMediaPath("");
         }
@@ -116,6 +107,7 @@ export default function UploadMedia({
     addMediaFile({ url: mediaUrl, path: mediaPath });
     onClose();
   };
+
   return (
     <>
       <Tooltip label={tooltip}>

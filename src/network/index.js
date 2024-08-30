@@ -53,12 +53,12 @@ export async function getTemplate(slug) {
   return template;
 }
 
-export async function fetchUserProfile(supabase, user) {
+export async function fetchUserProfile(supabaseClient, user) {
   if (!user) {
     return null;
   }
   try {
-    const { data, error } = await supabase
+    const { data, error } = await supabaseClient
       .from("profiles")
       .select("*")
       .eq("id", user.id)
@@ -72,13 +72,13 @@ export async function fetchUserProfile(supabase, user) {
       return data;
     }
   } catch (error) {
-    console.error("Error while fetch user profile", error);
+    console.error("Error while fetching user profile", error);
   }
 }
 
-export async function updateUserProfile(supabase, profileData) {
+export async function updateUserProfile(supabaseClient, profileData) {
   try {
-    const { error } = await supabase
+    const { error } = await supabaseClient
       .from("profiles")
       .update(profileData)
       .eq("id", profileData.id);
@@ -95,7 +95,7 @@ export async function updateUserProfile(supabase, profileData) {
   }
 }
 
-export async function verifyServerSideAuth(supabase, headers) {
+export async function verifyServerSideAuth(supabaseClient, headers) {
   const authHeader = headers["authorization"];
 
   if (authHeader) {
@@ -121,7 +121,7 @@ export async function verifyServerSideAuth(supabase, headers) {
   const {
     data: { user },
     error: err1,
-  } = await supabase.auth.getUser();
+  } = await supabaseClient.auth.getUser();
 
   if (err1 || !user) {
     console.error("Failed to get current user", err1);
@@ -142,8 +142,8 @@ export function getChatResponseHeaders() {
   };
 }
 
-export async function ensureUserProfile(supabase, user) {
-  let userProfile = await fetchUserProfile(supabase, user);
+export async function ensureUserProfile(supabaseClient, user) {
+  let userProfile = await fetchUserProfile(supabaseClient, user);
 
   if (!userProfile) {
     let username;
@@ -157,7 +157,7 @@ export async function ensureUserProfile(supabase, user) {
     }
 
     try {
-      const { data: profile, error } = await supabase
+      const { data: profile, error } = await supabaseClient
         .from("profiles")
         .insert({
           id: user.id,
@@ -181,23 +181,23 @@ export async function ensureUserProfile(supabase, user) {
   }
 }
 
-export async function sendVerificationCode(supabase, email) {
-  const { data, error } = await supabase.auth.signInWithOtp({
+export async function sendVerificationCode(supabaseClient, email) {
+  const { data, error } = await supabaseClient.auth.signInWithOtp({
     email: email,
   });
 
   if (error) {
-    toast.error("Failed to send verfication code");
+    toast.error("Failed to send verification code");
     console.error("Failed to send verification code", error);
     return;
   }
   if (data) {
-    toast.success("Verification code send. Check your email!");
+    toast.success("Verification code sent. Check your email!");
   }
 }
 
-export async function submitVerificationCode(supabase, email, code) {
-  const { data, error } = await supabase.auth.verifyOtp({
+export async function submitVerificationCode(supabaseClient, email, code) {
+  const { data, error } = await supabaseClient.auth.verifyOtp({
     email: email,
     token: code,
     type: "magiclink",
@@ -205,13 +205,13 @@ export async function submitVerificationCode(supabase, email, code) {
 
   if (data?.user) {
     toast.success("Signed in successfully");
-    return ensureUserProfile(supabase, data.user);
+    return ensureUserProfile(supabaseClient, data.user);
   }
 
   if (error) {
     console.error("Failed to sign in", error);
 
-    const { data: d2, error: e2 } = await supabase.auth.verifyOtp({
+    const { data: d2, error: e2 } = await supabaseClient.auth.verifyOtp({
       email: email,
       token: code,
       type: "signup",
@@ -219,11 +219,11 @@ export async function submitVerificationCode(supabase, email, code) {
 
     if (d2.user) {
       toast.success("Signed up successfully");
-      return ensureUserProfile(supabase, d2.user);
+      return ensureUserProfile(supabaseClient, d2.user);
     }
     if (e2) {
       toast.error("Failed to sign in / sign up");
-      console.error("sign up failed", e2);
+      console.error("Sign up failed", e2);
     }
   }
 }

@@ -1,7 +1,7 @@
-import { supabase } from '@supabase/supabaseClient';
+import supabaseClient from '@supabase/supabaseClient';
 
 export async function fetchFriendSuggestion() {
-  const { data, error } = await supabase
+  const { data, error } = await supabaseClient
     .from("profile")
     .select("id,avatar,name");
 
@@ -10,7 +10,7 @@ export async function fetchFriendSuggestion() {
 }
 
 export async function fetchFriendRequestSent(profileId) {
-  const { data, error } = await supabase
+  const { data, error } = await supabaseClient
     .from("friend")
     .select("to(id,name,avatar)")
     .eq("from", profileId);
@@ -22,7 +22,7 @@ export async function fetchFriendRequestSent(profileId) {
 export async function sendFriendRequest(from, to) {
   if (from === to)
     throw new Error("You cannot send friend request to yourself");
-  const { data: userData, error: userError } = await supabase
+  const { data: userData, error: userError } = await supabaseClient
     .from("friend")
     .select("id")
     .match({
@@ -33,14 +33,14 @@ export async function sendFriendRequest(from, to) {
   if (userError) throw userError;
   if (userData?.length) throw new Error("Friend request already sent");
 
-  const { data, error } = await supabase.from("friend").insert({ from, to });
+  const { data, error } = await supabaseClient.from("friend").insert({ from, to });
 
   if (error) throw error;
   if (data) return data;
 }
 
 export async function cancelFriendRequest(from, to) {
-  const { data, error } = await supabase.from("friend").delete().match({
+  const { data, error } = await supabaseClient.from("friend").delete().match({
     from,
     to,
   });
@@ -50,7 +50,7 @@ export async function cancelFriendRequest(from, to) {
 }
 
 export async function fetchFriendRequestReceived(profileId) {
-  const { data, error } = await supabase
+  const { data, error } = await supabaseClient
     .from("friend")
     .select("from(id,name,avatar)")
     .match({
@@ -62,7 +62,7 @@ export async function fetchFriendRequestReceived(profileId) {
 }
 
 export async function ignoreFriendRequest(from, to) {
-  const { data, error } = await supabase.from("friend").delete().match({
+  const { data, error } = await supabaseClient.from("friend").delete().match({
     from,
     to,
   });
@@ -74,7 +74,7 @@ export async function ignoreFriendRequest(from, to) {
 }
 
 export async function acceptFriendRequest(from, to) {
-  const { data, error } = await supabase
+  const { data, error } = await supabaseClient
     .from("friend")
     .update({
       isFriend: true,
@@ -89,7 +89,7 @@ export async function acceptFriendRequest(from, to) {
 }
 
 export async function fetchMyFriend(profileId) {
-  const { data, error } = await supabase
+  const { data, error } = await supabaseClient
     .from("friend")
     .select("*, from(id,name,avatar),to(id,name,avatar)")
     .eq("isFriend", true);
@@ -107,7 +107,7 @@ export async function fetchMyFriend(profileId) {
 }
 
 export async function unfriend(from, to) {
-  const { data: data1, error: error1 } = await supabase
+  const { data: data1, error: error1 } = await supabaseClient
     .from("friend")
     .delete()
     .match({
@@ -120,7 +120,7 @@ export async function unfriend(from, to) {
 
   if (data1) {
     if (data1.length === 0) {
-      const { data: data2, error: error2 } = await supabase
+      const { data: data2, error: error2 } = await supabaseClient
         .from("friend")
         .delete()
         .match({

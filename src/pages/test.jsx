@@ -1,9 +1,6 @@
 import { Center, Container, SimpleGrid, Text } from "@chakra-ui/react";
 import Head from "next/head";
 import Post from "../components/Post";
-import { supabase } from '@supabase/supabaseClient';
-
-
 
 export default function Home({ posts }) {
   return (
@@ -23,16 +20,4 @@ export default function Home({ posts }) {
       </SimpleGrid>
     </Container>
   );
-}
-
-export async function getServerSideProps() {
-  const { data } = await supabase
-    .from("post")
-    .select(`*,author(*)`)
-    .order("created_at", { ascending: false });
-  return {
-    props: {
-      posts: data,
-    },
-  };
 }

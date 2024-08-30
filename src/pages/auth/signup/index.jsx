@@ -15,7 +15,7 @@ import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
-import { supabase } from "@supabase/supabaseClient";
+import supabaseClient from '@supabase/supabaseClient';
 import { useRouter } from "next/router";
 import Head from "next/head";
 
@@ -40,7 +40,7 @@ export default function AuthSignupRoute() {
 
   const onSubmit = async ({ name, email, password }) => {
     try {
-      const { user, error: signUpError } = await supabase.auth.signUp({
+      const { user, error: signUpError } = await supabaseClient.auth.signUp({
         email,
         password,
       });
@@ -51,7 +51,7 @@ export default function AuthSignupRoute() {
   
       if (user) {
         const [first_name, last_name] = name.split(" ");
-        const { error: insertError } = await supabase.from("profiles").insert([
+        const { error: insertError } = await supabaseClient.from("profiles").insert([
           {
             id: user.id,
             username: email.split("@")[0], // This assumes the username is the part before the @ in the email
@@ -88,6 +88,7 @@ export default function AuthSignupRoute() {
       console.log(error); // Log the error for debugging
     }
   };
+  
   return (
     <Container>
       <Head>

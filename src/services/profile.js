@@ -1,17 +1,17 @@
-import { supabase } from '@supabase/supabaseClient';
+import supabaseClient from '@supabase/supabaseClient';
 
 export async function fetchProfileDetails(profileId) {
-  const { data: profileDetail, error } = await supabase
+  const { data: profileDetail, error } = await supabaseClient
     .from("profile")
     .select("*")
     .eq("id", profileId);
 
-  const { count: postsCount } = await supabase
+  const { count: postsCount } = await supabaseClient
     .from("post")
     .select("id", { count: "exact" })
     .eq("author", profileId);
 
-  const { data: friendsData } = await supabase
+  const { data: friendsData } = await supabaseClient
     .from("friend")
     .select("from(id), to(id)")
     .match({ isFriend: true });
@@ -31,7 +31,7 @@ export async function changeProfilePic(profileId, avatar) {
   console.log(avatar);
   console.log(profileId);
   // fetch profile information from database
-  const { data: profileData, error: profileErrr } = await supabase
+  const { data: profileData, error: profileErrr } = await supabaseClient
     .from("profile")
     .select("avatar")
     .eq("id", profileId);
@@ -41,7 +41,7 @@ export async function changeProfilePic(profileId, avatar) {
 
   // remove older avatar from supaabase storage
   if (profileData?.length && profileData[0].avatar) {
-    const { error: avatarRemoveError } = await supabase.storage
+    const { error: avatarRemoveError } = await supabaseClient.storage
       .from("avatar")
       .remove(profileData[0].avatar.path);
 
@@ -49,7 +49,7 @@ export async function changeProfilePic(profileId, avatar) {
   }
 
   // update profile data with new avatar
-  const { data: updateProfileData, error: updateProfileError } = await supabase
+  const { data: updateProfileData, error: updateProfileError } = await supabaseClient
     .from("profile")
     .update({ avatar })
     .eq("id", profileId);
