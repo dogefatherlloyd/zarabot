@@ -1,4 +1,18 @@
 import { useState, useEffect } from 'react';
+import { useToast, Container, Box, VStack, Heading, Text, Stack, FormControl, FormLabel, Input, FormErrorMessage, FormHelperText, Button, Link } from "@chakra-ui/react";
+import { useForm } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import * as yup from 'yup';
+import supabaseClient from '@supabase/supabaseClient';
+import Head from "next/head"; // Import Head
+import { useColorModeValue } from "@chakra-ui/react"; // Import useColorModeValue
+import { BsArrowRight } from "react-icons/bs";
+
+const schema = yup
+  .object({
+    email: yup.string().required().email(),
+  })
+  .required();
 
 export default function SigninSigninWithMagicLinkRoute() {
   const [isClient, setIsClient] = useState(false);
@@ -9,6 +23,7 @@ export default function SigninSigninWithMagicLinkRoute() {
     formState: { errors, isSubmitting },
     setValue,
   } = useForm({ resolver: yupResolver(schema) });
+  const bgColor = useColorModeValue("white", "gray.700"); // Use useColorModeValue
 
   useEffect(() => {
     setIsClient(true);
@@ -53,7 +68,7 @@ export default function SigninSigninWithMagicLinkRoute() {
       </Head>
       <Box
         rounded={"lg"}
-        bg={useColorModeValue("white", "gray.700")}
+        bg={bgColor}
         boxShadow={"outline"}
         p={8}
         mt={4}
