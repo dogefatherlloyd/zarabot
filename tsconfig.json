@@ -14,22 +14,23 @@
     "isolatedModules": true,
     "jsx": "preserve",
     "moduleResolution": "node",
-    "baseUrl": ".", 
+    "baseUrl": ".",
     "paths": {
       "@components/*": ["src/components/*"],
       "@services/*": ["src/services/*"],
-      "@layouts/*": ["layouts/*"],
-      "@context/*": ["context/*"],
+      "@layouts/*": ["./layouts/*"], // Updated path
+      "@context/*": ["src/context/*"],
       "@supabase/*": ["supabase/*"],
       "blockchain": ["./blockchain"],
       "@*": ["src/*"]
     }
   },
   "include": [
-  "next-env.d.ts",
-  "**/*.ts",
-  "**/*.tsx",
-  "**/*.jsx"
-, "src/services/profile.js"],
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    "**/*.jsx",
+    "src/services/profile.js"
+  ],
   "exclude": ["node_modules"]
 }
