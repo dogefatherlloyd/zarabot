@@ -12,7 +12,7 @@ import { toast } from "react-hot-toast";
 import { useRouter } from "next/router";
 import useSWR from "swr";
 import Post from "../../../components/Post";
-import ProfileLayout from "../../../../layouts/ProfileLayout"; // Adjusted path
+import ProfileLayout from "../../../layouts/ProfileLayout"; // Adjusted path
 import { fetchUserPosts } from "../../../../src/services/post"; // Adjusted path
 
 export default function MergedPage({ skill }) {

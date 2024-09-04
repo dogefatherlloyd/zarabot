@@ -24,6 +24,10 @@ import {
 
 export default function FriendsLayout({ children, loading, error, title }) {
   const router = useRouter();
+
+  // Call the hook here, at the top level, outside of the map or any other callback
+  const activeTabBg = useColorModeValue("gray.100", "gray.700");
+
   return (
     <Container maxW={"container.xl"}>
       <Head>
@@ -38,11 +42,8 @@ export default function FriendsLayout({ children, loading, error, title }) {
             {tabs.map((tab) => (
               <Link href={tab.href} key={tab.name} passHref>
                 <Button
-                  bg={
-                    router.pathname === tab.href
-                      ? useColorModeValue("gray.100", "gray.700")
-                      : ""
-                  }
+                  // Use the colorMode value outside of the callback
+                  bg={router.pathname === tab.href ? activeTabBg : ""}
                   as="a"
                   leftIcon={
                     <Icon fontSize={22} color="green.500" as={tab.icon} />

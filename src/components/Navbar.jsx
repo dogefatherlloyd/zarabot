@@ -12,7 +12,7 @@ import { useRouter } from "next/router";
 import { AiOutlineHome } from "react-icons/ai";
 import { BiLogIn } from "react-icons/bi";
 import { BsPeople } from "react-icons/bs";
-import { useAuthContext } from "../../context/auth";
+import { useAuthContext } from "../context/auth";
 import CreateMenu from "../components/CreateMenu";
 import NotificationMenu from "../components/NotificationMenu";
 import ProfileMenu from "../components/ProfileMenu";

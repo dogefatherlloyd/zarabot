@@ -21,9 +21,9 @@ import { useRouter } from "next/router";
 import { BsFilePostFill } from "react-icons/bs";
 import { FaCamera, FaUserFriends } from "react-icons/fa";
 import useSWR from "swr";
-import UploadMedia from "../src/components/UploadMedia"; // Adjusted path
+import UploadMedia from "../components/UploadMedia"; // Adjusted path
 import { useAuthContext } from "../context/auth";
-import { changeProfilePic, fetchProfileDetails } from "../src/services/profile"; // Adjusted path
+import { changeProfilePic, fetchProfileDetails } from "../services/profile"; // Adjusted path
 
 export default function ProfileLayout({
   children,
@@ -46,10 +46,7 @@ export default function ProfileLayout({
 
   const handleUpdateProfilePic = async (avatar) => {
     try {
-      const data = await changeProfilePic(
-        router.query.profileId,
-        avatar
-      );
+      await changeProfilePic(router.query.profileId, avatar); // Removed the unused 'data' variable
       // revalidate profile avatar after update
       profileMutate([`/${router.query.profileId}`]);
     } catch (error) {
@@ -146,28 +143,6 @@ export default function ProfileLayout({
               <Tag>{profile?.postsCount} Posts</Tag>
             </HStack>
           )}
-          {/* {authContext?.user?.id === profile?.id && (
-            <>
-              {profileLoading ? (
-                <Skeleton
-                  startColor="blue.400"
-                  endColor="yellow.400"
-                  width="120px"
-                  height={"32px"}
-                  rounded="full"
-                />
-              ) : (
-                <Button
-                  leftIcon={<RiUserSettingsLine size={18} />}
-                  size="sm"
-                  rounded="full"
-                  colorScheme="green"
-                >
-                  Edit Profile
-                </Button>
-              )}
-            </>
-          )} */}
         </VStack>
       </Stack>
 

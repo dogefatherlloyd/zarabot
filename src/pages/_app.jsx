@@ -1,7 +1,7 @@
 import { ChakraProvider } from "@chakra-ui/react";
 import { SWRConfig } from "swr";
-import AuthProvider from "../../context/auth";
-import AppLayout from "../../layouts/AppLayout";
+import AuthProvider from "../context/auth";
+import AppLayout from "../layouts/AppLayout";
 import { theme } from "../../theme";
 import supabaseClient from '@supabase/supabaseClient';
 import { SessionContextProvider } from "@supabase/auth-helpers-react";

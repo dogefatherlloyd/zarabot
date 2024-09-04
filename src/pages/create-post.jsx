@@ -13,7 +13,7 @@ import { useRouter } from "next/router";
 import { useState } from "react";
 import { FiImage } from "react-icons/fi";
 import UploadMedia from "../components/UploadMedia";
-import { useAuthContext } from "../../context/auth";  // Corrected path
+import { useAuthContext } from "../context/auth";  // Corrected path
 import supabaseClient from '@supabase/supabaseClient';
 
 export default function CreatePostRoute() {

@@ -10,7 +10,7 @@ import {
 } from "@chakra-ui/react";
 import { RiSettingsLine } from "react-icons/ri";
 import { IoLogOutOutline } from "react-icons/io5";
-import { useAuthContext } from "../../context/auth";
+import { useAuthContext } from "../context/auth";
 import Link from "next/link";
 export default function ProfileMenu() {
   const authContext = useAuthContext();

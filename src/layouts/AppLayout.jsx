@@ -1,6 +1,6 @@
 import { Box } from "@chakra-ui/react";
-import BottomNav from "../src/components/BottomNav";
-import Navbar from "../src/components/Navbar";
+import BottomNav from "../components/BottomNav";
+import Navbar from "../components/Navbar";
 import { useAuthContext } from "../context/auth";
 
 export default function AppLayout({ children }) {

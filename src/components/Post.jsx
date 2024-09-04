@@ -12,7 +12,7 @@ import {
 import Link from "next/link";
 import { AiOutlineHeart } from "react-icons/ai";
 import { VscComment } from "react-icons/vsc";
-import { useAuthContext } from "../../context/auth";
+import { useAuthContext } from "../context/auth";
 import PostAction from "./Post/PostAction";
 import Image from "next/image";
 
