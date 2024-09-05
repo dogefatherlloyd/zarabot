@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import AppLayout from "../components/AppLayout";
+import AppLayout from "../layouts/AppLayout";
 
 export default function Train() {
     const [text, setText] = useState('');
