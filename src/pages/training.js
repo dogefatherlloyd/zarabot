@@ -30,17 +30,53 @@ export default function Train() {
     return (
         <>
             <Navbar />
-            <div className="flex justify-center items-center h-screen">
-                <form onSubmit={handleSubmit} className="flex flex-col items-center space-y-4">
-                    <label className="text-white">
-                        Text:
-                        <input type="text" value={text} onChange={(e) => setText(e.target.value)} className="mt-2 p-2 border border-gray-300 text-black rounded"/>
-                    </label>
-                    <button type="submit" className="py-2 px-4 bg-blue-500 text-white rounded" disabled={loading}>Train</button>
-                </form>
-                {loading && <div>Loading...</div>}
-                {message && <div className={`message ${message.type}`}>{message.text}</div>}
+            <div className="flex justify-center items-center h-screen bg-gradient-to-r from-blue-500 to-purple-600">
+                <div className="bg-white rounded-lg shadow-lg p-8 max-w-lg w-full">
+                    <h1 className="text-2xl font-bold mb-6 text-center text-gray-700">Train Your Data</h1>
+                    <form onSubmit={handleSubmit} className="flex flex-col space-y-6">
+                        <label className="text-gray-700 font-semibold">
+                            Enter text to train:
+                            <input 
+                                type="text" 
+                                value={text} 
+                                onChange={(e) => setText(e.target.value)} 
+                                className="mt-2 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                                placeholder="Type something..."
+                            />
+                        </label>
+                        <button 
+                            type="submit" 
+                            className={`py-3 px-6 rounded-lg bg-blue-600 text-white font-bold transition-transform transform hover:scale-105 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                            disabled={loading}>
+                            {loading ? 'Training...' : 'Train'}
+                        </button>
+                    </form>
+
+                    {loading && (
+                        <div className="flex justify-center mt-4">
+                            <div className="loader ease-linear rounded-full border-4 border-t-4 border-gray-200 h-8 w-8"></div>
+                        </div>
+                    )}
+
+                    {message && (
+                        <div className={`mt-6 p-4 text-center rounded-lg ${message.type === 'success' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                            {message.text}
+                        </div>
+                    )}
+                </div>
             </div>
+
+            {/* Loader animation styles */}
+            <style jsx>{`
+                .loader {
+                    border-top-color: #3498db;
+                    animation: spin 1s infinite linear;
+                }
+                @keyframes spin {
+                    0% { transform: rotate(0deg); }
+                    100% { transform: rotate(360deg); }
+                }
+            `}</style>
         </>
     );
 }
