@@ -30,23 +30,23 @@ export default function Train() {
     return (
         <>
             <Navbar />
-            <div className="flex justify-center items-center h-screen bg-gradient-to-r from-blue-500 to-purple-600">
-                <div className="bg-white rounded-lg shadow-lg p-8 max-w-lg w-full">
-                    <h1 className="text-2xl font-bold mb-6 text-center text-gray-700">Train Your Data</h1>
+            <div className="flex justify-center items-center h-screen bg-black">
+                <div className="bg-gray-800 rounded-lg shadow-lg p-8 max-w-lg w-full">
+                    <h1 className="text-2xl font-bold mb-6 text-center text-white">Train Your Data</h1>
                     <form onSubmit={handleSubmit} className="flex flex-col space-y-6">
-                        <label className="text-gray-700 font-semibold">
+                        <label className="text-white font-semibold">
                             Enter text to train:
                             <input 
                                 type="text" 
                                 value={text} 
                                 onChange={(e) => setText(e.target.value)} 
-                                className="mt-2 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                                className="mt-2 p-3 border border-gray-300 rounded-lg text-black focus:ring-2 focus:ring-blue-500 focus:outline-none"
                                 placeholder="Type something..."
                             />
                         </label>
                         <button 
                             type="submit" 
-                            className={`py-3 px-6 rounded-lg bg-blue-600 text-white font-bold transition-transform transform hover:scale-105 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                            className={`py-3 px-6 rounded-lg bg-blue-500 text-white font-bold transition-transform transform hover:scale-105 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
                             disabled={loading}>
                             {loading ? 'Training...' : 'Train'}
                         </button>
