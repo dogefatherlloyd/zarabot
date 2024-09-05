@@ -4,6 +4,8 @@ import { AiOutlineHome } from "react-icons/ai";
 import { BsPeople } from "react-icons/bs";
 
 export default function BottomNav() {
+  console.log("BottomNav rendered");
+
   return (
     <HStack
       as="nav"
