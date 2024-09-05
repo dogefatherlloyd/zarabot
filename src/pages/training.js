@@ -46,7 +46,7 @@ export default function Train() {
                         </label>
                         <button 
                             type="submit" 
-                            className={`py-3 px-6 rounded-lg bg-blue-500 text-white font-bold transition-transform transform hover:scale-105 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                            className={`py-3 px-6 rounded-lg ${loading ? 'bg-blue-400' : 'bg-blue-500'} text-white font-bold transition-transform transform hover:scale-105`}
                             disabled={loading}>
                             {loading ? 'Training...' : 'Train'}
                         </button>
@@ -54,7 +54,7 @@ export default function Train() {
 
                     {loading && (
                         <div className="flex justify-center mt-4">
-                            <div className="loader ease-linear rounded-full border-4 border-t-4 border-gray-200 h-8 w-8"></div>
+                            <div className="loader ease-linear rounded-full border-4 border-t-4 border-gray-200 h-6 w-6"></div>
                         </div>
                     )}
 
