@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import Navbar from "../components/Navbar";
+import AppLayout from "../components/AppLayout";
 
 export default function Train() {
     const [text, setText] = useState('');
@@ -28,8 +28,7 @@ export default function Train() {
     };
 
     return (
-        <>
-            <Navbar />
+        <AppLayout>
             <div className="flex justify-center items-center h-screen bg-black">
                 <div className="bg-gray-800 rounded-lg shadow-lg p-8 max-w-lg w-full">
                     <h1 className="text-2xl font-bold mb-6 text-center text-white">Train Your Data</h1>
@@ -77,6 +76,6 @@ export default function Train() {
                     100% { transform: rotate(360deg); }
                 }
             `}</style>
-        </>
+        </AppLayout>
     );
 }
