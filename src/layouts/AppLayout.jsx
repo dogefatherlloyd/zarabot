@@ -7,13 +7,19 @@ export default function AppLayout({ children }) {
   const { user } = useAuthContext();
 
   return (
-    <Box minH="100vh">
+    <Box minH="100vh" display="flex" flexDirection="column">
       <Navbar />
-      <Box as="main" py={20}>
+      <Box as="main" flex="1" py={20}>
         {children}
       </Box>
       {user && (
-        <Box display={["block", "none"]}>
+        <Box
+          display={["block", "none"]} // BottomNav visible on mobile
+          position="fixed"
+          bottom="0"
+          width="100%"
+          zIndex="10"
+        >
           <BottomNav />
         </Box>
       )}
