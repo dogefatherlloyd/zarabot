@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 
-export default function TestPage() {
+export default function ARMagicWindow() {
   const [motionData, setMotionData] = useState(null);
   const [cameraEnabled, setCameraEnabled] = useState(false);
   const videoRef = useRef(null);
@@ -23,9 +23,9 @@ export default function TestPage() {
 
   const handleMotionEvent = (event) => {
     setMotionData({
-      x: event.acceleration.x,
-      y: event.acceleration.y,
-      z: event.acceleration.z,
+      x: event.acceleration.x?.toFixed(2),
+      y: event.acceleration.y?.toFixed(2),
+      z: event.acceleration.z?.toFixed(2),
     });
   };
 
@@ -33,13 +33,12 @@ export default function TestPage() {
     if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
       navigator.mediaDevices
         .getUserMedia({
-          video: { facingMode: 'environment' }, // Request the back camera
+          video: { facingMode: 'environment' }, // Use back camera
         })
         .then((stream) => {
           if (videoRef.current) {
             videoRef.current.srcObject = stream;
             setCameraEnabled(true); // Set camera as enabled
-            console.log('Camera stream: ', stream); // Log the stream to the console
           }
         })
         .catch((err) => {
@@ -58,8 +57,8 @@ export default function TestPage() {
   }, [cameraEnabled]);
 
   return (
-    <div style={{ textAlign: 'center', margin: '20px' }}>
-      <h1>Motion and Camera Access</h1>
+    <div style={{ position: 'relative', textAlign: 'center', margin: '20px', height: '100vh' }}>
+      <h1>AR Magic Window</h1>
 
       {/* Button to request motion data permission */}
       <button
@@ -95,29 +94,45 @@ export default function TestPage() {
         Enable Camera
       </button>
 
-      {motionData && (
-        <div>
-          <h2>Motion Data</h2>
-          <p>Acceleration along X: {motionData.x}</p>
-          <p>Acceleration along Y: {motionData.y}</p>
-          <p>Acceleration along Z: {motionData.z}</p>
-        </div>
-      )}
-
-      {/* Only display the video feed when camera is enabled */}
-      <div style={{ marginTop: '20px' }}>
+      {/* Video feed from the camera */}
+      <div style={{ position: 'relative', width: '100%', height: '100%', overflow: 'hidden' }}>
         {cameraEnabled ? (
           <video
             ref={videoRef}
-            width="100%"
-            height="auto"
-            style={{ border: '2px solid #0070f3' }}
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover', // Cover the whole area
+            }}
             autoPlay
             playsInline
             muted
           ></video>
         ) : (
           <p>Camera not enabled yet.</p>
+        )}
+
+        {/* Overlay for motion data */}
+        {motionData && (
+          <div
+            style={{
+              position: 'absolute',
+              top: '10px',
+              left: '10px',
+              backgroundColor: 'rgba(0, 0, 0, 0.5)',
+              color: 'white',
+              padding: '10px',
+              borderRadius: '5px',
+            }}
+          >
+            <h2>Motion Data</h2>
+            <p>Acceleration X: {motionData.x}</p>
+            <p>Acceleration Y: {motionData.y}</p>
+            <p>Acceleration Z: {motionData.z}</p>
+          </div>
         )}
       </div>
     </div>
