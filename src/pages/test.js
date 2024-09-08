@@ -3,14 +3,16 @@ import { useState, useRef, useEffect } from 'react';
 export default function TestPage() {
   const [motionData, setMotionData] = useState(null);
   const [cameraEnabled, setCameraEnabled] = useState(false);
+  const [motionEnabled, setMotionEnabled] = useState(false);
   const videoRef = useRef(null);
 
-  const requestPermission = () => {
+  const requestMotionPermission = () => {
     if (typeof DeviceMotionEvent.requestPermission === 'function') {
       DeviceMotionEvent.requestPermission()
         .then((permissionState) => {
           if (permissionState === 'granted') {
             window.addEventListener('devicemotion', handleMotionEvent);
+            setMotionEnabled(true); // Set motion as enabled
           } else {
             alert('Permission denied for motion data.');
           }
@@ -29,19 +31,21 @@ export default function TestPage() {
     });
   };
 
-  // Function to enable the camera
   const enableCamera = () => {
     if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
       navigator.mediaDevices
-        .getUserMedia({ video: true })
+        .getUserMedia({
+          video: { facingMode: { exact: 'environment' } }, // Request the back camera
+        })
         .then((stream) => {
           if (videoRef.current) {
             videoRef.current.srcObject = stream;
-            setCameraEnabled(true);
+            setCameraEnabled(true); // Set camera as enabled
           }
         })
         .catch((err) => {
           console.error("Error accessing the camera: ", err);
+          alert('Error accessing the camera. Please try again.');
         });
     } else {
       alert('Camera not supported on this device or browser.');
@@ -57,9 +61,10 @@ export default function TestPage() {
   return (
     <div style={{ textAlign: 'center', margin: '20px' }}>
       <h1>Motion and Camera Access</h1>
-      {/* Improved button styling */}
-      <button 
-        onClick={requestPermission}
+
+      {/* Button to request motion data permission */}
+      <button
+        onClick={requestMotionPermission}
         style={{
           padding: '15px 30px',
           fontSize: '18px',
@@ -74,6 +79,7 @@ export default function TestPage() {
         Request Motion Data Access
       </button>
 
+      {/* Button to enable the camera */}
       <button
         onClick={enableCamera}
         style={{
@@ -99,9 +105,9 @@ export default function TestPage() {
         </div>
       )}
 
-      {/* Display the video feed */}
+      {/* Only display the video feed once both motion and camera are enabled */}
       <div style={{ marginTop: '20px' }}>
-        {cameraEnabled ? (
+        {cameraEnabled && motionEnabled ? (
           <video
             ref={videoRef}
             width="400"
@@ -110,7 +116,7 @@ export default function TestPage() {
             autoPlay
           ></video>
         ) : (
-          <p>Camera not enabled yet.</p>
+          <p>Enable both motion and camera to see the feed.</p>
         )}
       </div>
     </div>
