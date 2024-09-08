@@ -35,12 +35,13 @@ export default function TestPage() {
     if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
       navigator.mediaDevices
         .getUserMedia({
-          video: { facingMode: { exact: 'environment' } }, // Request the back camera
+          video: { facingMode: 'environment' }, // Request the back camera
         })
         .then((stream) => {
           if (videoRef.current) {
             videoRef.current.srcObject = stream;
             setCameraEnabled(true); // Set camera as enabled
+            console.log('Camera stream: ', stream); // Log the stream to the console
           }
         })
         .catch((err) => {
@@ -107,16 +108,18 @@ export default function TestPage() {
 
       {/* Only display the video feed once both motion and camera are enabled */}
       <div style={{ marginTop: '20px' }}>
-        {cameraEnabled && motionEnabled ? (
+        {cameraEnabled ? (
           <video
             ref={videoRef}
-            width="400"
-            height="300"
+            width="100%"
+            height="auto"
             style={{ border: '2px solid #0070f3' }}
             autoPlay
+            playsInline
+            muted
           ></video>
         ) : (
-          <p>Enable both motion and camera to see the feed.</p>
+          <p>Camera not enabled yet.</p>
         )}
       </div>
     </div>
