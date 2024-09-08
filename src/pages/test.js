@@ -4,6 +4,9 @@ export default function ARMagicWindow() {
   const [motionData, setMotionData] = useState(null);
   const [cameraEnabled, setCameraEnabled] = useState(false);
   const videoRef = useRef(null);
+  const canvasRef = useRef(null);
+  const [world, setWorld] = useState(null); // For the LiquidFun world
+  const [particleSystem, setParticleSystem] = useState(null); // For particle system
 
   const requestMotionPermission = () => {
     if (typeof DeviceMotionEvent.requestPermission === 'function') {
@@ -22,11 +25,17 @@ export default function ARMagicWindow() {
   };
 
   const handleMotionEvent = (event) => {
-    setMotionData({
+    const newMotionData = {
       x: event.acceleration.x?.toFixed(2),
       y: event.acceleration.y?.toFixed(2),
       z: event.acceleration.z?.toFixed(2),
-    });
+    };
+    setMotionData(newMotionData);
+
+    // Update gravity in LiquidFun based on motion data
+    if (world) {
+      world.SetGravity(new b2Vec2(parseFloat(newMotionData.x), parseFloat(newMotionData.y)));
+    }
   };
 
   const enterFullScreen = () => {
@@ -64,48 +73,62 @@ export default function ARMagicWindow() {
     }
   };
 
-  // Try to play video when camera is enabled
+  // Initialize LiquidFun when component mounts
   useEffect(() => {
-    if (cameraEnabled && videoRef.current) {
-      videoRef.current.play().catch((err) => {
-        console.error("Error playing the video:", err);
-      });
-    }
+    const initLiquidFun = () => {
+      const gravity = new b2Vec2(0, 10); // Default gravity downwards
+      const world = new b2World(gravity);
+      setWorld(world);
 
-    // Cleanup stream when camera is disabled or component unmounts
-    return () => {
-      if (videoRef.current && videoRef.current.srcObject) {
-        const stream = videoRef.current.srcObject;
-        const tracks = stream.getTracks();
-        tracks.forEach(track => track.stop()); // Stop the camera stream
-      }
-    };
-  }, [cameraEnabled]);
+      // Create particle system
+      const particleSystemDef = new b2ParticleSystemDef();
+      const particleSystem = world.CreateParticleSystem(particleSystemDef);
+      setParticleSystem(particleSystem);
 
-  // Handle orientation changes for mobile devices
-  useEffect(() => {
-    const handleOrientationChange = () => {
-      if (cameraEnabled && videoRef.current) {
-        videoRef.current.style.transform = window.innerWidth > window.innerHeight ? 'rotate(90deg)' : 'rotate(0deg)';
-      }
+      // Add particles
+      const particleGroupDef = new b2ParticleGroupDef();
+      const circle = new b2CircleShape();
+      circle.m_radius = 2; // Particle size
+      particleGroupDef.shape = circle;
+      particleGroupDef.position.Set(200, 100); // Position
+      particleSystem.CreateParticleGroup(particleGroupDef);
     };
 
-    window.addEventListener('orientationchange', handleOrientationChange);
-    return () => window.removeEventListener('orientationchange', handleOrientationChange);
-  }, [cameraEnabled]);
-
-  // Check if camera permission is granted
-  useEffect(() => {
-    navigator.permissions.query({ name: 'camera' }).then((result) => {
-      if (result.state !== 'granted') {
-        console.error('Camera permission not granted.');
-      }
-    });
+    initLiquidFun();
   }, []);
+
+  // Update LiquidFun and draw particles on canvas
+  useEffect(() => {
+    if (!world || !particleSystem || !canvasRef.current) return;
+
+    const context = canvasRef.current.getContext('2d');
+    const stepWorld = () => {
+      world.Step(1 / 60, 6, 2); // Step the world at 60 FPS
+
+      // Clear the canvas
+      context.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
+
+      // Render particles
+      const particleCount = particleSystem.GetParticleCount();
+      const particlePositions = particleSystem.GetPositionBuffer();
+      for (let i = 0; i < particleCount; i++) {
+        const x = particlePositions[i * 2];
+        const y = particlePositions[i * 2 + 1];
+        context.beginPath();
+        context.arc(x, y, 2, 0, 2 * Math.PI);
+        context.fillStyle = 'rgba(0, 150, 255, 0.8)';
+        context.fill();
+      }
+
+      requestAnimationFrame(stepWorld); // Keep looping
+    };
+
+    stepWorld();
+  }, [world, particleSystem]);
 
   return (
     <div style={{ position: 'relative', textAlign: 'center', margin: '20px', height: '100vh' }}>
-      <h1>AR Magic Window</h1>
+      <h1>AR Magic Window with LiquidFun</h1>
 
       {/* Button to request motion data permission */}
       <button
@@ -152,8 +175,8 @@ export default function ARMagicWindow() {
               left: 0,
               width: '100%',
               height: '100%',
-              objectFit: 'cover', // Ensure the video covers the whole screen
-              transform: 'rotate(0deg)', // Reset rotation for landscape/portrait mode
+              objectFit: 'cover',
+              transform: 'rotate(0deg)',
             }}
             autoPlay
             playsInline
@@ -182,6 +205,19 @@ export default function ARMagicWindow() {
             <p>Acceleration Z: {motionData.z}</p>
           </div>
         )}
+
+        {/* Canvas to render LiquidFun particles */}
+        <canvas
+          ref={canvasRef}
+          width={window.innerWidth}
+          height={window.innerHeight}
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            pointerEvents: 'none',
+          }}
+        />
       </div>
     </div>
   );
