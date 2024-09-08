@@ -1,7 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 
 export default function ARMagicWindow() {
-  const [motionData, setMotionData] = useState(null);
   const [cameraEnabled, setCameraEnabled] = useState(false);
   const videoRef = useRef(null);
 
@@ -12,49 +11,18 @@ export default function ARMagicWindow() {
     speechSynthesis.speak(utterance);
   };
 
-  const requestMotionPermission = () => {
-    if (typeof DeviceMotionEvent.requestPermission === 'function') {
-      DeviceMotionEvent.requestPermission()
-        .then((permissionState) => {
-          if (permissionState === 'granted') {
-            window.addEventListener('devicemotion', handleMotionEvent);
-            speak("Motion data access granted.");
-          } else {
-            speak("Permission denied for motion data.");
-          }
-        })
-        .catch(console.error);
-    } else {
-      speak("Motion data is not supported on this device.");
-    }
-  };
-
-  const handleMotionEvent = (event) => {
-    const motionX = event.acceleration.x?.toFixed(2);
-    const motionY = event.acceleration.y?.toFixed(2);
-    const motionZ = event.acceleration.z?.toFixed(2);
-
-    setMotionData({
-      x: motionX,
-      y: motionY,
-      z: motionZ,
-    });
-
-    // The AI assistant "speaks" the motion data
-    speak(`Motion data. X: ${motionX}, Y: ${motionY}, Z: ${motionZ}`);
-  };
-
   const enableCamera = () => {
     if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
       navigator.mediaDevices
         .getUserMedia({
-          video: { facingMode: { ideal: 'environment' } }, // More flexible camera access
+          video: { facingMode: { ideal: 'environment' } }, // Use back camera
         })
         .then((stream) => {
           if (videoRef.current) {
             videoRef.current.srcObject = stream;
             setCameraEnabled(true); // Set camera as enabled
-            speak("Camera enabled.");
+            speak("Camera is now enabled."); // AI assistant speaks
+            console.log("Camera stream received: ", stream); // Log camera stream
           }
         })
         .catch((err) => {
@@ -73,25 +41,8 @@ export default function ARMagicWindow() {
   }, [cameraEnabled]);
 
   return (
-    <div style={{ position: 'relative', textAlign: 'center', margin: '20px', height: '100vh' }}>
-      <h1>AR Magic Window with AI Assistant</h1>
-
-      {/* Button to request motion data permission */}
-      <button
-        onClick={requestMotionPermission}
-        style={{
-          padding: '15px 30px',
-          fontSize: '18px',
-          backgroundColor: '#0070f3',
-          color: 'white',
-          border: 'none',
-          borderRadius: '5px',
-          cursor: 'pointer',
-          margin: '10px'
-        }}
-      >
-        Request Motion Data Access
-      </button>
+    <div style={{ textAlign: 'center', margin: '20px', height: '100vh' }}>
+      <h1>AR Magic Window</h1>
 
       {/* Button to enable the camera */}
       <button
@@ -129,26 +80,6 @@ export default function ARMagicWindow() {
           ></video>
         ) : (
           <p>Camera not enabled yet.</p>
-        )}
-
-        {/* Overlay for motion data */}
-        {motionData && (
-          <div
-            style={{
-              position: 'absolute',
-              top: '10px',
-              left: '10px',
-              backgroundColor: 'rgba(0, 0, 0, 0.5)',
-              color: 'white',
-              padding: '10px',
-              borderRadius: '5px',
-            }}
-          >
-            <h2>Motion Data</h2>
-            <p>Acceleration X: {motionData.x}</p>
-            <p>Acceleration Y: {motionData.y}</p>
-            <p>Acceleration Z: {motionData.z}</p>
-          </div>
         )}
       </div>
     </div>
