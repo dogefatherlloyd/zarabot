@@ -3,7 +3,6 @@ import { useState, useRef, useEffect } from 'react';
 export default function TestPage() {
   const [motionData, setMotionData] = useState(null);
   const [cameraEnabled, setCameraEnabled] = useState(false);
-  const [motionEnabled, setMotionEnabled] = useState(false);
   const videoRef = useRef(null);
 
   const requestMotionPermission = () => {
@@ -12,7 +11,6 @@ export default function TestPage() {
         .then((permissionState) => {
           if (permissionState === 'granted') {
             window.addEventListener('devicemotion', handleMotionEvent);
-            setMotionEnabled(true); // Set motion as enabled
           } else {
             alert('Permission denied for motion data.');
           }
@@ -106,7 +104,7 @@ export default function TestPage() {
         </div>
       )}
 
-      {/* Only display the video feed once both motion and camera are enabled */}
+      {/* Only display the video feed when camera is enabled */}
       <div style={{ marginTop: '20px' }}>
         {cameraEnabled ? (
           <video
