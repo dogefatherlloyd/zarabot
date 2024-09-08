@@ -32,12 +32,12 @@ export default function ARMagicWindow() {
   const enterFullScreen = () => {
     if (videoRef.current && videoRef.current.requestFullscreen) {
       videoRef.current.requestFullscreen();
-    } else if (videoRef.current && videoRef.current.webkitRequestFullscreen) { // For Safari
-      videoRef.current.webkitRequestFullscreen();
-    } else if (videoRef.current && videoRef.current.mozRequestFullScreen) { // For Firefox
-      videoRef.current.mozRequestFullScreen();
-    } else if (videoRef.current && videoRef.current.msRequestFullscreen) { // For IE/Edge
-      videoRef.current.msRequestFullscreen();
+    } else if (videoRef.current && videoRef.current.webkitRequestFullscreen) {
+      videoRef.current.webkitRequestFullscreen(); // Safari
+    } else if (videoRef.current && videoRef.current.mozRequestFullScreen) {
+      videoRef.current.mozRequestFullScreen(); // Firefox
+    } else if (videoRef.current && videoRef.current.msRequestFullscreen) {
+      videoRef.current.msRequestFullscreen(); // IE/Edge
     }
   };
 
@@ -49,8 +49,9 @@ export default function ARMagicWindow() {
         })
         .then((stream) => {
           if (videoRef.current) {
-            videoRef.current.srcObject = stream;
-            setCameraEnabled(true); // Set camera as enabled
+            console.log("Stream:", stream); // Log the stream to inspect
+            videoRef.current.srcObject = stream; // Assign stream to video element
+            setCameraEnabled(true); // Camera is enabled
             enterFullScreen(); // Enter fullscreen when camera is enabled
           }
         })
@@ -63,12 +64,15 @@ export default function ARMagicWindow() {
     }
   };
 
+  // Try to play video when camera is enabled
   useEffect(() => {
     if (cameraEnabled && videoRef.current) {
-      videoRef.current.play();
+      videoRef.current.play().catch((err) => {
+        console.error("Error playing the video:", err);
+      });
     }
 
-    // Cleanup on component unmount or when camera is disabled
+    // Cleanup stream when camera is disabled or component unmounts
     return () => {
       if (videoRef.current && videoRef.current.srcObject) {
         const stream = videoRef.current.srcObject;
@@ -78,6 +82,7 @@ export default function ARMagicWindow() {
     };
   }, [cameraEnabled]);
 
+  // Handle orientation changes for mobile devices
   useEffect(() => {
     const handleOrientationChange = () => {
       if (cameraEnabled && videoRef.current) {
@@ -88,6 +93,15 @@ export default function ARMagicWindow() {
     window.addEventListener('orientationchange', handleOrientationChange);
     return () => window.removeEventListener('orientationchange', handleOrientationChange);
   }, [cameraEnabled]);
+
+  // Check if camera permission is granted
+  useEffect(() => {
+    navigator.permissions.query({ name: 'camera' }).then((result) => {
+      if (result.state !== 'granted') {
+        console.error('Camera permission not granted.');
+      }
+    });
+  }, []);
 
   return (
     <div style={{ position: 'relative', textAlign: 'center', margin: '20px', height: '100vh' }}>
@@ -138,8 +152,8 @@ export default function ARMagicWindow() {
               left: 0,
               width: '100%',
               height: '100%',
-              objectFit: 'cover', // Cover the whole area
-              transform: 'rotate(0deg)', // Reset rotation
+              objectFit: 'cover', // Ensure the video covers the whole screen
+              transform: 'rotate(0deg)', // Reset rotation for landscape/portrait mode
             }}
             autoPlay
             playsInline
