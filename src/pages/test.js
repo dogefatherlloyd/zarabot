@@ -5,48 +5,64 @@ export default function ARMagicWindow() {
   const [cameraEnabled, setCameraEnabled] = useState(false);
   const videoRef = useRef(null);
 
+  // AI Assistant that speaks to the user
+  const speak = (text) => {
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = 'en-US';
+    speechSynthesis.speak(utterance);
+  };
+
   const requestMotionPermission = () => {
     if (typeof DeviceMotionEvent.requestPermission === 'function') {
       DeviceMotionEvent.requestPermission()
         .then((permissionState) => {
           if (permissionState === 'granted') {
             window.addEventListener('devicemotion', handleMotionEvent);
+            speak("Motion data access granted.");
           } else {
-            alert('Permission denied for motion data.');
+            speak("Permission denied for motion data.");
           }
         })
         .catch(console.error);
     } else {
-      alert('DeviceMotionEvent is not supported.');
+      speak("Motion data is not supported on this device.");
     }
   };
 
   const handleMotionEvent = (event) => {
+    const motionX = event.acceleration.x?.toFixed(2);
+    const motionY = event.acceleration.y?.toFixed(2);
+    const motionZ = event.acceleration.z?.toFixed(2);
+
     setMotionData({
-      x: event.acceleration.x?.toFixed(2),
-      y: event.acceleration.y?.toFixed(2),
-      z: event.acceleration.z?.toFixed(2),
+      x: motionX,
+      y: motionY,
+      z: motionZ,
     });
+
+    // The AI assistant "speaks" the motion data
+    speak(`Motion data. X: ${motionX}, Y: ${motionY}, Z: ${motionZ}`);
   };
 
   const enableCamera = () => {
     if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
       navigator.mediaDevices
         .getUserMedia({
-          video: { facingMode: 'environment' }, // Use back camera
+          video: { facingMode: { ideal: 'environment' } }, // More flexible camera access
         })
         .then((stream) => {
           if (videoRef.current) {
             videoRef.current.srcObject = stream;
             setCameraEnabled(true); // Set camera as enabled
+            speak("Camera enabled.");
           }
         })
         .catch((err) => {
           console.error("Error accessing the camera: ", err);
-          alert('Error accessing the camera. Please try again.');
+          speak("Error accessing the camera. Please try again.");
         });
     } else {
-      alert('Camera not supported on this device or browser.');
+      speak("Camera is not supported on this device.");
     }
   };
 
@@ -58,7 +74,7 @@ export default function ARMagicWindow() {
 
   return (
     <div style={{ position: 'relative', textAlign: 'center', margin: '20px', height: '100vh' }}>
-      <h1>AR Magic Window</h1>
+      <h1>AR Magic Window with AI Assistant</h1>
 
       {/* Button to request motion data permission */}
       <button
