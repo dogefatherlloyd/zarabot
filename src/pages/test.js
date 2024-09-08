@@ -1,42 +1,43 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Motion and Orientation</title>
-</head>
-<body>
-    <h1>Motion and Orientation Access</h1>
-    <button id="request-permission">Request Access to Motion Data</button>
-    <div id="output"></div>
+import { useState } from 'react';
 
-    <script>
-        const output = document.getElementById('output');
-        const requestPermissionButton = document.getElementById('request-permission');
+export default function TestPage() {
+  const [motionData, setMotionData] = useState(null);
 
-        requestPermissionButton.addEventListener('click', () => {
-            if (typeof DeviceMotionEvent.requestPermission === 'function') {
-                DeviceMotionEvent.requestPermission()
-                    .then(permissionState => {
-                        if (permissionState === 'granted') {
-                            window.addEventListener('devicemotion', handleMotionEvent);
-                        } else {
-                            output.textContent = 'Permission denied for motion data.';
-                        }
-                    })
-                    .catch(console.error);
-            } else {
-                output.textContent = 'DeviceMotionEvent is not supported.';
-            }
-        });
+  const requestPermission = () => {
+    if (typeof DeviceMotionEvent.requestPermission === 'function') {
+      DeviceMotionEvent.requestPermission()
+        .then((permissionState) => {
+          if (permissionState === 'granted') {
+            window.addEventListener('devicemotion', handleMotionEvent);
+          } else {
+            alert('Permission denied for motion data.');
+          }
+        })
+        .catch(console.error);
+    } else {
+      alert('DeviceMotionEvent is not supported.');
+    }
+  };
 
-        function handleMotionEvent(event) {
-            output.textContent = `
-                Acceleration along X: ${event.acceleration.x}\n
-                Acceleration along Y: ${event.acceleration.y}\n
-                Acceleration along Z: ${event.acceleration.z}
-            `;
-        }
-    </script>
-</body>
-</html>
+  const handleMotionEvent = (event) => {
+    setMotionData({
+      x: event.acceleration.x,
+      y: event.acceleration.y,
+      z: event.acceleration.z,
+    });
+  };
+
+  return (
+    <div>
+      <h1>Motion and Orientation Access</h1>
+      <button onClick={requestPermission}>Request Access to Motion Data</button>
+      {motionData && (
+        <div>
+          <p>Acceleration along X: {motionData.x}</p>
+          <p>Acceleration along Y: {motionData.y}</p>
+          <p>Acceleration along Z: {motionData.z}</p>
+        </div>
+      )}
+    </div>
+  );
+}
