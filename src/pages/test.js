@@ -1,4 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
+import { b2Vec2, b2World, b2ParticleSystemDef, b2ParticleGroupDef, b2CircleShape } from 'box2dweb';
+
 
 export default function ARMagicWindow() {
   const [motionData, setMotionData] = useState(null);

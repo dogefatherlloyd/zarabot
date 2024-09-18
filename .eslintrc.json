@@ -5,5 +5,12 @@
     "node": true,
     "es6": true,
     "jest": true
+  },
+  "globals": {
+    "b2Vec2": "readonly",
+    "b2World": "readonly",
+    "b2ParticleSystemDef": "readonly",
+    "b2ParticleGroupDef": "readonly",
+    "b2CircleShape": "readonly"
   }
 }
