@@ -41,13 +41,13 @@ export default function Navbar() {
       {/* logo */}
       <Link href={"/"} passHref>
         <Box w={"40px"} h={"40px"}>
-          <Image
-            alt={"Logo"}
-            w="full"
-            h="full"
-            background="transparent"
-            src="https://marketplace-assets.digitalocean.com/logos/supabase-supabasepostgres-18-04.svg"
-          />
+        <Image
+  alt={"Logo"}
+  w="full"
+  h="full"
+  background="transparent"
+  src="/logo.png"
+/>
         </Box>
       </Link>
 
