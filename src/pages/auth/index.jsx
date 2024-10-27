@@ -5,19 +5,19 @@ import {
   Text,
   useColorModeValue,
   Container,
-  SimpleGrid,
   Button,
+  Flex,
 } from "@chakra-ui/react";
 import Head from "next/head";
 import Link from "next/link";
 
 export default function AuthRoute() {
   return (
-    <Container>
+    <Container maxW="container.md" centerContent>
       <Head>
         <title>Authenticate</title>
       </Head>
-      <Stack spacing={8} mx={"auto"} maxW={"lg"} py={12} px={6}>
+      <Stack spacing={8} mx={"auto"} py={12} px={6} align="center">
         <Stack align={"center"}>
           <Heading fontSize={"4xl"}>Authenticate</Heading>
           <Text fontSize={"lg"} maxW="md" textAlign={"center"}>
@@ -28,22 +28,23 @@ export default function AuthRoute() {
         <Box
           rounded={"lg"}
           bg={useColorModeValue("white", "gray.700")}
-          boxShadow={"sm"}
-          p={4}
-          borderWidth={"2px"}
+          boxShadow={"lg"}
+          p={8}
+          w="full"
+          maxW="sm"
         >
-          <SimpleGrid columns={[1, 2]} spacing={4}>
+          <Flex gap={4} justify="center">
             <Link href="/auth/login" passHref>
-              <Button colorScheme="blue">
+              <Button colorScheme="blue" w="120px">
                 Login
               </Button>
             </Link>
             <Link href="/auth/signup" passHref>
-              <Button colorScheme="green">
+              <Button colorScheme="green" w="120px">
                 Signup
               </Button>
             </Link>
-          </SimpleGrid>
+          </Flex>
         </Box>
       </Stack>
     </Container>
