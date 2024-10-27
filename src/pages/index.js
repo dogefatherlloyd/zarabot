@@ -70,7 +70,7 @@ export default function Home() {
       <Head>
         <title>Artemis - AI</title>
         <meta name="description" content="Artemis is a general purpose, programmable & extensible AI." />
-        <link rel="icon" href="/jobot_icon.png" type="image/png" />
+        <link rel="icon" href="/eagle_silhouette_logo.png" type="image/png" />
         <meta property="og:image" content="/jobot_meta.png" />
         <meta property="og:title" content="Artemis - AI" />
         <meta property="og:description" content="A general purpose, programmable, and extensible AI." />

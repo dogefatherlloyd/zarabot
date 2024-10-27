@@ -29,8 +29,8 @@ const Message = ({ role, content }) => {
           role === "user"
             ? "/profile_placeholder.png"
             : role === "assistant"
-            ? "/jobot.jpg"
-            : "/jovian_avatar.jpeg"
+            ? "/eagle_silhouette_logo.png"
+            : "/eagle_silhouette_logo.png"
         }
         height={40}
         width={40}
