@@ -4,25 +4,28 @@
     "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "skipLibCheck": true,
-    "strict": false,
+    "strict": true,
     "forceConsistentCasingInFileNames": true,
     "noEmit": true,
     "incremental": true,
     "esModuleInterop": true,
     "module": "esnext",
+    "moduleResolution": "node",
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "preserve",
-    "moduleResolution": "node",
     "baseUrl": ".",
     "paths": {
       "@components/*": ["src/components/*"],
       "@services/*": ["src/services/*"],
-      "@layouts/*": ["src/layouts/*"], // Fixed to align with other paths
-      "@context/*": ["src/context/*"], // Ensure src/context/auth.js or auth.ts exists
-      "@supabase/*": ["src/supabase/*"], // Added src before supabase
-      "blockchain": ["./blockchain"],
-      "@*": ["src/*"]
+      "@layouts/*": ["src/layouts/*"],
+      "@context/*": ["src/context/*"],
+      "@supabase/*": ["src/supabase/*"],
+      "@lib/*": ["src/lib/*"],
+      "@styles/*": ["src/styles/*"],
+      "@src/*": ["src/*"],
+      "@Friend": ["Friend"], // Added alias for Friend component in the root
+      "blockchain": ["./blockchain"]
     }
   },
   "include": [
@@ -30,7 +33,7 @@
     "**/*.ts",
     "**/*.tsx",
     "**/*.jsx",
-    "src/services/profile.js"
+    "src/**/*"
   ],
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules", "functions"]
 }

@@ -1,34 +1,54 @@
-import { createMiddlewareClient } from "@supabase/auth-helpers-nextjs";
+import { initializeApp } from "firebase/app";
+import { getFirestore, collection, query, where, getDocs } from "firebase/firestore";
+
+const firebaseConfig = {
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
 
 export default async function handler(req, res) {
-  // Use createMiddlewareClient for API routes
-  const supabase = createMiddlewareClient({ req, res });
-
-  // Fetch profile by username
-  const { data: profile, error: err1 } = await supabase
-    .from("profiles")
-    .select("*")
-    .eq("username", req.query.username)
-    .single();
-
-  // Handle error if profile is not found
-  if (err1) {
-    res.status(404).json({ error: err1 });
+  // Only allow GET requests
+  if (req.method !== "GET") {
+    res.status(405).json({ message: "Method not supported" });
     return;
   }
 
-  // Fetch skills based on the user_id from the profile
-  const { data: skills, error: err2 } = await supabase
-    .from("skills")
-    .select("*")
-    .eq("user_id", profile.id);
+  try {
+    const { username } = req.query;
 
-  // Handle error if skills are not found
-  if (err2) {
-    res.status(404).json({ profile, error: err2 });
-    return;
+    // Fetch profile by username from Firestore
+    const profilesRef = collection(db, "profiles");
+    const profilesQuery = query(profilesRef, where("username", "==", username));
+    const profilesSnapshot = await getDocs(profilesQuery);
+
+    if (profilesSnapshot.empty) {
+      res.status(404).json({ error: "Profile not found" });
+      return;
+    }
+
+    const profile = profilesSnapshot.docs[0].data();
+
+    // Fetch skills based on the user_id from the profile
+    const skillsRef = collection(db, "skills");
+    const skillsQuery = query(skillsRef, where("user_id", "==", profile.id));
+    const skillsSnapshot = await getDocs(skillsQuery);
+
+    if (skillsSnapshot.empty) {
+      res.status(404).json({ profile, error: "Skills not found" });
+      return;
+    }
+
+    const skills = skillsSnapshot.docs.map((doc) => doc.data());
+
+    // Return the profile and skills data
+    res.status(200).json({ skills, profile });
+  } catch (error) {
+    console.error("Error fetching data:", error);
+    res.status(500).json({ message: "Internal Server Error" });
   }
-
-  // Return the profile and skills data
-  res.status(200).json({ skills, profile });
 }

@@ -13,12 +13,24 @@ import { useRouter } from "next/router";
 import { useState } from "react";
 import { FiImage } from "react-icons/fi";
 import UploadMedia from "../components/UploadMedia";
-import { useAuthContext } from "../context/auth";  // Corrected path
-import supabaseClient from '@supabase/supabaseClient';
+import { getFirestore, collection, addDoc } from "firebase/firestore";
+import { getAuth } from "firebase/auth";
+import { initializeApp } from "firebase/app";
+
+// Firebase Configuration
+const firebaseConfig = {
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const auth = getAuth(app);
 
 export default function CreatePostRoute() {
   const router = useRouter();
-  const authContext = useAuthContext();
   const [content, setContent] = useState("");
   const [media, setMedia] = useState();
   const [inserting, setInserting] = useState(false);
@@ -27,25 +39,26 @@ export default function CreatePostRoute() {
     setInserting(true);
 
     try {
-      const { data: postCreateData, error: postCreateError } = await supabaseClient
-        .from("post")
-        .insert([
-          {
-            content,
-            media,
-            author: authContext?.user.id,
-          },
-        ]);
+      // Get the current authenticated user
+      const user = auth.currentUser;
 
-      if (postCreateData) {
-        router.push("/");
+      if (!user) {
+        console.log("No user is logged in");
+        return;
       }
 
-      if (postCreateError) {
-        console.log(postCreateError.message);
-      }
+      // Create the new post in Firestore
+      await addDoc(collection(db, "posts"), {
+        content,
+        media,
+        author: user.uid,
+        createdAt: new Date(), // Add a timestamp for when the post was created
+      });
+
+      // Redirect to home after post creation
+      router.push("/");
     } catch (error) {
-      console.log(error);
+      console.error("Error creating post:", error);
     } finally {
       setInserting(false);
     }

@@ -3,18 +3,35 @@ import { SWRConfig } from "swr";
 import AuthProvider from "../context/auth";
 import AppLayout from "../layouts/AppLayout";
 import { theme } from "../../theme";
-import supabaseClient from '@supabase/supabaseClient';
-import { SessionContextProvider } from "@supabase/auth-helpers-react";
 import { Analytics } from "@vercel/analytics/react";
 import { Toaster } from "react-hot-toast";
 import "../../src/styles/globals.css";
 import { useEffect, useState } from "react";
+import { initializeApp } from "firebase/app";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
+
+const firebaseConfig = {
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+  // Add other config options as needed
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
 
 export default function App({ Component, pageProps }) {
   const [isMounted, setIsMounted] = useState(false);
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
     setIsMounted(true);
+
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+    });
+
+    return () => unsubscribe();
   }, []);
 
   if (!isMounted) {
@@ -23,18 +40,13 @@ export default function App({ Component, pageProps }) {
 
   return (
     <ChakraProvider theme={theme}>
-      <AuthProvider>
-        <SessionContextProvider
-          supabaseClient={supabaseClient}
-          initialSession={pageProps.initialSession}
-        >
-          <SWRConfig>
-            <AppLayout>
-              <Component {...pageProps} />
-              <Toaster />
-            </AppLayout>
-          </SWRConfig>
-        </SessionContextProvider>
+      <AuthProvider value={{ user }}>
+        <SWRConfig>
+          <AppLayout>
+            <Component {...pageProps} />
+            <Toaster />
+          </AppLayout>
+        </SWRConfig>
         <Analytics />
       </AuthProvider>
     </ChakraProvider>

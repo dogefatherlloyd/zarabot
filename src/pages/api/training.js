@@ -1,40 +1,47 @@
+import { initializeApp } from "firebase/app";
+import { getFirestore, collection, addDoc } from "firebase/firestore";
+import { Configuration, OpenAIApi } from "openai";
 
-import { createClient } from '@supabase/supabase-js';
-import { Configuration, OpenAIApi } from 'openai';
+// Firebase Configuration
+const firebaseConfig = {
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+};
 
-const supabaseUrl = 'https://gwsmfmqtmuhmglnfzqma.supabase.co';
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd3c21mbXF0bXVobWdsbmZ6cW1hIiwicm9sZSI6ImFub24iLCJpYXQiOjE2ODIwMTgxNDAsImV4cCI6MTk5NzU5NDE0MH0.RidOWSEh2N8Kj4EjKe7balLKFXMErDQl3mCMs8kyY7g';
-const supabase = createClient(supabaseUrl, supabaseKey);
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
 
 export default async function handler(req, res) {
-    if (req.method === 'POST') {
-        const { text } = req.body;
+  if (req.method === "POST") {
+    try {
+      const { text } = req.body;
 
-        // Initialize OpenAI API
-        const configuration = new Configuration({ apiKey: process.env.OPENAI_API_KEY });
-        const openai = new OpenAIApi(configuration);
+      // Initialize OpenAI API
+      const configuration = new Configuration({ apiKey: process.env.OPENAI_API_KEY });
+      const openai = new OpenAIApi(configuration);
 
-        // Turn input text into an embedding
-        const embeddingResponse = await openai.createEmbedding({
-            model: "text-embedding-ada-002", // Model that creates our embeddings
-            input: text
-        });
+      // Turn input text into an embedding
+      const embeddingResponse = await openai.createEmbedding({
+        model: "text-embedding-ada-002", // Model that creates our embeddings
+        input: text,
+      });
 
-        const [{ embedding }] = embeddingResponse.data.data;
+      const [{ embedding }] = embeddingResponse.data.data;
 
-        // Save to Supabase
-        const { error } = await supabase
-            .from('documents')
-            .insert([
-                { content: text, embedding: embedding }
-            ]);
+      // Save to Firestore (Firebase)
+      await addDoc(collection(db, "documents"), {
+        content: text,
+        embedding: embedding,
+      });
 
-        if (error) {
-            res.status(500).json({ error: error.message });
-        } else {
-            res.status(200).json({ message: 'Training data saved.' });
-        }
-    } else {
-        res.status(405).json({ error: 'Method not allowed.' });
+      res.status(200).json({ message: "Training data saved." });
+    } catch (error) {
+      console.error("Error saving training data:", error);
+      res.status(500).json({ error: error.message });
     }
+  } else {
+    res.status(405).json({ error: "Method not allowed." });
+  }
 }

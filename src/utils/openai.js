@@ -1,8 +1,20 @@
-import { useUser, useSessionContext } from "@supabase/auth-helpers-react"; // Ensure correct hooks are used
 import { createParser } from "eventsource-parser";
-import { useState } from "react";
+import { useState, useEffect } from "react"; // Added useEffect import
 import { toast } from "react-hot-toast";
 import { useLoginDialog } from ".";
+import { initializeApp } from "firebase/app";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
+
+// Firebase Configuration
+const firebaseConfig = {
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
 
 export const OpenAIStream = async (body) => {
   const encoder = new TextEncoder();
@@ -107,14 +119,25 @@ export const getSystemMessage = (mode = "default", user = null) => {
 
 export default function useOpenAIMessages(initialHistory = null) {
   const { setLoginOpen } = useLoginDialog();
-  const { isLoading, session } = useSessionContext(); // Using the session context to get the session
-  const user = useUser();
+  const [user, setUser] = useState(null);
   const [history, setHistory] = useState(initialHistory || [{ role: "system", content: getSystemMessage() }]);
   const [sending, setSending] = useState(false);
 
+  // Effect to monitor user authentication
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      if (currentUser) {
+        setUser(currentUser);
+      } else {
+        setUser(null);
+      }
+    });
+
+    return () => unsubscribe();
+  }, []);
+
   const sendMessages = async (newMessages) => {
-    if (isLoading) return; // Avoid sending messages while loading session data
-    if (!session || !user) {
+    if (!user) {
       toast("Please log in to send a message");
       setLoginOpen(true);
       return;

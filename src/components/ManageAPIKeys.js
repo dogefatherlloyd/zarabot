@@ -1,82 +1,100 @@
-import { useSupabaseClient, useUser } from "@supabase/auth-helpers-react";
 import { useEffect, useState } from "react";
 import CopyToClipboard from "react-copy-to-clipboard";
 import { toast } from "react-hot-toast";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
+import { getFirestore, collection, addDoc, getDocs, deleteDoc, query, where, doc } from "firebase/firestore";
+import { initializeApp } from "firebase/app";
 
-async function createApiKey(supabase, keyData) {
-  const { error } = await supabase.from("apikeys").insert(keyData);
-  if (error) {
+const firebaseConfig = {
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+  // Add other config options as needed
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+async function createApiKey(keyData) {
+  try {
+    await addDoc(collection(db, "apikeys"), keyData);
+    toast.success("API key created");
+    return true;
+  } catch (error) {
     toast.error("Failed to create API key");
     console.error("Failed to create key", error);
     return false;
   }
-  toast.success("API key created");
-  return true;
 }
 
-async function fetchApiKeys(supabase, user) {
-  const { data, error } = await supabase
-    .from("apikeys")
-    .select("*")
-    .eq("user_id", user.id);
-
-  if (error) {
+async function fetchApiKeys(user) {
+  try {
+    const q = query(collection(db, "apikeys"), where("user_id", "==", user.uid));
+    const querySnapshot = await getDocs(q);
+    const apiKeys = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+    return apiKeys;
+  } catch (error) {
     console.log("Failed to fetch API keys", error);
     toast.error("Failed to fetch API keys. " + error.message);
     return [];
   }
-  return data;
 }
 
-async function deleteApiKey(supabase, key) {
-  console.log("deleting key", key);
-  const { error } = await supabase.from("apikeys").delete().eq("key", key);
-
-  if (error) {
+async function deleteApiKey(keyId) {
+  try {
+    const keyDoc = doc(db, "apikeys", keyId);
+    await deleteDoc(keyDoc);
+    toast.success("Deleted API key");
+    return true;
+  } catch (error) {
     console.log("Failed to delete API key", error);
     toast.error("Failed to delete API key. " + error.message);
     return false;
   }
-
-  toast.success("Deleted API key");
-  return true;
 }
 
 export default function ManageAPIKeys() {
   const [apiKeys, setApiKeys] = useState([]);
   const [keyName, setKeyName] = useState("");
-  const user = useUser();
-  const supabase = useSupabaseClient();
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+    });
+    return () => unsubscribe();
+  }, []);
 
   useEffect(() => {
     if (user) {
-      fetchApiKeys(supabase, user).then(setApiKeys);
+      fetchApiKeys(user).then(setApiKeys);
     }
-  }, [supabase, user]);
+  }, [user]);
 
   const handleCreateClick = async () => {
     if (!keyName) {
       toast.error("Enter a key name to create a key");
       return;
     }
-    const created = await createApiKey(supabase, {
+    const created = await createApiKey({
       name: keyName,
-      user_id: user.id,
+      user_id: user.uid,
     });
     if (created) {
       setKeyName("");
-      fetchApiKeys(supabase, user).then(setApiKeys);
+      fetchApiKeys(user).then(setApiKeys);
     }
   };
 
-  const handleDeleteClick = async (key) => {
+  const handleDeleteClick = async (keyId) => {
     const confirmed = window.confirm(
       "Are you sure you want to delete this API key?"
     );
     if (confirmed) {
-      const deleted = await deleteApiKey(supabase, key);
+      const deleted = await deleteApiKey(keyId);
       if (deleted) {
-        fetchApiKeys(supabase, user).then(setApiKeys);
+        fetchApiKeys(user).then(setApiKeys);
       }
     }
   };
@@ -112,7 +130,7 @@ export default function ManageAPIKeys() {
             <td className="border p-2">
               <pre>
                 ********************
-                {apiKey.key.substring(apiKey.key.length - 4)}
+                {apiKey.key?.substring(apiKey.key.length - 4)}
               </pre>
             </td>
             <td className="border p-2">
@@ -126,7 +144,7 @@ export default function ManageAPIKeys() {
               </CopyToClipboard>
               <button
                 className="ml-2 rounded-md bg-white py-1 px-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 active:bg-gray-100"
-                onClick={() => handleDeleteClick(apiKey.key)}
+                onClick={() => handleDeleteClick(apiKey.id)}
               >
                 Delete
               </button>

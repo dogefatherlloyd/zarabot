@@ -1,5 +1,16 @@
 import { getChatResponseHeaders } from "../../../network";
-import { createMiddlewareClient } from "@supabase/auth-helpers-nextjs";
+import { getAuth, sendSignInLinkToEmail } from "firebase/auth";
+import { initializeApp } from "firebase/app";
+
+const firebaseConfig = {
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+  // Add other config options as needed
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
 
 export default async function handler(req, res) {
   // Set chat response headers
@@ -10,43 +21,33 @@ export default async function handler(req, res) {
 
   // Only allow POST requests
   if (req.method !== "POST") {
-    res.status(405).json({ message: "Method not supported" }); // Changed from res.send to res.status(405).json
+    res.status(405).json({ message: "Method not supported" });
     return;
   }
 
   // Destructure email and phone from the request body
-  const { email, phone } = req.body || {};
+  const { email } = req.body || {};
 
-  // Require either email or phone for OTP
-  if (!email && !phone) {
-    res.status(400).json({ message: "Email or phone number is required" });
+  // Require email for OTP
+  if (!email) {
+    res.status(400).json({ message: "Email is required" });
     return;
   }
 
-  // Use createMiddlewareClient for handling Supabase auth
-  const supabase = createMiddlewareClient({ req, res });
+  // Set actionCodeSettings for Firebase OTP
+  const actionCodeSettings = {
+    url: process.env.NEXT_PUBLIC_LOGIN_REDIRECT_URL,
+    handleCodeInApp: true,
+  };
 
-  // Prepare the payload for OTP
-  const supabaseBody = {};
-  if (email) {
-    supabaseBody.email = email;
-  }
-  if (phone) {
-    supabaseBody.phone = phone;
-  }
-
-  // Send the OTP using Supabase
-  const { error } = await supabase.auth.signInWithOtp(supabaseBody);
-
-  // Handle errors
-  if (error) {
+  // Send the OTP using Firebase
+  try {
+    await sendSignInLinkToEmail(auth, email, actionCodeSettings);
+    res.status(200).json({ message: "Verification code sent" });
+  } catch (error) {
     console.error("Failed to send verification code", error);
     res.status(500).json({
       message: "Failed to send verification code. " + error.message,
     });
-    return;
   }
-
-  // Respond with success if no errors
-  res.status(200).json({ message: "Verification code sent" });
 }

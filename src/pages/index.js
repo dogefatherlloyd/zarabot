@@ -5,17 +5,36 @@ import MessageInput from "../components/MessageInput";
 import MessageHistory from "../components/MessageHistory";
 import Skills from "../components/Skills";
 import Layout from "../components/Layout";
-import { useSupabaseClient, useUser } from "@supabase/auth-helpers-react";
 import { toast } from "react-hot-toast";
 import { useRouter } from "next/router";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
+import { getFirestore, collection, addDoc } from "firebase/firestore";
+import { initializeApp } from "firebase/app";
+
+const firebaseConfig = {
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+  // Add other config options as needed
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
 
 export default function Home() {
   const { history, sending, sendMessages } = useOpenAIMessages();
-  const supabase = useSupabaseClient();
-  const user = useUser();
   const router = useRouter();
+  const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(false); // Loading state
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+    });
+    return () => unsubscribe();
+  }, []);
 
   // Helper to safely handle send messages logic
   async function handleSend(newMessages) {
@@ -27,37 +46,25 @@ export default function Home() {
         throw new Error("Message sending failed");
       }
 
-      // Insert the conversation into Supabase
-      const { data: conversationData, error: conversationError } = await supabase
-        .from("conversations")
-        .insert({
-          user_id: user.id,
-          title: finalHistory.filter((m) => m.role !== "system")[0].content.slice(0, 40),
-        })
-        .select()
-        .single();
-
-      if (conversationError) {
-        throw conversationError;
-      }
+      // Insert the conversation into Firestore
+      const conversationRef = await addDoc(collection(db, "conversations"), {
+        user_id: user.uid,
+        title: finalHistory.filter((m) => m.role !== "system")[0].content.slice(0, 40),
+      });
 
       // Add conversation ID into all messages
       const unsavedMessages = finalHistory.map((message) => ({
         ...message,
-        conversation_id: conversationData.id,
+        conversation_id: conversationRef.id,
       }));
 
-      // Insert messages into Supabase
-      const { error: messagesError } = await supabase
-        .from("messages")
-        .insert(unsavedMessages);
-
-      if (messagesError) {
-        throw messagesError;
+      // Insert messages into Firestore
+      for (const message of unsavedMessages) {
+        await addDoc(collection(db, "messages"), message);
       }
 
       // Navigate to the conversation page
-      router.push(`/conversations/${conversationData.id}`);
+      router.push(`/conversations/${conversationRef.id}`);
     } catch (error) {
       toast.error("Failed to send messages: " + error.message);
     } finally {

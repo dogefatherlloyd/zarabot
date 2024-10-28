@@ -1,7 +1,9 @@
 import { useCallback, useEffect, useState, createContext, useContext, useMemo } from "react";
 import { useRouter } from "next/router";
-import supabaseClient from '@supabase/supabaseClient';
 import { useToast, Button, Flex, Box, Heading, Text, VStack } from "@chakra-ui/react";
+import { auth, db } from "@lib/firebase";
+import { onAuthStateChanged, signOut } from "firebase/auth";
+import { collection, query, where, getDocs } from "firebase/firestore";
 
 // Create AuthContext
 const AuthContext = createContext(null);
@@ -16,28 +18,29 @@ export default function AuthProvider({ children }) {
 
   const loadUserSession = useCallback(async () => {
     try {
-      const {
-        data: { session },
-      } = await supabaseClient.auth.getSession();
+      onAuthStateChanged(auth, async (currentUser) => {
+        if (currentUser) {
+          const profilesRef = collection(db, "profiles");
+          const profilesQuery = query(profilesRef, where("user_id", "==", currentUser.uid));
+          const profilesSnapshot = await getDocs(profilesQuery);
 
-      if (session?.user) {
-        const { data } = await supabaseClient
-          .from("profiles")
-          .select("id, user_id, username, first_name, last_name, avatar_url")
-          .eq("user_id", session.user.id);
-        setUser(data?.[0]);
+          if (!profilesSnapshot.empty) {
+            const profile = profilesSnapshot.docs[0].data();
+            setUser(profile);
+          }
 
-        if (router.pathname.includes("auth")) {
-          router.replace("/");
+          if (router.pathname.includes("auth")) {
+            router.replace("/");
+          }
+        } else {
+          if (protectedRoutes.includes(router.pathname)) {
+            router.replace("/auth");
+          }
         }
-      } else {
-        if (protectedRoutes.includes(router.pathname)) {
-          router.replace("/auth");
-        }
-      }
+        setIsAuthenticating(false);
+      });
     } catch (error) {
-      console.log(error);
-    } finally {
+      console.log("Error loading user session:", error);
       setIsAuthenticating(false);
     }
   }, [router, protectedRoutes]);
@@ -49,16 +52,8 @@ export default function AuthProvider({ children }) {
   const logout = async () => {
     setUser(null);
 
-    const { error } = await supabaseClient.auth.signOut();
-    if (error) {
-      toast({
-        title: "Logout error",
-        description: error.message,
-        duration: 5000,
-        isClosable: true,
-        status: "error",
-      });
-    } else {
+    try {
+      await signOut(auth);
       toast({
         title: "Logout",
         description: "You have logged out successfully",
@@ -66,8 +61,15 @@ export default function AuthProvider({ children }) {
         isClosable: true,
         status: "success",
       });
-
       router.replace("/auth");
+    } catch (error) {
+      toast({
+        title: "Logout error",
+        description: error.message,
+        duration: 5000,
+        isClosable: true,
+        status: "error",
+      });
     }
   };
 
@@ -86,46 +88,3 @@ export default function AuthProvider({ children }) {
 
 // Hook to use the AuthContext
 export const useAuthContext = () => useContext(AuthContext);
-
-// AuthButtons Component
-export function AuthButtons() {
-  const router = useRouter();
-
-  const handleLogin = () => {
-    router.push("/login");
-  };
-
-  const handleSignup = () => {
-    router.push("/signup");
-  };
-
-  return (
-    <Flex direction="column" justify="center" align="center" minH="100vh" p={4} bg="gray.900">
-      <VStack spacing={4} textAlign="center">
-        <Heading as="h2" size="xl" color="white">
-          Authenticate
-        </Heading>
-        <Text fontSize="lg" color="gray.400">
-          Authenticate your account using different types of authentication providers
-        </Text>
-      </VStack>
-      <Box
-        p={8}
-        mt={8}
-        bg="gray.800"
-        rounded="md"
-        boxShadow="lg"
-        textAlign="center"
-      >
-        <Flex gap={4} justify="center">
-          <Button colorScheme="blue" size="lg" onClick={handleLogin}>
-            Login
-          </Button>
-          <Button colorScheme="green" size="lg" onClick={handleSignup}>
-            Signup
-          </Button>
-        </Flex>
-      </Box>
-    </Flex>
-  );
-}

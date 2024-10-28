@@ -5,13 +5,25 @@ import SlugInput from "../components/inputs/SlugInput";
 import TextArea from "../components/inputs/TextArea";
 import TextInput from "../components/inputs/TextInput";
 import { fetchUserProfile, updateUserProfile } from "../network";
-import { useSupabaseClient, useUser } from "@supabase/auth-helpers-react";
 import Head from "next/head";
 import Link from "next/link";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
+import { initializeApp } from "firebase/app";
+import { getFirestore, doc, getDoc } from "firebase/firestore";
+
+const firebaseConfig = {
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+  // Add other config options as needed
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const auth = getAuth(app);
 
 export default function AccountPage() {
-  const user = useUser();
-  const supabase = useSupabaseClient();
+  const [user, setUser] = useState(null);
   const [profileData, setProfileData] = useState({});
   const [tokenBalance, setTokenBalance] = useState(0);
   const [isEditable, setIsEditable] = useState(false);
@@ -19,31 +31,35 @@ export default function AccountPage() {
 
   useEffect(() => {
     setIsClient(true);
+
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+    });
+
+    return () => unsubscribe();
   }, []);
 
   const fetchTokenBalance = useCallback(async () => {
     if (!user) return;
-    console.log(`Fetching token balance for user ID: ${user.id}`);
-    const { data, error } = await supabase
-      .from("profiles")
-      .select("token_balance")
-      .eq("id", user.id)
-      .single();
+    console.log(`Fetching token balance for user ID: ${user.uid}`);
+    const userRef = doc(db, "profiles", user.uid);
+    const userSnap = await getDoc(userRef);
 
-    if (error) {
-      console.error("Failed to fetch token balance:", error);
-    } else {
+    if (userSnap.exists()) {
+      const data = userSnap.data();
       console.log("Fetched token balance:", data.token_balance);
-      setTokenBalance(data.token_balance);
+      setTokenBalance(data.token_balance || 0);
+    } else {
+      console.error("No such user document!");
     }
-  }, [supabase, user]);
+  }, [user]);
 
   const fetchProfileAndTokenBalance = useCallback(async () => {
     if (!user) return;
-    const profile = await fetchUserProfile(supabase, user);
+    const profile = await fetchUserProfile(user);
     setProfileData(profile);
     fetchTokenBalance();
-  }, [supabase, user, fetchTokenBalance]);
+  }, [user, fetchTokenBalance]);
 
   useEffect(() => {
     if (user) {
@@ -56,7 +72,7 @@ export default function AccountPage() {
 
   async function handleSubmit(e) {
     e.preventDefault();
-    updateUserProfile(supabase, profileData);
+    await updateUserProfile(profileData);
     setIsEditable(false);
   }
 
@@ -94,7 +110,7 @@ export default function AccountPage() {
                 field="username"
                 label="Username:"
                 required
-                value={profileData.username}
+                value={profileData.username || ""}
                 onChange={makeOnChange("username")}
                 disabled={!isEditable}
               />
@@ -102,21 +118,21 @@ export default function AccountPage() {
                 field="first_name"
                 label="First Name:"
                 required
-                value={profileData.first_name}
+                value={profileData.first_name || ""}
                 onChange={makeOnChange("first_name")}
                 disabled={!isEditable}
               />
               <TextInput
                 field="last_name"
                 label="Last Name:"
-                value={profileData.last_name}
+                value={profileData.last_name || ""}
                 onChange={makeOnChange("last_name")}
                 disabled={!isEditable}
               />
               <TextArea
                 field="bio"
                 label="Bio:"
-                value={profileData.bio}
+                value={profileData.bio || ""}
                 onChange={makeOnChange("bio")}
                 disabled={!isEditable}
               />

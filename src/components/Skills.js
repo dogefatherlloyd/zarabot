@@ -1,24 +1,27 @@
 import { makeDisplayName } from "../utils";
-import { useSupabaseClient } from "@supabase/auth-helpers-react";
+import { getFirestore, collection, getDocs } from "firebase/firestore";
+import { initializeApp } from "firebase/app";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
 
-async function getSkills(supabase) {
+const firebaseConfig = {
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+  // Add other config options as needed
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+async function getSkills() {
   try {
-    const { data, error } = await supabase.from("skills").select(`
-        *,
-        profiles (
-          username,
-          first_name,
-          last_name
-        )
-      `);
-    if (error) {
-      throw error;
-    }
-    return data;
+    const skillsCollection = collection(db, "skills");
+    const querySnapshot = await getDocs(skillsCollection);
+    const skills = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+    return skills;
   } catch (error) {
     toast.error("Failed to get skills");
     console.error("Failed to get skills", error);
@@ -28,11 +31,10 @@ async function getSkills(supabase) {
 
 const Skills = () => {
   const [skills, setSkills] = useState([]);
-  const supabase = useSupabaseClient();
 
   useEffect(() => {
-    getSkills(supabase).then(setSkills);
-  }, [setSkills, supabase]);
+    getSkills().then(setSkills);
+  }, [setSkills]);
 
   return (
     <div className="px-2 pb-6">
@@ -46,7 +48,7 @@ const Skills = () => {
               className="group col-span-1 cursor-pointer divide-y divide-gray-200 rounded-lg border bg-white hover:shadow"
               key={skill.slug}
             >
-              <Link href={`/${skill.profiles.username}/${skill.slug}`}>
+              <Link href={`/${skill.profiles?.username || 'unknown'}/${skill.slug}`}>
                 <div className="flex h-full w-full flex-col p-5">
                   <div>
                     {skill.iconUrl && (

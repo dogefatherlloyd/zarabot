@@ -8,6 +8,17 @@ import MessageHistory from '../components/MessageHistory';
 import Layout from '../components/Layout';
 import Dashboard from '../components/Dashboard';
 import TradeEventsWindow from '../components/TradeEventsWindow';
+import { initializeApp } from "firebase/app";
+
+// Firebase Configuration
+const firebaseConfig = {
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+};
+
+// Initialize Firebase
+initializeApp(firebaseConfig);
 
 export default function Finance() {
   const { history, sending, sendMessages } = useOpenAIMessages();
@@ -16,6 +27,7 @@ export default function Finance() {
   const [socket, setSocket] = useState(null);
 
   useEffect(() => {
+    // Cleanup the socket connection on unmount
     return () => {
       if (socket) {
         socket.disconnect();
@@ -30,7 +42,7 @@ export default function Finance() {
 
   const toggleBot = async () => {
     const newBotStatus = !botStatus;
-  
+
     if (newBotStatus) {
       if (!socket) {
         const newSocket = io.connect(`${window.location.protocol}//${window.location.host}`, {
@@ -47,7 +59,7 @@ export default function Finance() {
         setSocket(null);
       }
     }
-  
+
     try {
       await fetch('/api/tradingbot', {
         method: 'POST',
@@ -56,7 +68,7 @@ export default function Finance() {
         },
         body: JSON.stringify({ status: newBotStatus }),
       });
-  
+
       setBotStatus(newBotStatus);
     } catch (error) {
       console.error('Failed to toggle bot:', error);

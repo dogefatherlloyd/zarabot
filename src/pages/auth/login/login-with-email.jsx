@@ -1,27 +1,39 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { useAuthContext } from '@context/auth';
-import { 
-  useToast, 
-  Container, 
-  Box, 
-  VStack, 
-  Heading, 
-  Text, 
-  Stack, 
-  FormControl, 
-  FormLabel, 
-  Input, 
-  FormErrorMessage, 
-  Button 
+import {
+  useToast,
+  Container,
+  Box,
+  VStack,
+  Heading,
+  Text,
+  Stack,
+  FormControl,
+  FormLabel,
+  Input,
+  FormErrorMessage,
+  Button
 } from "@chakra-ui/react";
 import Link from "next/link"; // Import Link from Next.js
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
-import supabaseClient from '@supabase/supabaseClient';
 import Head from "next/head";
 import { useColorModeValue } from "@chakra-ui/react";
+import { initializeApp } from "firebase/app";
+import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+
+// Firebase Configuration
+const firebaseConfig = {
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
 
 const schema = yup.object({
   email: yup.string().required().email(),
@@ -53,17 +65,10 @@ export default function AuthSigninSigninWithEmailRoute() {
 
   const onSubmit = async ({ email, password }) => {
     try {
-      const { data, error } = await supabaseClient.auth.signInWithPassword({
-        email,
-        password,
-      });
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
 
-      if (error) {
-        throw error;
-      }
-
-      if (data.user) {
-        console.log("User successfully logged in:", data.user);
+      if (userCredential.user) {
+        console.log("User successfully logged in:", userCredential.user);
         authContext?.loadUserSession();
         toast({
           title: "Authentication",

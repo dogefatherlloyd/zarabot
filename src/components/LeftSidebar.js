@@ -5,39 +5,57 @@ import { RiMenuUnfoldLine, RiMenuFoldLine } from "react-icons/ri";
 import cn from "classnames";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { useSupabaseClient, useUser } from "@supabase/auth-helpers-react";
 import { toast } from "react-hot-toast";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
+import { getFirestore, collection, getDocs, deleteDoc, doc, query, where } from "firebase/firestore";
+import { initializeApp } from "firebase/app";
 
-async function getConversations(supabase, user) {
+const firebaseConfig = {
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+  // Add other config options as needed
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+async function getConversations(user) {
   if (!user) {
     return [];
   }
-  const { data, error } = await supabase
-    .from("conversations")
-    .select("*, messages (id, created_at, role, content)")
-    .eq("user_id", user.id);
-
-  if (error) {
+  try {
+    const q = query(collection(db, "conversations"), where("user_id", "==", user.uid));
+    const querySnapshot = await getDocs(q);
+    const conversations = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+    return conversations;
+  } catch (error) {
     toast.error("Failed to retrieve conversations. " + error.message);
     console.error("Failed to retrieve conversations", error);
     return [];
   }
-
-  return data;
 }
 
 const LeftSidebar = () => {
   const [show, setShow] = useState(true);
-  const router = useRouter();  // <---- Added this
+  const router = useRouter();
   const { query } = router;
-  const supabase = useSupabaseClient();
-  const user = useUser();
-
+  const [user, setUser] = useState(null);
   const [conversations, setConversations] = useState([]);
 
   useEffect(() => {
-    getConversations(supabase, user).then(setConversations);
-  }, [supabase, user, setConversations]);
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+    });
+    return () => unsubscribe();
+  }, []);
+
+  useEffect(() => {
+    if (user) {
+      getConversations(user).then(setConversations);
+    }
+  }, [user]);
 
   if (!user) {
     return null;
@@ -46,7 +64,7 @@ const LeftSidebar = () => {
   if (!show) {
     return (
       <button
-        className="hidden fixed mt-3 ml-3 rounded-full lg:flex items-center justify-center p-2  hover:bg-gray-100 text-gray-400 text-lg z-50"
+        className="hidden fixed mt-3 ml-3 rounded-full lg:flex items-center justify-center p-2 hover:bg-gray-100 text-gray-400 text-lg z-50"
         title="Open Sidebar"
         onClick={() => setShow(true)}
       >
@@ -58,24 +76,13 @@ const LeftSidebar = () => {
   async function handleDeleteConversation(conversationId) {
     try {
       // Delete messages associated with the conversation
-      const { error: deleteMessagesError } = await supabase
-        .from("messages")
-        .delete()
-        .eq("conversation_id", conversationId);
-
-      if (deleteMessagesError) {
-        throw new Error(deleteMessagesError.message);
-      }
+      const messagesQuery = query(collection(db, "messages"), where("conversation_id", "==", conversationId));
+      const messagesSnapshot = await getDocs(messagesQuery);
+      const deletePromises = messagesSnapshot.docs.map((messageDoc) => deleteDoc(doc(db, "messages", messageDoc.id)));
+      await Promise.all(deletePromises);
 
       // Delete the conversation
-      const { error: deleteConversationError } = await supabase
-        .from("conversations")
-        .delete()
-        .eq("id", conversationId);
-
-      if (deleteConversationError) {
-        throw new Error(deleteConversationError.message);
-      }
+      await deleteDoc(doc(db, "conversations", conversationId));
 
       // Update the conversations state after successful deletion
       setConversations((prevConversations) =>
@@ -84,7 +91,7 @@ const LeftSidebar = () => {
 
       // If the deleted conversation is the one being viewed, navigate back to the homepage
       if (query.id === conversationId) {
-        router.push('/');  // <---- Navigate to homepage
+        router.push('/');
       }
 
       toast.success("Conversation deleted successfully!");
@@ -137,7 +144,10 @@ const LeftSidebar = () => {
             <AiOutlineDelete
               size={16}
               className="ml-2 text-gray-400 cursor-pointer"
-              onClick={() => handleDeleteConversation(conversation.id)}
+              onClick={(e) => {
+                e.preventDefault();
+                handleDeleteConversation(conversation.id);
+              }}
             />
           </Link>
         ))}
