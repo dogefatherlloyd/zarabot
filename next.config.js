@@ -4,7 +4,7 @@ const nextConfig = {
   swcMinify: true,
   images: {
     domains: [
-      'xbckkmpvfqlwoaaqedoe.supabase.co',
+      'gwsmfmqtmuhmglnfzqma.supabase.co',
       'lh3.googleusercontent.com',
       'firebasestorage.googleapis.com'
     ]
