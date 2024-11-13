@@ -13,7 +13,7 @@
     "firebase:deploy": "firebase deploy"
   },
   "dependencies": {
-    "@alpacahq/alpaca-trade-api": "^3.1.2",
+    "@alpacahq/alpaca-trade-api": "^1.4.2",
     "@chakra-ui/react": "^2.8.2",
     "@emotion/react": "^11",
     "@emotion/styled": "^11",
@@ -36,7 +36,7 @@
     "ethers": "^6.13.2",
     "eventsource-parser": "^2.0.1",
     "express": "^4.19.2",
-    "firebase": "^9.23.0",
+    "firebase": "^11.0.1",
     "firebase-admin": "^12.4.0",
     "firebase-functions": "^5.1.0",
     "framer-motion": "^7.2.1",
