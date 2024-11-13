@@ -1,21 +1,12 @@
 import { makeDisplayName } from "../utils";
-import { getFirestore, collection, getDocs } from "firebase/firestore";
-import { initializeApp } from "firebase/app";
+import { db } from "../lib/firebase"; // Import the initialized Firestore instance
+import { collection, getDocs } from "firebase/firestore";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
 
-const firebaseConfig = {
-  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
-  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
-  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
-  // Add other config options as needed
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-
+// Function to get skills data from Firestore
 async function getSkills() {
   try {
     const skillsCollection = collection(db, "skills");

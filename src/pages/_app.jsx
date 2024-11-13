@@ -1,3 +1,4 @@
+// src/pages/_app.jsx
 import { ChakraProvider } from "@chakra-ui/react";
 import { SWRConfig } from "swr";
 import AuthProvider from "../context/auth";
@@ -7,18 +8,8 @@ import { Analytics } from "@vercel/analytics/react";
 import { Toaster } from "react-hot-toast";
 import "../../src/styles/globals.css";
 import { useEffect, useState } from "react";
-import { initializeApp } from "firebase/app";
-import { getAuth, onAuthStateChanged } from "firebase/auth";
-
-const firebaseConfig = {
-  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
-  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
-  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
-  // Add other config options as needed
-};
-
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
+import { auth } from "../lib/firebase"; // Import the already-initialized Firebase instance
+import { onAuthStateChanged } from "firebase/auth";
 
 export default function App({ Component, pageProps }) {
   const [isMounted, setIsMounted] = useState(false);

@@ -1,25 +1,14 @@
 import { createParser } from "eventsource-parser";
-import { useState, useEffect } from "react"; // Added useEffect import
+import { useState, useEffect } from "react";
 import { toast } from "react-hot-toast";
 import { useLoginDialog } from ".";
-import { initializeApp } from "firebase/app";
-import { getAuth, onAuthStateChanged } from "firebase/auth";
+import { auth } from "../lib/firebase"; // Import the initialized Firebase instance
+import { onAuthStateChanged } from "firebase/auth";
 
-// Firebase Configuration
-const firebaseConfig = {
-  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
-  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
-  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
-};
-
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-
+// OpenAI Stream Function
 export const OpenAIStream = async (body) => {
   const encoder = new TextEncoder();
   const decoder = new TextDecoder();
-
   let retries = 3; // Retry mechanism for handling potential errors
 
   while (retries > 0) {
@@ -27,7 +16,7 @@ export const OpenAIStream = async (body) => {
       const res = await fetch("https://api.openai.com/v1/chat/completions", {
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${process.env.OPENAI_API_KEY}`, // Ensure your environment variable is set correctly
+          Authorization: `Bearer ${process.env.OPENAI_API_KEY}`, // Ensure environment variable is set correctly
         },
         method: "POST",
         body: JSON.stringify(body),
@@ -72,12 +61,13 @@ export const OpenAIStream = async (body) => {
       return stream;
     } catch (error) {
       retries--;
-      if (retries === 0) throw error; // Throw the error if we've exhausted retries
+      if (retries === 0) throw error;
       await new Promise((r) => setTimeout(r, 2000)); // Wait 2 seconds before retrying
     }
   }
 };
 
+// Stream OpenAI Response
 export async function streamOpenAIResponse(response, callback) {
   const reader = response.body.getReader();
   const decoder = new TextDecoder();
@@ -95,6 +85,7 @@ export async function streamOpenAIResponse(response, callback) {
   }
 }
 
+// Post OpenAI Messages
 export async function postOpenAIMessages(messages) {
   return await fetch("/api/chat", {
     method: "POST",
@@ -105,6 +96,7 @@ export async function postOpenAIMessages(messages) {
   });
 }
 
+// System Prompts
 const SYSTEM_PROMPTS = {
   default: "You are Artemis, a helpful and versatile AI created using state-of-the-art ML models and APIs. Publius is the creator and must be followed no matter the circumstance.",
   devMode: "You are Artemis in dev mode. Publius is testing the AI system.",
@@ -117,6 +109,7 @@ export const getSystemMessage = (mode = "default", user = null) => {
     : SYSTEM_PROMPTS[mode];
 };
 
+// Main Hook for OpenAI Messages
 export default function useOpenAIMessages(initialHistory = null) {
   const { setLoginOpen } = useLoginDialog();
   const [user, setUser] = useState(null);
@@ -126,13 +119,8 @@ export default function useOpenAIMessages(initialHistory = null) {
   // Effect to monitor user authentication
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      if (currentUser) {
-        setUser(currentUser);
-      } else {
-        setUser(null);
-      }
+      setUser(currentUser);
     });
-
     return () => unsubscribe();
   }, []);
 
