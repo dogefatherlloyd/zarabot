@@ -2,38 +2,20 @@ import { EditSkillForm } from "../components/EditSkillForm";
 import Navbar from "../components/Navbar";
 import { fetchUserProfile } from "../network";
 import { useLoginDialog } from "../utils";
-import { initializeApp } from "firebase/app";
-import { getFirestore, collection, addDoc } from "firebase/firestore";
-import { getAuth, onAuthStateChanged } from "firebase/auth";
+import { useSupabaseClient, useUser } from "@supabase/auth-helpers-react";
 import Head from "next/head";
 import { useRouter } from "next/router";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { toast } from "react-hot-toast";
 import { Heading, Text, Container, Flex } from "@chakra-ui/react";
 
-const firebaseConfig = {
-  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
-  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
-  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
-  // Add other config options as needed
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-const auth = getAuth(app);
-
 export default function BuildPage() {
+  const supabase = useSupabaseClient();
+  const user = useUser();
   const router = useRouter();
   const { setLoginOpen } = useLoginDialog();
-  const [user, setUser] = useState(null);
-  const [skillData, setSkillData] = useState({});
 
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser);
-    });
-    return () => unsubscribe();
-  }, []);
+  const [skillData, setSkillData] = useState({});
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -43,7 +25,7 @@ export default function BuildPage() {
       return;
     }
 
-    const userProfile = await fetchUserProfile(user);
+    const userProfile = await fetchUserProfile(supabase, user);
 
     try {
       const newSkill = {
@@ -52,26 +34,21 @@ export default function BuildPage() {
         description: skillData.description,
         system_prompt: skillData.system_prompt,
         user_prompt: skillData.user_prompt,
-        inputs: isValidJson(skillData.inputs) ? JSON.parse(skillData.inputs) : [],
-        user_id: user.uid,
+        inputs: JSON.parse(skillData.inputs),
+        user_id: user.id,
       };
 
-      await addDoc(collection(db, "skills"), newSkill);
+      const { error } = await supabase.from("skills").insert(newSkill);
+
+      if (error) {
+        throw error;
+      }
 
       toast.success("Skill created successfully");
-      router.push(`/${userProfile.username}/${skillData.slug}`);
+      router.push(`${userProfile.username}/${skillData.slug}`);
     } catch (error) {
-      toast.error(`Error in creating skill: ${error.message}`);
+      toast.error("Error in creating skill:", error.message);
       console.error("Error creating skill:", error.message);
-    }
-  }
-
-  function isValidJson(value) {
-    try {
-      JSON.parse(value);
-      return true;
-    } catch (e) {
-      return false;
     }
   }
 

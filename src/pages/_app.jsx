@@ -1,28 +1,20 @@
-// src/pages/_app.jsx
 import { ChakraProvider } from "@chakra-ui/react";
 import { SWRConfig } from "swr";
 import AuthProvider from "../context/auth";
 import AppLayout from "../layouts/AppLayout";
 import { theme } from "../../theme";
+import supabaseClient from '@supabase/supabaseClient';
+import { SessionContextProvider } from "@supabase/auth-helpers-react";
 import { Analytics } from "@vercel/analytics/react";
 import { Toaster } from "react-hot-toast";
 import "../../src/styles/globals.css";
 import { useEffect, useState } from "react";
-import { auth } from "../lib/firebase"; // Import the already-initialized Firebase instance
-import { onAuthStateChanged } from "firebase/auth";
 
 export default function App({ Component, pageProps }) {
   const [isMounted, setIsMounted] = useState(false);
-  const [user, setUser] = useState(null);
 
   useEffect(() => {
     setIsMounted(true);
-
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser);
-    });
-
-    return () => unsubscribe();
   }, []);
 
   if (!isMounted) {
@@ -31,13 +23,18 @@ export default function App({ Component, pageProps }) {
 
   return (
     <ChakraProvider theme={theme}>
-      <AuthProvider value={{ user }}>
-        <SWRConfig>
-          <AppLayout>
-            <Component {...pageProps} />
-            <Toaster />
-          </AppLayout>
-        </SWRConfig>
+      <AuthProvider>
+        <SessionContextProvider
+          supabaseClient={supabaseClient}
+          initialSession={pageProps.initialSession}
+        >
+          <SWRConfig>
+            <AppLayout>
+              <Component {...pageProps} />
+              <Toaster />
+            </AppLayout>
+          </SWRConfig>
+        </SessionContextProvider>
         <Analytics />
       </AuthProvider>
     </ChakraProvider>

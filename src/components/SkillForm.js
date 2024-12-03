@@ -1,42 +1,23 @@
 import { useState } from "react";
 import SkillInput from "./SkillInput";
 import { makeDisplayName } from "../utils";
-import { getAuth, onAuthStateChanged } from "firebase/auth";
+import { useUser } from "@supabase/auth-helpers-react";
 import Link from "next/link";
-import { useEffect } from "react";
-import { initializeApp } from "firebase/app";
-
-const firebaseConfig = {
-  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
-  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
-  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
-  // Add other config options as needed
-};
-
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
 
 export function fillTemplate(string, data = {}) {
   return Object.entries(data).reduce((res, [key, value]) => {
     // lookbehind expression, only replaces if mustache was not preceded by a backslash
-    const mainRe = new RegExp(`(?<!\\\\){{ *${key} *}}`, "g");
+    const mainRe = new RegExp(`(?<!\\\\){{\\s*${key}\\s*}}`, "g");
     // this regex is actually (?<!\\){{\s*<key>\s*}} but because of escaping it looks like that...
-    const escapeRe = new RegExp(`\\\\({{ *${key} *}})`, "g");
+    const escapeRe = new RegExp(`\\\\({{\\s*${key}\\s*}})`, "g");
     // the second regex now handles the cases that were skipped in the first case.
     return res.replace(mainRe, value.toString()).replace(escapeRe, "$1");
   }, string);
 }
 
 const SkillForm = ({ skill, sendMessages }) => {
-  const [user, setUser] = useState(null);
+  const user = useUser();
   const [inputData, setInputData] = useState({});
-
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser);
-    });
-    return () => unsubscribe();
-  }, []);
 
   const inputs = skill.inputs || [];
 
@@ -83,7 +64,7 @@ const SkillForm = ({ skill, sendMessages }) => {
           Start Conversation
         </button>
 
-        {skill.user_id !== user?.uid ? (
+        {skill.user_id !== user?.id ? (
           <div className="text-gray-500 font-medium text-sm">
             Author: {makeDisplayName(skill.profiles)}
           </div>

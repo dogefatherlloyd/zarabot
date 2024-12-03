@@ -16,23 +16,9 @@ import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
+import supabaseClient from "@supabase/supabaseClient";
 import { useRouter } from "next/router";
 import Head from "next/head";
-import { initializeApp } from "firebase/app";
-import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
-import { getFirestore, doc, setDoc } from "firebase/firestore";
-
-// Firebase Configuration
-const firebaseConfig = {
-  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
-  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
-  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
-};
-
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
 
 const schema = yup
   .object({
@@ -66,24 +52,37 @@ export default function AuthSignupRoute() {
 
   const onSubmit = async ({ name, email, password }) => {
     try {
-      // Sign up user with Firebase
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      const user = userCredential.user;
+      // Sign up user with Supabase
+      const { user, error: signUpError } = await supabaseClient.auth.signUp({
+        email,
+        password,
+      });
+
+      // Handle errors from sign-up
+      if (signUpError) {
+        throw new Error(signUpError.message);
+      }
 
       if (user) {
         // Handle user data processing
         const [first_name = "", last_name = ""] = name.split(" ");
 
-        // Insert user profile into Firestore
-        await setDoc(doc(db, "profiles", user.uid), {
-          id: user.uid,
-          username: email.split("@")[0],
-          first_name,
-          last_name,
-          email,
-          created_at: new Date().toISOString(),
-          token_balance: 0,
-        });
+        // Insert user profile into Supabase
+        const { error: insertError } = await supabaseClient.from("profiles").insert([
+          {
+            id: user.id,
+            username: email.split("@")[0],
+            first_name,
+            last_name,
+            email,
+            created_at: new Date().toISOString(),
+            token_balance: 0,
+          },
+        ]);
+
+        if (insertError) {
+          throw new Error(insertError.message);
+        }
 
         // Display success toast and redirect user
         toast({

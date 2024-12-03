@@ -5,40 +5,21 @@ import useOpenAIMessages from "../../../utils/openai";
 import MessageHistory from "../../../components/MessageHistory";
 import MessageInput from "../../../components/MessageInput";
 import SkillForm from "../../../components/SkillForm";
+import { createPagesServerClient } from "@supabase/auth-helpers-nextjs";
 import Layout from "../../../components/Layout";
+import { useSupabaseClient, useUser } from "@supabase/auth-helpers-react";
 import { toast } from "react-hot-toast";
 import { useRouter } from "next/router";
 import useSWR from "swr";
 import Post from "../../../components/Post";
 import ProfileLayout from "../../../layouts/ProfileLayout"; // Adjusted path
 import { fetchUserPosts } from "../../../../src/services/post"; // Adjusted path
-import { initializeApp } from "firebase/app";
-import { getAuth, onAuthStateChanged } from "firebase/auth";
-import { getFirestore, collection, query, where, getDocs, addDoc } from "firebase/firestore";
-import { useEffect, useState } from "react";
-
-const firebaseConfig = {
-  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
-  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
-  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
-  // Add other config options as needed
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-const auth = getAuth(app);
 
 export default function MergedPage({ skill }) {
   const { history, sending, sendMessages } = useOpenAIMessages();
+  const supabase = useSupabaseClient();
+  const user = useUser();
   const router = useRouter();
-  const [user, setUser] = useState(null);
-
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser);
-    });
-    return () => unsubscribe();
-  }, []);
 
   // Fetch posts for the profile section
   const { data: posts, error: postsError } = useSWR(
@@ -58,32 +39,37 @@ export default function MergedPage({ skill }) {
       return false;
     }
 
-    try {
-      const conversationData = {
-        user_id: user.uid,
+    const { data: conversationData, error: conversationError } = await supabase
+      .from("conversations")
+      .insert({
+        user_id: user.id,
         title: finalHistory.filter((m) => m.role !== "system")[0].content.slice(0, 40),
-      };
+      })
+      .select()
+      .single();
 
-      const conversationRef = await addDoc(collection(db, "conversations"), conversationData);
-
-      // add conversation id into all messages
-      const unsavedMessages = finalHistory.map((message) => ({
-        ...message,
-        conversation_id: conversationRef.id,
-      }));
-
-      // insert messages using Firebase Firestore
-      for (const message of unsavedMessages) {
-        await addDoc(collection(db, "messages"), message);
-      }
-
-      toast.success("Conversation created successfully");
-      router.push(`/conversations/${conversationRef.id}`);
-    } catch (error) {
-      toast.error("Failed to save messages. " + error.message);
-      console.error("Failed to save messages", error);
+    if (conversationError) {
+      toast.error("Failed to create conversation. " + conversationError.message);
+      console.error("Failed to create conversation", conversationError);
       return false;
     }
+
+    // add conversation id into all messages
+    const unsavedMessages = finalHistory.map((message) => ({
+      ...message,
+      conversation_id: conversationData.id,
+    }));
+
+    // insert messages using supabase
+    const { error: messagesError } = await supabase.from("messages").insert(unsavedMessages);
+
+    if (messagesError) {
+      toast.error("Failed to save messages. " + messagesError.message);
+      console.error("Failed to save messages", messagesError);
+      return false;
+    }
+
+    router.push(`/conversations/${conversationData.id}`);
   }
 
   return (
@@ -97,7 +83,7 @@ export default function MergedPage({ skill }) {
 
       <Layout>
         <Navbar />
-
+        
         {/* Skill Section with OpenAI Messages */}
         {history.length === 1 && <SkillForm skill={skill} sendMessages={handleSend} />}
         {history.length > 1 && (
@@ -131,27 +117,25 @@ export default function MergedPage({ skill }) {
 }
 
 export async function getServerSideProps(context) {
+  const supabase = createPagesServerClient(context);
   const slug = context.params.slug;
   const username = context.params.username;
 
-  const skillsQuery = query(
-    collection(db, "skills"),
-    where("slug", "==", slug),
-    where("profiles.username", "==", username)
-  );
+  const { data: skills, error } = await supabase
+    .from("skills")
+    .select("*,profiles(username, first_name, last_name)")
+    .eq("slug", slug)
+    .eq("profiles.username", username)
+    .limit(1);
 
-  const skillsSnapshot = await getDocs(skillsQuery);
-  if (skillsSnapshot.empty) {
-    console.error("Failed to fetch skill for slug: " + slug);
+  if (error || !skills || skills.length === 0) {
+    console.error("Failed to fetch skill for slug: " + slug, error);
     return {
       notFound: true,
     };
   }
 
-  const skill = skillsSnapshot.docs[0].data();
-  skill.id = skillsSnapshot.docs[0].id; // Save the document ID for later use
-
   return {
-    props: { skill },
+    props: { skill: skills[0] },
   };
 }

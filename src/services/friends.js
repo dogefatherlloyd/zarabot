@@ -1,112 +1,137 @@
-import { initializeApp } from "firebase/app";
-import { getFirestore, collection, query, where, getDocs, addDoc, deleteDoc, updateDoc } from "firebase/firestore"; // Removed unused `doc` import
-
-// Firebase Configuration
-const firebaseConfig = {
-  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
-  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
-  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
-};
-
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+import supabaseClient from '@supabase/supabaseClient';
 
 export async function fetchFriendSuggestion() {
-  const profilesRef = collection(db, "profile");
-  const profilesSnapshot = await getDocs(profilesRef);
-  return profilesSnapshot.docs.map((doc) => doc.data());
+  const { data, error } = await supabaseClient
+    .from("profile")
+    .select("id,avatar,name");
+
+  if (error) throw error;
+  if (data) return data;
 }
 
 export async function fetchFriendRequestSent(profileId) {
-  const friendRef = collection(db, "friend");
-  const friendQuery = query(friendRef, where("from", "==", profileId));
-  const friendSnapshot = await getDocs(friendQuery);
-  return friendSnapshot.docs.map((doc) => doc.data().to);
+  const { data, error } = await supabaseClient
+    .from("friend")
+    .select("to(id,name,avatar)")
+    .eq("from", profileId);
+
+  if (error) throw error;
+  if (data) return data?.map((user) => user.to);
 }
 
 export async function sendFriendRequest(from, to) {
-  if (from === to) throw new Error("You cannot send a friend request to yourself");
+  if (from === to)
+    throw new Error("You cannot send friend request to yourself");
+  const { data: userData, error: userError } = await supabaseClient
+    .from("friend")
+    .select("id")
+    .match({
+      from,
+      to,
+    });
 
-  const friendRef = collection(db, "friend");
-  const friendQuery = query(friendRef, where("from", "==", from), where("to", "==", to));
-  const friendSnapshot = await getDocs(friendQuery);
+  if (userError) throw userError;
+  if (userData?.length) throw new Error("Friend request already sent");
 
-  if (!friendSnapshot.empty) throw new Error("Friend request already sent");
+  const { data, error } = await supabaseClient.from("friend").insert({ from, to });
 
-  await addDoc(friendRef, { from, to });
+  if (error) throw error;
+  if (data) return data;
 }
 
 export async function cancelFriendRequest(from, to) {
-  const friendRef = collection(db, "friend");
-  const friendQuery = query(friendRef, where("from", "==", from), where("to", "==", to));
-  const friendSnapshot = await getDocs(friendQuery);
+  const { data, error } = await supabaseClient.from("friend").delete().match({
+    from,
+    to,
+  });
 
-  if (!friendSnapshot.empty) {
-    const friendDoc = friendSnapshot.docs[0];
-    await deleteDoc(friendDoc.ref);
-  }
+  if (error) throw error;
+  if (data) return data;
 }
 
 export async function fetchFriendRequestReceived(profileId) {
-  const friendRef = collection(db, "friend");
-  const friendQuery = query(friendRef, where("isFriend", "==", false), where("to", "==", profileId));
-  const friendSnapshot = await getDocs(friendQuery);
-  return friendSnapshot.docs.map((doc) => doc.data().from);
+  const { data, error } = await supabaseClient
+    .from("friend")
+    .select("from(id,name,avatar)")
+    .match({
+      isFriend: false,
+      to: profileId,
+    });
+  if (error) throw error;
+  if (data) return data?.map((user) => user.from);
 }
 
 export async function ignoreFriendRequest(from, to) {
-  const friendRef = collection(db, "friend");
-  const friendQuery = query(friendRef, where("from", "==", from), where("to", "==", to));
-  const friendSnapshot = await getDocs(friendQuery);
+  const { data, error } = await supabaseClient.from("friend").delete().match({
+    from,
+    to,
+  });
 
-  if (!friendSnapshot.empty) {
-    const friendDoc = friendSnapshot.docs[0];
-    await deleteDoc(friendDoc.ref);
-  }
+  console.log(from, to);
+
+  if (error) throw error;
+  if (data) return data;
 }
 
 export async function acceptFriendRequest(from, to) {
-  const friendRef = collection(db, "friend");
-  const friendQuery = query(friendRef, where("from", "==", from), where("to", "==", to));
-  const friendSnapshot = await getDocs(friendQuery);
+  const { data, error } = await supabaseClient
+    .from("friend")
+    .update({
+      isFriend: true,
+    })
+    .match({
+      from,
+      to,
+    });
 
-  if (!friendSnapshot.empty) {
-    const friendDoc = friendSnapshot.docs[0];
-    await updateDoc(friendDoc.ref, { isFriend: true });
-  }
+  if (error) throw error;
+  if (data) return data;
 }
 
 export async function fetchMyFriend(profileId) {
-  const friendRef = collection(db, "friend");
-  const friendQuery = query(friendRef, where("isFriend", "==", true));
-  const friendSnapshot = await getDocs(friendQuery);
-
-  return friendSnapshot.docs
-    .filter((doc) => doc.data().from === profileId || doc.data().to === profileId)
-    .map((doc) => {
-      const data = doc.data();
-      return data.from === profileId ? data.to : data.from;
-    });
+  const { data, error } = await supabaseClient
+    .from("friend")
+    .select("*, from(id,name,avatar),to(id,name,avatar)")
+    .eq("isFriend", true);
+  if (error) throw error;
+  if (data)
+    return data
+      ?.filter((user) => user.from.id === profileId || user.to.id === profileId)
+      .map((user) => {
+        if (profileId === user.to.id) {
+          return user.from;
+        } else {
+          return user.to;
+        }
+      });
 }
 
 export async function unfriend(from, to) {
-  const friendRef = collection(db, "friend");
+  const { data: data1, error: error1 } = await supabaseClient
+    .from("friend")
+    .delete()
+    .match({
+      from,
+      to,
+      isFriend: true,
+    });
 
-  // Attempt to delete the friend request in both directions
-  const friendQuery1 = query(friendRef, where("from", "==", from), where("to", "==", to), where("isFriend", "==", true));
-  const friendSnapshot1 = await getDocs(friendQuery1);
+  if (error1) throw error1;
 
-  if (!friendSnapshot1.empty) {
-    const friendDoc1 = friendSnapshot1.docs[0];
-    await deleteDoc(friendDoc1.ref);
-  } else {
-    const friendQuery2 = query(friendRef, where("from", "==", to), where("to", "==", from), where("isFriend", "==", true));
-    const friendSnapshot2 = await getDocs(friendQuery2);
+  if (data1) {
+    if (data1.length === 0) {
+      const { data: data2, error: error2 } = await supabaseClient
+        .from("friend")
+        .delete()
+        .match({
+          from: to,
+          to: from,
+          isFriend: true,
+        });
 
-    if (!friendSnapshot2.empty) {
-      const friendDoc2 = friendSnapshot2.docs[0];
-      await deleteDoc(friendDoc2.ref);
+      if (error2) throw error2;
+      return data2;
     }
+    return data1;
   }
 }

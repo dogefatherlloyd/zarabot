@@ -1,62 +1,59 @@
-import { initializeApp } from "firebase/app";
-import { getFirestore, doc, collection, query, where, getDoc, getDocs, updateDoc } from "firebase/firestore";
-import { getStorage, ref, deleteObject } from "firebase/storage";
-
-// Firebase Configuration
-const firebaseConfig = {
-  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
-  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
-  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
-};
-
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-const storage = getStorage(app);
+import supabaseClient from '@supabase/supabaseClient';
 
 export async function fetchProfileDetails(profileId) {
-  // Fetch profile details
-  const profileRef = doc(db, "profile", profileId);
-  const profileSnap = await getDoc(profileRef);
+  const { data: profileDetail, error } = await supabaseClient
+    .from("profile")
+    .select("*")
+    .eq("id", profileId);
 
-  if (!profileSnap.exists()) {
-    throw new Error("Profile not found");
-  }
-  const profileDetail = profileSnap.data();
+  const { count: postsCount } = await supabaseClient
+    .from("post")
+    .select("id", { count: "exact" })
+    .eq("author", profileId);
 
-  // Fetch posts count for the user
-  const postsQuery = query(collection(db, "post"), where("author", "==", profileId));
-  const postsSnapshot = await getDocs(postsQuery);
-  const postsCount = postsSnapshot.size;
+  const { data: friendsData } = await supabaseClient
+    .from("friend")
+    .select("from(id), to(id)")
+    .match({ isFriend: true });
 
-  // Fetch friends count for the user
-  const friendsQuery = query(collection(db, "friend"), where("isFriend", "==", true));
-  const friendsSnapshot = await getDocs(friendsQuery);
-  const friendsCount = friendsSnapshot.docs.filter(
-    (doc) => doc.data().from === profileId || doc.data().to === profileId
+  const friendsCount = friendsData?.filter(
+    (profile) => profile.from.id === profileId || profile.to.id === profileId
   ).length;
 
-  return { ...profileDetail, postsCount, friendsCount };
+  if (error) throw error;
+  if (profileDetail) {
+    const data = { ...profileDetail[0], postsCount, friendsCount };
+    return data;
+  }
 }
 
 export async function changeProfilePic(profileId, avatar) {
-  // Fetch current profile data
-  const profileRef = doc(db, "profile", profileId);
-  const profileSnap = await getDoc(profileRef);
+  console.log(avatar);
+  console.log(profileId);
+  // fetch profile information from database
+  const { data: profileData, error: profileErrr } = await supabaseClient
+    .from("profile")
+    .select("avatar")
+    .eq("id", profileId);
+  if (profileErrr) throw profileErrr;
 
-  if (!profileSnap.exists()) {
-    throw new Error("Profile not found");
+  console.log(profileData);
+
+  // remove older avatar from supaabase storage
+  if (profileData?.length && profileData[0].avatar) {
+    const { error: avatarRemoveError } = await supabaseClient.storage
+      .from("avatar")
+      .remove(profileData[0].avatar.path);
+
+    if (avatarRemoveError) throw avatarRemoveError;
   }
-  const profileData = profileSnap.data();
 
-  // Remove older avatar from Firebase Storage if exists
-  if (profileData?.avatar?.path) {
-    const avatarRef = ref(storage, profileData.avatar.path);
-    await deleteObject(avatarRef);
-  }
+  // update profile data with new avatar
+  const { data: updateProfileData, error: updateProfileError } = await supabaseClient
+    .from("profile")
+    .update({ avatar })
+    .eq("id", profileId);
 
-  // Update profile data with new avatar
-  await updateDoc(profileRef, { avatar });
-
-  return { ...profileData, avatar };
+  if (updateProfileError) throw updateProfileError;
+  if (updateProfileData) return updateProfileData[0];
 }

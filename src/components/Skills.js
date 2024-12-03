@@ -1,18 +1,24 @@
 import { makeDisplayName } from "../utils";
-import { db } from "../lib/firebase"; // Import the initialized Firestore instance
-import { collection, getDocs } from "firebase/firestore";
+import { useSupabaseClient } from "@supabase/auth-helpers-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
 
-// Function to get skills data from Firestore
-async function getSkills() {
+async function getSkills(supabase) {
   try {
-    const skillsCollection = collection(db, "skills");
-    const querySnapshot = await getDocs(skillsCollection);
-    const skills = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-    return skills;
+    const { data, error } = await supabase.from("skills").select(`
+        *,
+        profiles (
+          username,
+          first_name,
+          last_name
+        )
+      `);
+    if (error) {
+      throw error;
+    }
+    return data;
   } catch (error) {
     toast.error("Failed to get skills");
     console.error("Failed to get skills", error);
@@ -22,10 +28,11 @@ async function getSkills() {
 
 const Skills = () => {
   const [skills, setSkills] = useState([]);
+  const supabase = useSupabaseClient();
 
   useEffect(() => {
-    getSkills().then(setSkills);
-  }, [setSkills]);
+    getSkills(supabase).then(setSkills);
+  }, [setSkills, supabase]);
 
   return (
     <div className="px-2 pb-6">
@@ -39,7 +46,7 @@ const Skills = () => {
               className="group col-span-1 cursor-pointer divide-y divide-gray-200 rounded-lg border bg-white hover:shadow"
               key={skill.slug}
             >
-              <Link href={`/${skill.profiles?.username || 'unknown'}/${skill.slug}`}>
+              <Link href={`/${skill.profiles.username}/${skill.slug}`}>
                 <div className="flex h-full w-full flex-col p-5">
                   <div>
                     {skill.iconUrl && (

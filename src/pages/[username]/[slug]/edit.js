@@ -1,46 +1,23 @@
 import { EditSkillForm } from "../../../components/EditSkillForm";
 import Navbar from "../../../components/Navbar";
 import { isJson } from "../../../utils";
-import { initializeApp } from "firebase/app";
-import { getAuth, onAuthStateChanged } from "firebase/auth";
-import { getFirestore, collection, query, where, getDocs, updateDoc, doc } from "firebase/firestore";
+import { createPagesServerClient } from "@supabase/auth-helpers-nextjs"; // Updated import
+import { useSupabaseClient, useUser } from "@supabase/auth-helpers-react";
 import Head from "next/head";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { toast } from "react-hot-toast";
-
-const firebaseConfig = {
-  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
-  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
-  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
-  // Add other config options as needed
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-const auth = getAuth(app);
 
 export default function EditSkillPage({ skill }) {
   const [skillData, setSkillData] = useState(skill);
-  const [user, setUser] = useState(null);
+  const supabase = useSupabaseClient();
+  const user = useUser();
   const router = useRouter();
-
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser);
-    });
-    return () => unsubscribe();
-  }, []);
 
   async function handleSubmit(e) {
     e.preventDefault();
 
     try {
-      if (!user) {
-        toast.error("User not authenticated");
-        return;
-      }
-
       const updatedSkill = {
         title: skillData.title,
         slug: skillData.slug,
@@ -50,11 +27,17 @@ export default function EditSkillPage({ skill }) {
         inputs: isJson(skillData.inputs)
           ? skillData.inputs
           : JSON.parse(skillData.inputs),
-        user_id: user.uid,
+        user_id: user.id,
       };
 
-      const skillRef = doc(db, "skills", skillData.id);
-      await updateDoc(skillRef, updatedSkill);
+      const { error } = await supabase
+        .from("skills")
+        .update(updatedSkill)
+        .eq("id", skillData.id);
+
+      if (error) {
+        throw error;
+      }
 
       toast.success("Skill updated successfully");
       router.push(`/${skill.profiles.username}/${updatedSkill.slug}`);
@@ -94,36 +77,40 @@ export default function EditSkillPage({ skill }) {
 }
 
 export async function getServerSideProps(context) {
+  const supabase = createPagesServerClient(context); // Updated function
   const slug = context.params.slug;
   const username = context.params.username;
 
-  const skillsQuery = query(
-    collection(db, "skills"),
-    where("slug", "==", slug),
-    where("profiles.username", "==", username)
-  );
+  const { data: skills, error } = await supabase
+    .from("skills")
+    .select("*,profiles(username, first_name, last_name)")
+    .eq("slug", slug)
+    .eq("profiles.username", username)
+    .limit(1);
 
-  const skillsSnapshot = await getDocs(skillsQuery);
-  if (skillsSnapshot.empty) {
-    console.error("Failed to fetch skill for slug: " + slug);
+  if (error || !skills || skills.length == 0) {
+    console.error("Failed to fetch skill for slug: " + slug, error);
     return {
       notFound: true,
     };
   }
 
-  const skill = skillsSnapshot.docs[0].data();
-  skill.id = skillsSnapshot.docs[0].id; // Save the document ID for updating later
+  const skill = skills[0];
 
-  // Authenticate the user on the server side
-  const authUser = await new Promise((resolve) => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      unsubscribe();
-      resolve(currentUser);
-    });
-  });
+  const {
+    data: { user },
+    error: e2,
+  } = await supabase.auth.getUser();
 
-  if (!authUser || authUser.uid !== skill.user_id) {
-    console.error("User is not the author", "user.id", authUser?.uid, "skill.user_id", skill?.user_id);
+  if (e2 || user?.id != skill?.user_id) {
+    console.error(
+      "User is not the author",
+      e2,
+      "user.id",
+      user?.id,
+      "skill.user_id",
+      skill?.user_id
+    );
     return {
       notFound: true,
     };

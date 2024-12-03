@@ -1,36 +1,26 @@
 // @ts-nocheck
 
 require('dotenv').config();
+const { createClient } = require('@supabase/supabase-js');
 const axios = require('axios');
-const { initializeApp } = require("firebase/app");
-const { getFirestore, collection, getDocs, query: firestoreQuery, where } = require("firebase/firestore");
 
-// Firebase configuration setup
-const firebaseConfig = {
-  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
-  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
-  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+const supabaseClient = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
 
 export default async function handler(req, res) {
   try {
-    if (req.method === "OPTIONS") {
+    if(req.method === "OPTIONS") {
       res.status(200).end();
       return;
     }
 
-    const { query: userQuery } = req.body; // Rename `query` to `userQuery`
-    const input = userQuery.replace(/\n/g, ' ');
+    const { query } = req.body;
+    const input = query.replace(/\n/g, ' ');
 
-    // Requesting Embedding from OpenAI
     const embeddingResponse = await axios.post(
       'https://api.openai.com/v1/embeddings',
-      {
+      { 
         model: "text-embedding-ada-002",
-        input: input
+        input: input 
       },
       {
         headers: {
@@ -42,28 +32,30 @@ export default async function handler(req, res) {
 
     console.log('Embedding response:', embeddingResponse.data);
 
-    // Remove the embedding value since it's not being used
-    // const [{ embedding }] = embeddingResponse.data.data;
+    const [{ embedding }] = embeddingResponse.data.data;
 
-    // Firestore query to get documents (replace match_documents RPC function)
-    const documentsRef = collection(db, "documents");
-    const documentsQuery = firestoreQuery(documentsRef, where("match_threshold", ">=", 0.73));
-    const querySnapshot = await getDocs(documentsQuery);
+    const { data: documents, error} = await supabaseClient.rpc('match_documents', {
+      query_embedding: embedding,
+      match_threshold: .73,
+      match_count: 10
+    });
 
-    if (querySnapshot.empty) {
-      throw new Error('No matching documents found');
+    if(error) {
+      console.error('Supabase error:', error);
+      throw error;
     }
 
     let contextText = '';
 
-    querySnapshot.forEach((doc) => {
-      const content = doc.data().content;
+    for(let i = 0; i < documents.length; i++) {
+      const document = documents[i];
+      const content = document.content;
+
       contextText += `${content.trim()}---\n`;
-    });
+    }
 
-    const prompt = `${contextText}question: ${userQuery}`;
+    const prompt = `${contextText}question: ${query}`;
 
-    // Requesting completion from OpenAI
     const completionResponse = await axios.post(
       'https://api.openai.com/v1/completions',
       {
@@ -92,7 +84,7 @@ export default async function handler(req, res) {
 
     res.setHeader('Content-Type', 'application/json');
     res.status(200).json({ id, text: responseText.trim() });
-  } catch (err) {
+  } catch(err) {
     console.error('Unhandled error:', err);
     res.status(500).send({ message: err.message });
   }

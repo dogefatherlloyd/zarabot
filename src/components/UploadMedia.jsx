@@ -22,21 +22,8 @@ import {
 } from "@chakra-ui/react";
 import { FiImage } from "react-icons/fi";
 import { AiOutlineDelete } from "react-icons/ai";
+import supabaseClient from '@supabase/supabaseClient';
 import shortid from "shortid";
-import { initializeApp } from "firebase/app";
-import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from "firebase/storage";
-
-// Firebase Configuration
-const firebaseConfig = {
-  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
-  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
-  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
-  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
-};
-
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const storage = getStorage(app);
 
 export default function UploadMedia({ children, addMediaFile, bucket, tooltip }) {
   const [isClient, setIsClient] = React.useState(false);
@@ -48,11 +35,11 @@ export default function UploadMedia({ children, addMediaFile, bucket, tooltip })
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   React.useEffect(() => {
-    setIsClient(true); // Ensures the component only renders fully on the client side
+    setIsClient(true);  // Ensures the component only renders fully on the client side
   }, []);
 
   if (!isClient) {
-    return null; // Prevents rendering on the server side
+    return null;  // Prevents rendering on the server side
   }
 
   const handleOpenFile = () => {
@@ -62,15 +49,29 @@ export default function UploadMedia({ children, addMediaFile, bucket, tooltip })
   const handleFileChange = async (e) => {
     setUploading(true);
     try {
-      const mediaPath = `${bucket}/${shortid()}.jpg`;
+      const mediaPath = `public/${shortid()}.jpg`;
       setMediaPath(mediaPath);
       const file = e.target.files?.[0];
-      const storageRef = ref(storage, mediaPath);
-      await uploadBytes(storageRef, file);
-      const signedUrl = await getDownloadURL(storageRef);
-      setMediaUrl(signedUrl);
+      const { data: uploadData, error: uploadError } = await supabaseClient.storage
+        .from(bucket)
+        .upload(mediaPath, file);
+      if (uploadData) {
+        const { data: signedURL, error: signedUrlError } = await supabaseClient.storage
+          .from(bucket)
+          .createSignedUrl(mediaPath, 60 * 60 * 24 * 365);
+
+        if (signedUrlError) {
+          console.log(signedUrlError.message);
+        }
+        if (signedURL) {
+          setMediaUrl(signedURL.signedUrl);
+        }
+      }
+      if (uploadError) {
+        console.log(uploadError.message);
+      }
     } catch (error) {
-      console.error("Error uploading file:", error);
+      console.log(error);
     } finally {
       setUploading(false);
     }
@@ -80,13 +81,19 @@ export default function UploadMedia({ children, addMediaFile, bucket, tooltip })
     setDeleting(true);
     try {
       if (mediaPath) {
-        const storageRef = ref(storage, mediaPath);
-        await deleteObject(storageRef);
-        setMediaUrl("");
-        setMediaPath("");
+        const { data: removeData, error: removeError } = await supabaseClient.storage
+          .from(bucket)
+          .remove([mediaPath]);
+        if (removeError) {
+          console.log(removeError.message);
+        }
+        if (removeData) {
+          setMediaUrl("");
+          setMediaPath("");
+        }
       }
     } catch (error) {
-      console.error("Error removing media:", error);
+      console.log(error);
     } finally {
       setDeleting(false);
     }
